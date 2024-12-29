@@ -1,0 +1,35 @@
+{
+  "name": "solo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "tauri": "tauri",
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "create_db": "DATABASE_URL='sqlite://solo.db?mode=rwc' sea-orm-cli migrate up"
+  },
+  "dependencies": {
+    "@nuxt/icon": "1.10.3",
+    "@nuxtjs/tailwindcss": "6.12.2",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-log": "~2",
+    "@tauri-apps/plugin-opener": "^2",
+    "@tauri-apps/plugin-sql": "~2",
+    "date-fns": "^4.1.0",
+    "nuxt": "^3.14.1592",
+    "vue": "^3.5.13",
+    "vue-router": "latest"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "@types/node": "^22.10.2",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.3",
+    "vue-tsc": "^2.1.10"
+  }
+}
