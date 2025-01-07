@@ -15,6 +15,13 @@
             size="2em"
           />
         </div>
+        <div v-else-if="isResting()">
+          <Icon
+            name="fluent:drink-coffee-20-filled"
+            style="color: aqua"
+            size="2em"
+          />
+        </div>
         <div class="text-2xl">
           {{ isWorking() ? "勤務中" : isResting() ? "休憩中" : "未出勤" }}
         </div>

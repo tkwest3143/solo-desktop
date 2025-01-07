@@ -33,3 +33,9 @@ pub struct WorkTimeForUpdate {
   pub rest_end: Option<String>,
   pub memo: Option<String>,
 }
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct GetWorkTimeByMonthQuery {
+  pub user_id: i32,
+  pub target_month: String,
+}

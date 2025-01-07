@@ -1,9 +1,16 @@
 <template>
-  <Header />
   <main>
     <div v-if="users.length">
-      <h2>ユーザ情報選択</h2>
-      <div class="user-list">
+      <h1 class="text-2xl font-semibold">ユーザを選択してください</h1>
+      <div class="flex justify-end mt-4">
+        <NuxtLink
+          to="/addUser"
+          class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+        >
+          ユーザを追加する
+        </NuxtLink>
+      </div>
+      <div class="user-list mt-4">
         <NuxtLink
           v-for="user in users"
           :key="user.prop.id"
@@ -37,6 +44,8 @@ export default {
   },
   async mounted() {
     await this.loadUsers();
+
+    console.log(this.users);
   },
   methods: {
     async loadUsers() {

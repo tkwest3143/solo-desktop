@@ -91,12 +91,52 @@ pub mod user {
 }
 
 pub mod work_times {
-
   use crate::data::WorkTimeForUpdate;
   use crate::repositories::database::establish_connection;
   use crate::{data::WorkTimeForInsert, entities::work_times};
   use chrono::{Local, NaiveDateTime};
   use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, Set};
+
+  use serde::Serialize;
+  #[derive(Serialize)]
+  pub struct ResponseWorkTime {
+    pub id: i32,
+    pub target_day: String,
+    pub start: Option<String>,
+    pub end: Option<String>,
+    pub rest_start: Option<String>,
+    pub rest_end: Option<String>,
+    pub memo: Option<String>,
+    pub user_id: i32,
+    pub created_at: String,
+    pub updated_at: String,
+  }
+  #[tauri::command]
+  pub async fn get_work_time_by_month(user_id: &str, target_month: &str) -> Result<String, String> {
+    let db: sea_orm::DatabaseConnection = establish_connection().await.unwrap();
+    let work_times: Vec<work_times::Model> = work_times::Entity::find()
+      .filter(work_times::Column::UserId.eq(user_id))
+      .filter(work_times::Column::TargetDay.contains(target_month))
+      .all(&db)
+      .await
+      .unwrap();
+    let mut response_work_times: Vec<ResponseWorkTime> = vec![];
+    for work_time in work_times {
+      response_work_times.push(ResponseWorkTime {
+        id: work_time.id,
+        target_day: work_time.target_day.to_string(),
+        start: work_time.start.map(|x| x.to_string()),
+        end: work_time.end.map(|x| x.to_string()),
+        rest_start: work_time.rest_start.map(|x| x.to_string()),
+        rest_end: work_time.rest_end.map(|x| x.to_string()),
+        memo: work_time.memo,
+        user_id: work_time.user_id,
+        created_at: work_time.created_at.to_string(),
+        updated_at: work_time.updated_at.to_string(),
+      });
+    }
+    Ok(serde_json::to_string(&response_work_times).unwrap())
+  }
   #[tauri::command]
   pub async fn create_work_time(work_time: &str) -> Result<String, String> {
     let json_to: WorkTimeForInsert = serde_json::from_str(work_time).unwrap();

@@ -3,13 +3,25 @@
     <nav>
       <ul>
         <li>
-          <NuxtLink to="/">ホーム</NuxtLink>
+          <NuxtLink :to="{ name: 'id', params: { id: userId } }"
+            >ホーム</NuxtLink
+          >
         </li>
         <li>
-          <NuxtLink to="/add-user">ユーザ追加</NuxtLink>
+          <NuxtLink :to="{ name: 'id-workTimeList', params: { id: userId } }"
+            >勤怠一覧</NuxtLink
+          >
         </li>
         <li>
           <button @click="goBack">戻る</button>
+        </li>
+        <li>
+          <NuxtLink :to="{ name: 'id-settings', params: { id: userId } }"
+            ><Icon
+              name="fluent:settings-20-filled"
+              style="color: slategray"
+              size="2em"
+          /></NuxtLink>
         </li>
       </ul>
     </nav>
@@ -17,9 +29,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
 export default defineComponent({
+  setup() {
+    const route = useRoute();
+    const userId = ref(route.params.id as string);
+
+    return {
+      userId,
+    };
+  },
   methods: {
     goBack() {
       this.$router.back();

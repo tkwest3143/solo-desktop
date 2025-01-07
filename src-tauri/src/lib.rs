@@ -4,7 +4,7 @@ pub mod repositories;
 mod tauri_command;
 use tauri_command::{
   user::{create_user, get_all_users, get_user_by_id, update_user},
-  work_times::{create_work_time, update_work_time},
+  work_times::{create_work_time, get_work_time_by_month, update_work_time},
 };
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -15,6 +15,7 @@ pub fn run() {
       get_user_by_id,
       create_user,
       update_user,
+      get_work_time_by_month,
       create_work_time,
       update_work_time
     ])
