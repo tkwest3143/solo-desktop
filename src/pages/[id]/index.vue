@@ -198,6 +198,7 @@ export default defineComponent({
       this.working = Working.working;
       await WorkTimeRepository.create({
         userId: this.user!.prop.id,
+        targetDay: formatDate(new Date(), "yyyy-MM-dd"),
         start: new Date(),
       });
     },

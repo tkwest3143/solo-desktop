@@ -21,7 +21,7 @@
         </NuxtLink>
         <NuxtLink
           :to="{
-            name: 'id-settings-userSetting',
+            name: 'id-settings-workSetting',
             params: { id: user?.prop.id },
           }"
           class="w-full py-2 px-4 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600"

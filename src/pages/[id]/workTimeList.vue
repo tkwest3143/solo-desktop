@@ -12,24 +12,74 @@
         <div class="flex space-x-2">
           <button
             @click="previousMonth"
-            class="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600"
+            class="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600 flex items-center"
           >
+            <Icon
+              name="material-symbols:arrow-back-ios"
+              style="color: white"
+              size="1em"
+              class="mr-2"
+            />
             前の月
           </button>
           <button
             @click="nextMonth"
-            class="px-4 py-2 bg-rose-500 text-white rounded hover:bg-rose-600"
+            class="px-4 py-2 bg-rose-500 text-white rounded hover:bg-rose-600 flex items-center"
           >
             次の月
+            <Icon
+              name="material-symbols:arrow-forward-ios"
+              style="color: white"
+              size="1em"
+              class="ml-2"
+            />
           </button>
         </div>
       </div>
-      <div class="flex justify-end mb-4">
+      <div class="mb-4">
+        <label
+          for="workSetting"
+          class="block text-sm font-medium text-gray-700"
+        >
+          勤務設定
+        </label>
+        <select
+          id="workSetting"
+          v-model="selectedWorkSetting"
+          class="mt-1 block px-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        >
+          <option
+            v-for="setting in workSettings"
+            :key="setting.prop.id"
+            :value="setting"
+          >
+            {{ setting.prop.title }}
+          </option>
+        </select>
+        <div class="mb-4 divide-x divide-solid space-x-1">
+          <label class="text-gray-700 text-sm font-bold">
+            開始時間：{{ selectedWorkSetting?.startByText }}
+          </label>
+          <label class="text-gray-700 text-sm font-bold">
+            終了時間：{{ selectedWorkSetting?.endByText }}
+          </label>
+          <label class="text-gray-700 text-sm font-bold">
+            休憩開始時間：{{ selectedWorkSetting?.restStartByText }}
+          </label>
+          <label class="text-gray-700 text-sm font-bold">
+            休憩終了時間：{{ selectedWorkSetting?.restEndByText }}
+          </label>
+          <label class="text-gray-700 text-sm font-bold">
+            勤務時間単位：{{ selectedWorkSetting?.prop.working_unit }}分
+          </label>
+        </div>
+      </div>
+      <div class="flex justify-end mb-2">
         <div class="flex items-center space-x-2">
-          <span class="text-lg font-semibold text-gray-700"
+          <span class="text-md font-semibold text-gray-700"
             >今月の勤務時間:</span
           >
-          <span class="text-lg font-semibold text-gray-900">
+          <span class="text-md font-semibold text-gray-900">
             {{ totalWorkTime() }}
           </span>
         </div>
@@ -39,9 +89,19 @@
           <tr>
             <th
               scope="col"
+              class="w-1/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+            ></th>
+            <th
+              scope="col"
               class="w-2/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
             >
               日付
+            </th>
+            <th
+              scope="col"
+              class="w-1/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+            >
+              稼働状況
             </th>
             <th
               scope="col"
@@ -99,7 +159,31 @@
             <td
               class="py-2 text-center text-sm text-gray-900 border border-slate-300"
             >
+              <button
+                @click="setDefaultWorkTime(workTime)"
+                class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs"
+              >
+                デフォルト
+              </button>
+            </td>
+            <td
+              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+            >
               {{ workTime.prop.target_day }}
+            </td>
+            <td
+              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+            >
+              <div
+                v-if="
+                  workTimes.some(
+                    (wt) => wt.prop.target_day === workTime.prop.target_day
+                  )
+                "
+              >
+                稼働
+              </div>
+              <div v-else>非稼働</div>
             </td>
             <td
               @dblclick="editWorkTime(workTime)"
@@ -256,14 +340,17 @@
 </template>
 
 <script lang="ts">
+import { format } from "date-fns";
 import { defineComponent } from "vue";
 import Header from "~/components/Header.vue";
 import Loading from "~/components/Loading.vue";
 import { MonthForWork } from "~/models/monthForWork";
 import { UserData } from "~/models/user";
+import { workSettingData } from "~/models/workSetting";
 import { workTimeData } from "~/models/workTime";
 import { UserRepository } from "~/repositories/tauri-commands/user";
 import { WorkTimeRepository } from "~/repositories/tauri-commands/workTime";
+import { WorkSettingRepository } from "~/repositories/tauri-commands/workTimeSetting";
 
 export default defineComponent({
   components: {
@@ -278,6 +365,8 @@ export default defineComponent({
       workTimes: [] as workTimeData[],
       editingWorkTime: null as workTimeData | null,
       changedWorkTimes: [] as workTimeData[],
+      workSettings: [] as workSettingData[],
+      selectedWorkSetting: null as workSettingData | null,
     };
   },
   async mounted() {
@@ -287,15 +376,17 @@ export default defineComponent({
     async init() {
       const userId = this.$route.params.id as string;
       this.user = new UserData(await UserRepository.getById(parseInt(userId)));
-      await WorkTimeRepository.getWorkTimeByMonth(
+      const workTimeRes = await WorkTimeRepository.getWorkTimeByMonth(
         userId,
         this.selectedMonth.byText
-      )
-        .then((val) => {
-          this.workTimes = val.map((wt) => new workTimeData(wt));
-          this.selectedMonth = new MonthForWork(new Date(), this.workTimes);
-        })
-        .finally(() => (this.isLoading = false));
+      );
+      this.workTimes = workTimeRes.map((wt) => new workTimeData(wt));
+      this.selectedMonth = new MonthForWork(new Date(), this.workTimes);
+      const workSettingRes = await WorkSettingRepository.getByUserId(
+        parseInt(userId)
+      );
+      this.workSettings = workSettingRes.map((ws) => new workSettingData(ws));
+      this.isLoading = false;
     },
     getWorkTime(date: string): workTimeData | undefined {
       const workTime = this.workTimes.find(
@@ -427,7 +518,6 @@ export default defineComponent({
           });
         } else {
           WorkTimeRepository.update({
-            id: workTime.prop.id,
             start: workTime.prop.start,
             end: workTime.prop.end,
             restStart: workTime.prop.rest_start,
@@ -441,12 +531,21 @@ export default defineComponent({
       this.changedWorkTimes = [];
       this.editingWorkTime = null;
       await this.init();
-      console.log("saved", this.selectedMonth);
     },
     async resetChanges() {
       this.changedWorkTimes = [];
       this.editingWorkTime = null;
       await this.init();
+    },
+    setDefaultWorkTime(workTime: workTimeData) {
+      if (!this.selectedWorkSetting) return;
+      this.changeWorkTime(workTime, {
+        start: format(this.selectedWorkSetting.prop.start, "HH:mm"),
+        end: format(this.selectedWorkSetting.prop.end, "HH:mm"),
+        restStart: format(this.selectedWorkSetting.prop.rest_start, "HH:mm"),
+        restEnd: format(this.selectedWorkSetting.prop.rest_end, "HH:mm"),
+        memo: this.selectedWorkSetting.prop.memo,
+      });
     },
   },
 });

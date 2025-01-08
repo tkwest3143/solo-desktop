@@ -39,3 +39,30 @@ pub struct GetWorkTimeByMonthQuery {
   pub user_id: i32,
   pub target_month: String,
 }
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct WorkTimeSettingForInsert {
+  pub title: String,
+  pub start: String,
+  pub end: String,
+  pub rest_start: String,
+  pub rest_end: String,
+  pub working_unit: i32,
+  pub memo: Option<String>,
+  pub user_id: i32,
+  pub is_default: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct WorkTimeSettingForUpdate {
+  pub id: i32,
+  pub title: Option<String>,
+  pub start: Option<String>,
+  pub end: Option<String>,
+  pub rest_start: Option<String>,
+  pub rest_end: Option<String>,
+  pub working_unit: Option<i32>,
+  pub memo: Option<String>,
+  pub user_id: i32,
+  pub is_default: bool,
+}

@@ -199,3 +199,113 @@ pub mod work_times {
     Ok("update_work_time finish".to_string())
   }
 }
+
+pub mod work_time_settings {
+  use crate::data::{WorkTimeSettingForInsert, WorkTimeSettingForUpdate};
+  use crate::entities::work_settings;
+  use crate::repositories::database::establish_connection;
+  use chrono::{Local, NaiveDateTime};
+  use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, Set};
+
+  use serde::Serialize;
+  #[derive(Serialize)]
+  pub struct ResponseWorkTimeSetting {
+    pub id: i32,
+    pub title: String,
+    pub start: String,
+    pub end: String,
+    pub rest_start: String,
+    pub rest_end: String,
+    pub memo: Option<String>,
+    pub working_unit: i32,
+    pub user_id: i32,
+    pub created_at: String,
+    pub updated_at: String,
+  }
+  #[tauri::command]
+  pub async fn get_work_setting_by_user_id(user_id: i32) -> Result<String, String> {
+    let db: sea_orm::DatabaseConnection = establish_connection().await.unwrap();
+    let work_time_settings: Vec<work_settings::Model> = work_settings::Entity::find().filter(work_settings::Column::UserId.eq(user_id)).all(&db).await.unwrap();
+    let mut response_work_time_settings: Vec<ResponseWorkTimeSetting> = vec![];
+    for work_time_setting in work_time_settings {
+      response_work_time_settings.push(ResponseWorkTimeSetting {
+        id: work_time_setting.id,
+        title: work_time_setting.title,
+        start: work_time_setting.start.to_string(),
+        end: work_time_setting.end.to_string(),
+        rest_start: work_time_setting.rest_start.to_string(),
+        rest_end: work_time_setting.rest_end.to_string(),
+        working_unit: work_time_setting.working_unit,
+        memo: work_time_setting.memo,
+        user_id: work_time_setting.user_id,
+        created_at: work_time_setting.created_at.to_string(),
+        updated_at: work_time_setting.updated_at.to_string(),
+      });
+    }
+    Ok(serde_json::to_string(&response_work_time_settings).unwrap())
+  }
+  #[tauri::command]
+  pub async fn create_work_time_setting(body: &str) -> Result<String, String> {
+    let json_to: WorkTimeSettingForInsert = serde_json::from_str(body).unwrap();
+    let db = establish_connection().await.unwrap();
+    let data = work_settings::ActiveModel {
+      user_id: Set(json_to.user_id),
+      title: Set(json_to.title.to_owned()),
+      start: Set(NaiveDateTime::parse_from_str(&json_to.start, "%Y-%m-%d %H:%M:%S").unwrap()),
+      end: Set(NaiveDateTime::parse_from_str(&json_to.end, "%Y-%m-%d %H:%M:%S").unwrap()),
+      rest_start: Set(NaiveDateTime::parse_from_str(&json_to.rest_start, "%Y-%m-%d %H:%M:%S").unwrap()),
+      rest_end: Set(NaiveDateTime::parse_from_str(&json_to.rest_end, "%Y-%m-%d %H:%M:%S").unwrap()),
+      working_unit: Set(json_to.working_unit),
+      memo: Set(json_to.memo),
+      created_at: Set(Local::now().naive_local()),
+      updated_at: Set(Local::now().naive_local()),
+      ..Default::default()
+    };
+    let result = work_settings::Entity::insert(data).exec(&db).await.unwrap();
+    if json_to.is_default {
+      let user = crate::entities::users::Entity::find_by_id(json_to.user_id).one(&db).await.unwrap().unwrap();
+      let mut user: crate::entities::users::ActiveModel = user.into();
+      user.default_work_setting_id = Set(Some(result.last_insert_id));
+      crate::entities::users::Entity::update(user).exec(&db).await.unwrap();
+    }
+    Ok("create_work_settings finish".to_string())
+  }
+  #[tauri::command]
+  pub async fn update_work_time_setting(body: &str) -> Result<String, String> {
+    let json_to: WorkTimeSettingForUpdate = serde_json::from_str(body).unwrap();
+    let db = establish_connection().await.unwrap();
+
+    let data = work_settings::Entity::find_by_id(json_to.id).one(&db).await.unwrap();
+    let mut data: work_settings::ActiveModel = data.unwrap().into();
+    if json_to.title.is_some() {
+      data.title = Set(json_to.title.unwrap());
+    }
+    if json_to.start.is_some() {
+      data.start = Set(NaiveDateTime::parse_from_str(&json_to.start.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap());
+    }
+    if json_to.end.is_some() {
+      data.end = Set(NaiveDateTime::parse_from_str(&json_to.end.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap());
+    }
+    if json_to.rest_start.is_some() {
+      data.rest_start = Set(NaiveDateTime::parse_from_str(&json_to.rest_start.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap());
+    }
+    if json_to.rest_end.is_some() {
+      data.rest_end = Set(NaiveDateTime::parse_from_str(&json_to.rest_end.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap());
+    }
+    if json_to.working_unit.is_some() {
+      data.working_unit = Set(json_to.working_unit.unwrap());
+    }
+    if json_to.memo.is_some() {
+      data.memo = Set(Some(json_to.memo.unwrap()));
+    }
+    data.updated_at = Set(Local::now().naive_local());
+    work_settings::Entity::update(data).exec(&db).await.unwrap();
+    if json_to.is_default {
+      let user = crate::entities::users::Entity::find_by_id(json_to.user_id).one(&db).await.unwrap().unwrap();
+      let mut user: crate::entities::users::ActiveModel = user.into();
+      user.default_work_setting_id = Set(Some(json_to.id));
+      crate::entities::users::Entity::update(user).exec(&db).await.unwrap();
+    }
+    Ok("update_work_time finish".to_string())
+  }
+}

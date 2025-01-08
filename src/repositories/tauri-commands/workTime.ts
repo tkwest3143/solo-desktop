@@ -45,7 +45,6 @@ export class WorkTimeRepository {
     console.log(res);
   }
   static async update(record: {
-    id: number;
     userId: number;
     targetDay: string;
     start?: Date;
