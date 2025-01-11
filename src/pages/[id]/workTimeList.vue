@@ -1,7 +1,6 @@
 <template>
   <Loading v-if="isLoading" />
   <div v-else>
-    <Header />
     <div class="overflow-x-auto m-2 mb-20">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold text-gray-700">
@@ -37,40 +36,41 @@
         </div>
       </div>
       <div class="mb-4">
-        <label
-          for="workSetting"
-          class="block text-sm font-medium text-gray-700"
-        >
-          勤務設定
-        </label>
-        <select
-          id="workSetting"
-          v-model="selectedWorkSetting"
-          class="mt-1 block px-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-        >
-          <option
-            v-for="setting in workSettings"
-            :key="setting.prop.id"
-            :value="setting"
+        <div class="flex items-center space-x-2">
+          <CommonSelect
+            class="w-1/3"
+            id="workSetting"
+            label="勤務設定"
+            v-model="selectedWorkSettingId"
+            :options="
+              workSettings.map((setting) => ({
+                value: setting.prop.id,
+                text: setting.prop.title,
+              }))
+            "
+          />
+          <button
+            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           >
-            {{ setting.prop.title }}
-          </option>
-        </select>
+            設定を編集する
+          </button>
+        </div>
+
         <div class="mb-4 divide-x divide-solid space-x-1">
           <label class="text-gray-700 text-sm font-bold">
-            開始時間：{{ selectedWorkSetting?.startByText }}
+            開始時間：{{ getSelectedWorkSetting()?.startByText }}
           </label>
           <label class="text-gray-700 text-sm font-bold">
-            終了時間：{{ selectedWorkSetting?.endByText }}
+            終了時間：{{ getSelectedWorkSetting()?.endByText }}
           </label>
           <label class="text-gray-700 text-sm font-bold">
-            休憩開始時間：{{ selectedWorkSetting?.restStartByText }}
+            休憩開始時間：{{ getSelectedWorkSetting()?.restStartByText }}
           </label>
           <label class="text-gray-700 text-sm font-bold">
-            休憩終了時間：{{ selectedWorkSetting?.restEndByText }}
+            休憩終了時間：{{ getSelectedWorkSetting()?.restEndByText }}
           </label>
           <label class="text-gray-700 text-sm font-bold">
-            勤務時間単位：{{ selectedWorkSetting?.prop.working_unit }}分
+            勤務時間単位：{{ getSelectedWorkSetting()?.prop.working_unit }}分
           </label>
         </div>
       </div>
@@ -169,7 +169,7 @@
             <td
               class="py-2 text-center text-sm text-gray-900 border border-slate-300"
             >
-              {{ workTime.prop.target_day }}
+              {{ workTime.getDayTextWithWeek(japaneseHolidays) }}
             </td>
             <td
               class="py-2 text-center text-sm text-gray-900 border border-slate-300"
@@ -342,20 +342,22 @@
 <script lang="ts">
 import { format } from "date-fns";
 import { defineComponent } from "vue";
-import Header from "~/components/Header.vue";
+import CommonSelect from "~/components/CommonSelect.vue";
 import Loading from "~/components/Loading.vue";
+import { JapaneseHolidayData } from "~/models/japaneseHoliday";
 import { MonthForWork } from "~/models/monthForWork";
 import { UserData } from "~/models/user";
 import { workSettingData } from "~/models/workSetting";
 import { workTimeData } from "~/models/workTime";
+import { JapaneseHolidayRepository } from "~/repositories/tauri-commands/japaneseHoliday";
 import { UserRepository } from "~/repositories/tauri-commands/user";
 import { WorkTimeRepository } from "~/repositories/tauri-commands/workTime";
 import { WorkSettingRepository } from "~/repositories/tauri-commands/workTimeSetting";
 
 export default defineComponent({
   components: {
-    Header,
     Loading,
+    CommonSelect,
   },
   data() {
     return {
@@ -366,7 +368,8 @@ export default defineComponent({
       editingWorkTime: null as workTimeData | null,
       changedWorkTimes: [] as workTimeData[],
       workSettings: [] as workSettingData[],
-      selectedWorkSetting: null as workSettingData | null,
+      selectedWorkSettingId: 0,
+      japaneseHolidays: [] as JapaneseHolidayData[],
     };
   },
   async mounted() {
@@ -386,6 +389,23 @@ export default defineComponent({
         parseInt(userId)
       );
       this.workSettings = workSettingRes.map((ws) => new workSettingData(ws));
+      if (this.user.prop.default_work_setting_id) {
+        this.selectedWorkSettingId = this.user.prop.default_work_setting_id;
+      }
+      const holiday = await JapaneseHolidayRepository.get(
+        new Date().getFullYear().toString()
+      );
+      if (holiday.length === 0) {
+        await JapaneseHolidayRepository.import();
+        const importHoliday = await JapaneseHolidayRepository.get(
+          new Date().getFullYear().toString()
+        );
+        this.japaneseHolidays = importHoliday.map(
+          (h) => new JapaneseHolidayData(h)
+        );
+      } else {
+        this.japaneseHolidays = holiday.map((h) => new JapaneseHolidayData(h));
+      }
       this.isLoading = false;
     },
     getWorkTime(date: string): workTimeData | undefined {
@@ -537,14 +557,20 @@ export default defineComponent({
       this.editingWorkTime = null;
       await this.init();
     },
+    getSelectedWorkSetting() {
+      return this.workSettings.find(
+        (ws) => ws.prop.id === this.selectedWorkSettingId
+      );
+    },
     setDefaultWorkTime(workTime: workTimeData) {
-      if (!this.selectedWorkSetting) return;
+      const workSetting = this.getSelectedWorkSetting();
+      if (!workSetting) return;
       this.changeWorkTime(workTime, {
-        start: format(this.selectedWorkSetting.prop.start, "HH:mm"),
-        end: format(this.selectedWorkSetting.prop.end, "HH:mm"),
-        restStart: format(this.selectedWorkSetting.prop.rest_start, "HH:mm"),
-        restEnd: format(this.selectedWorkSetting.prop.rest_end, "HH:mm"),
-        memo: this.selectedWorkSetting.prop.memo,
+        start: format(workSetting.prop.start, "HH:mm"),
+        end: format(workSetting.prop.end, "HH:mm"),
+        restStart: format(workSetting.prop.rest_start, "HH:mm"),
+        restEnd: format(workSetting.prop.rest_end, "HH:mm"),
+        memo: workSetting.prop.memo,
       });
     },
   },

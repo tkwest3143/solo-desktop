@@ -4,7 +4,7 @@ dev:
 	yarn tauri dev
 
 gen-entity: 
-	sea-orm-cli generate entity -u ${DATABASE_URL} -o src/entities
+	source .env && cd ./src-tauri && sea-orm-cli generate entity -u ${DATABASE_URL} -o src/entities && cd ../../
 
 migrate: 
 	@echo "Running step 1"

@@ -1,7 +1,6 @@
 <template>
   <Loading v-if="isLoading" />
   <div v-else>
-    <Header />
     <div class="text-center text-4xl mt-5">{{ user?.prop.name }} さん</div>
     <div class="w-full mt-4 grid justify-items-center">
       <div class="flex">
@@ -149,7 +148,6 @@ button .nuxt-icon {
 import { formatDate } from "date-fns";
 import { defineComponent } from "vue";
 import { useRoute } from "vue-router";
-import Header from "~/components/Header.vue";
 import Loading from "~/components/Loading.vue";
 import { UserData } from "~/models/user";
 import { UserRepository } from "~/repositories/tauri-commands/user";
@@ -162,7 +160,6 @@ enum Working {
 }
 export default defineComponent({
   components: {
-    Header,
     Loading,
   },
   data() {

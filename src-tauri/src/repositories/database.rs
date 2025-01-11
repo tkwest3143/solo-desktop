@@ -5,7 +5,6 @@ pub async fn establish_connection() -> Result<DbConn, DbErr> {
   // アプリのディレクトリ内にデータベースを作成
   let db_path = get_data_directory();
   let db_url = format!("sqlite://{}", db_path + "/solo.db");
-  println!("データベースのパス: {}", db_url);
 
   // データベースに接続
   let db = Database::connect(&db_url).await?;

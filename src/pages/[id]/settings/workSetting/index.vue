@@ -35,16 +35,12 @@
 </template>
 
 <script lang="ts">
-import Header from "~/components/Header.vue";
 import { UserData } from "~/models/user";
 import { workSettingData, type workSetting } from "~/models/workSetting";
 import { UserRepository } from "~/repositories/tauri-commands/user";
 import { WorkSettingRepository } from "~/repositories/tauri-commands/workTimeSetting";
 
 export default {
-  components: {
-    Header,
-  },
   data() {
     return {
       user: undefined as UserData | undefined,

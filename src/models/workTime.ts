@@ -1,7 +1,26 @@
 import { differenceInMinutes, format } from "date-fns";
+import type { JapaneseHolidayData } from "./japaneseHoliday";
 
 export class workTimeData {
   constructor(public prop: workTime) {}
+  getDayTextWithWeek(holidays: JapaneseHolidayData[]) {
+    const date = new Date(this.prop.target_day);
+    const day = date.getDay();
+    const dayText = ["日", "月", "火", "水", "木", "金", "土"][day];
+    console.log(holidays, date);
+    const holiday = holidays.find((d) => {
+      console.log(
+        typeof d.prop.day,
+        typeof this.prop.start,
+        format(d.prop.day, "HH:mm")
+      );
+      return d.isDay(date);
+    });
+    if (holiday) {
+      return `${format(date, "yyyy/M/d")}(${dayText}・祝)`;
+    }
+    return `${format(date, "yyyy/M/d")}(${dayText})`;
+  }
   get startByText() {
     if (this.prop.start) {
       return format(this.prop.start, "HH:mm");

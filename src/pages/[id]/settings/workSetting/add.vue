@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Header />
     <div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-6">
       <h2 class="text-2xl font-bold mb-4">勤務設定を追加</h2>
       <form @submit.prevent="submitForm">
@@ -140,16 +139,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { useRoute } from "vue-router";
-import Header from "~/components/Header.vue";
 import { UserData } from "~/models/user";
 import { workSettingData } from "~/models/workSetting";
 import { UserRepository } from "~/repositories/tauri-commands/user";
 import { WorkSettingRepository } from "~/repositories/tauri-commands/workTimeSetting";
 
 export default defineComponent({
-  components: {
-    Header,
-  },
   data() {
     return {
       user: undefined as UserData | undefined,

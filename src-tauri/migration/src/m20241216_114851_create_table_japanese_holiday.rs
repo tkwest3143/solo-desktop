@@ -11,7 +11,7 @@ impl MigrationTrait for Migration {
           .table(JapaneseHoliday::Table)
           .if_not_exists()
           .col(pk_auto(JapaneseHoliday::Id))
-          .col(string(JapaneseHoliday::Day).not_null())
+          .col(date_time(JapaneseHoliday::Day).not_null())
           .col(string(JapaneseHoliday::Subject).not_null())
           .to_owned(),
       )

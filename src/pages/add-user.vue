@@ -2,26 +2,26 @@
   <div class="add-user-container">
     <h1>ユーザ追加</h1>
     <form @submit.prevent="addUser" class="add-user-form">
-      <div class="form-group">
-        <label for="name">名前:</label>
-        <input type="text" v-model="name" id="name" required />
-      </div>
-      <div class="form-group">
-        <label for="email">メール:</label>
-        <input type="email" v-model="email" id="email" required />
-      </div>
+      <CommonInput id="name" label="名前" v-model="name" required />
+      <CommonInput
+        id="email"
+        label="メール"
+        type="email"
+        v-model="email"
+        required
+      />
       <button type="submit" class="submit-button">追加</button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
-import Header from "~/components/Header.vue";
+import CommonInput from "~/components/CommonInput.vue";
 import { UserRepository } from "~/repositories/tauri-commands/user";
 
 export default {
   components: {
-    Header,
+    CommonInput,
   },
   data() {
     return {

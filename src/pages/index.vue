@@ -22,21 +22,33 @@
         </NuxtLink>
       </div>
     </div>
-    <div v-else>
-      <p>ユーザ情報がありません。</p>
+    <div
+      v-else
+      class="flex items-center justify-center h-[40rem] w-full flex-col"
+    >
+      <div class="w-full mb-6 font-bold text-gray-500 text-xl">
+        ユーザ情報が未登録です。
+      </div>
+      <div class="w-full mb-6 font-bold text-gray-500 text-xl">
+        ユーザを追加するボタンからユーザを追加してください。
+      </div>
+      <div class="w-full">
+        <NuxtLink
+          to="/addUser"
+          class="bg-indigo-500 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded shadow hover:shadow-lg text-xl"
+        >
+          ユーザを追加する
+        </NuxtLink>
+      </div>
     </div>
   </main>
 </template>
 
 <script lang="ts">
-import Header from "~/components/Header.vue";
 import { UserData, type user } from "~/models/user";
 import { UserRepository } from "~/repositories/tauri-commands/user";
 
 export default {
-  components: {
-    Header,
-  },
   data() {
     return {
       users: [] as UserData[],
@@ -57,18 +69,6 @@ export default {
 </script>
 
 <style scoped>
-body {
-  font-family: "Arial", sans-serif;
-  background-color: #f4f4f9;
-  margin: 0;
-  padding: 0;
-}
-
-header {
-  background-color: #343a40;
-  padding: 10px 0;
-}
-
 nav ul {
   display: flex;
   list-style: none;

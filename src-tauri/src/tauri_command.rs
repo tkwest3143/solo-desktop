@@ -309,3 +309,56 @@ pub mod work_time_settings {
     Ok("update_work_time finish".to_string())
   }
 }
+
+pub mod japanese_holiday {
+
+  use crate::entities::japanese_holiday;
+  use crate::helper::import_csv::read_csv_to_2d_array;
+  use crate::repositories::database::establish_connection;
+  use chrono::{NaiveDate, NaiveDateTime};
+  use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, Set};
+  use serde::Serialize;
+  #[derive(Serialize)]
+  pub struct ResponseJapaneseHoliday {
+    pub id: i32,
+    pub day: String,
+    pub subject: String,
+  }
+  #[tauri::command]
+  pub async fn get_all_japanese_holidays(start_year: &str) -> Result<String, String> {
+    let start = NaiveDate::parse_from_str(&format!("{}-01-01", start_year), "%Y-%m-%d").unwrap();
+    let db = establish_connection().await.unwrap();
+    let holidays = japanese_holiday::Entity::find().filter(japanese_holiday::Column::Day.gt(start)).all(&db).await.unwrap();
+    let mut response_holidays: Vec<ResponseJapaneseHoliday> = vec![];
+    for holiday in holidays {
+      response_holidays.push(ResponseJapaneseHoliday {
+        id: holiday.id,
+        day: holiday.day.to_string(),
+        subject: holiday.subject.to_string(),
+      });
+    }
+    Ok(serde_json::to_string(&response_holidays).unwrap())
+  }
+  #[tauri::command]
+  pub async fn import_japanese_holiday() -> Result<String, String> {
+    let data = read_csv_to_2d_array("https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv").await.unwrap();
+    let mut holidays: Vec<japanese_holiday::ActiveModel> = vec![];
+    for result in data {
+      let date = NaiveDateTime::parse_from_str(&format!("{} 00:00:00", result[0]), "%Y/%m/%d %H:%M:%S");
+      let name = result[1].to_string();
+      if date.is_err() {
+        log::error!("date parse error : date:{:?} subject: {name}", date);
+        continue;
+      }
+      holidays.push(japanese_holiday::ActiveModel {
+        day: Set(date.unwrap()),
+        subject: Set(name),
+        ..Default::default()
+      });
+    }
+    let db = establish_connection().await.unwrap();
+    japanese_holiday::Entity::delete_many().exec(&db).await.unwrap();
+    japanese_holiday::Entity::insert_many(holidays).exec(&db).await.unwrap();
+    Ok("create_japanese_holiday finish".to_string())
+  }
+}

@@ -1,5 +1,4 @@
 import { invoke } from "@tauri-apps/api/core";
-import { info } from "@tauri-apps/plugin-log";
 import { getDateTextForDB } from "~/functions/date";
 import type { workTime } from "~/models/workTime";
 
@@ -9,9 +8,7 @@ export class WorkTimeRepository {
       userId,
       targetMonth,
     });
-    const data = JSON.parse(res as string) as workTime[];
-    info(res.toString());
-    return data;
+    return JSON.parse(res as string) as workTime[];
   }
   static async create(record: {
     userId: number;

@@ -1,22 +1,27 @@
 <template>
-  <header>
+  <header class="h-16">
     <nav>
       <ul>
         <li>
-          <NuxtLink :to="{ name: 'id', params: { id: userId } }"
+          <NuxtLink to="/">ユーザ一覧</NuxtLink>
+        </li>
+        <li v-if="userData">
+          <NuxtLink :to="{ name: 'id', params: { id: userData.prop.id } }"
             >ホーム</NuxtLink
           >
         </li>
-        <li>
-          <NuxtLink :to="{ name: 'id-workTimeList', params: { id: userId } }"
+        <li v-if="userData">
+          <NuxtLink
+            :to="{ name: 'id-workTimeList', params: { id: userData.prop.id } }"
             >勤怠一覧</NuxtLink
           >
         </li>
-        <li>
+        <li v-if="userData">
           <button @click="goBack">戻る</button>
         </li>
-        <li>
-          <NuxtLink :to="{ name: 'id-settings', params: { id: userId } }"
+        <li v-if="userData">
+          <NuxtLink
+            :to="{ name: 'id-settings', params: { id: userData.prop.id } }"
             ><Icon
               name="fluent:settings-20-filled"
               style="color: slategray"
@@ -30,15 +35,14 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { UserData } from "~/models/user";
 
 export default defineComponent({
-  setup() {
-    const route = useRoute();
-    const userId = ref(route.params.id as string);
-
-    return {
-      userId,
-    };
+  props: {
+    userData: {
+      type: Object as () => UserData,
+      required: false,
+    },
   },
   methods: {
     goBack() {
@@ -54,12 +58,16 @@ header {
   padding: 10px 0;
 }
 
+nav {
+  display: flex;
+  justify-content: center;
+}
+
 nav ul {
   display: flex;
   list-style: none;
   padding: 0;
   margin: 0;
-  justify-content: center;
 }
 
 nav ul li {

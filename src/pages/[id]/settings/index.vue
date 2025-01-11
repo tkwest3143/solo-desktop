@@ -1,7 +1,6 @@
 <template>
   <Loading v-if="isLoading" />
   <div v-else>
-    <Header />
     <div class="text-center text-2xl mt-5">
       {{ user?.prop.name ?? "" }} さん
     </div>
@@ -45,14 +44,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { useRoute } from "vue-router";
-import Header from "~/components/Header.vue";
 import Loading from "~/components/Loading.vue";
 import { UserData } from "~/models/user";
 import { UserRepository } from "~/repositories/tauri-commands/user";
 
 export default defineComponent({
   components: {
-    Header,
     Loading,
   },
   data() {

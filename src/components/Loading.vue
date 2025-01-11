@@ -1,16 +1,31 @@
 <template>
-  <div class="loading-container">
+  <div
+    class="loading-container flex justify-center items-center h-screen w-full"
+  >
     <div class="loading-line"></div>
-    <div class="loading-text">Loading</div>
+    <div class="loading-text">{{ loadingText }}</div>
   </div>
 </template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  props: {
+    loadingText: {
+      type: String,
+      default: "Loading",
+    },
+  },
+});
+</script>
 
 <style scoped>
 .loading-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100px;
+  height: 100%;
   position: relative;
 }
 
