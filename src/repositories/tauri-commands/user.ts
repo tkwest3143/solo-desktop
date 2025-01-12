@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { info } from "@tauri-apps/plugin-log";
+import { getDateTextForDB } from "~/functions/date";
 import type { user } from "~/models/user";
 
 export class UserRepository {
@@ -9,9 +10,21 @@ export class UserRepository {
     });
   }
 
-  static async update(user: { id: number; name: string; email: string }) {
+  static async update(user: {
+    id: number;
+    name?: string;
+    email?: string;
+    lastLoginTime?: Date;
+  }) {
     const res = await invoke<String>("update_user", {
-      user: JSON.stringify(user),
+      user: JSON.stringify({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        last_login_time: user.lastLoginTime
+          ? getDateTextForDB(user.lastLoginTime)
+          : undefined,
+      }),
     });
   }
   static async getAll() {

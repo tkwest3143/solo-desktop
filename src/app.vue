@@ -41,6 +41,8 @@ export default defineComponent({
         userData.value = new UserData(
           await UserRepository.getById(parseInt(userId))
         );
+      } else {
+        userData.value = undefined;
       }
     };
 

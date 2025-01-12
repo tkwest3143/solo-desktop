@@ -36,7 +36,7 @@
       <div class="right-panel">
         <div class="button-group ml-4">
           <button
-            class="bg-sky-300 hover:bg-sky-500"
+            class="bg-sky-300 enabled:hover:bg-sky-500 disabled:opacity-25"
             @click="startWork"
             :disabled="isWorking() || isResting()"
           >
@@ -46,7 +46,7 @@
             <div class="w-2/3 text-xl">出勤</div>
           </button>
           <button
-            class="bg-rose-300 hover:bg-rose-500"
+            class="bg-rose-300 enabled:hover:bg-rose-500 disabled:opacity-25"
             @click="endWork"
             :disabled="!isWorking()"
           >
@@ -56,7 +56,7 @@
             <div class="w-2/3 text-xl">退勤</div>
           </button>
           <button
-            class="bg-lime-300 hover:bg-lime-500"
+            class="bg-lime-300 enabled:hover:bg-lime-500 disabled:opacity-25"
             @click="startRest"
             :disabled="isResting() || isNone()"
           >
@@ -66,7 +66,7 @@
             <div class="w-2/3 text-xl">休憩開始</div>
           </button>
           <button
-            class="bg-amber-300 hover:bg-amber-500"
+            class="bg-amber-300 enabled:hover:bg-amber-500 disabled:opacity-25"
             @click="endRest"
             :disabled="!isResting()"
           >

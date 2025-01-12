@@ -9,8 +9,12 @@
         $emit('update:modelValue', ($event.target as HTMLInputElement).value)
       "
       :required="required"
-      class="input"
+      :class="[
+        'w-full border rounded p-2',
+        { 'border-error-500': errorMessage },
+      ]"
     />
+    <span v-if="errorMessage" class="text-error-500">{{ errorMessage }}</span>
   </div>
 </template>
 
@@ -39,15 +43,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    errorMessage: {
+      type: String,
+      default: "",
+    },
   },
 });
 </script>
-
-<style scoped>
-.input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-</style>

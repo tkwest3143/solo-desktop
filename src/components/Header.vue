@@ -1,35 +1,41 @@
 <template>
-  <header class="h-16">
-    <nav>
-      <ul>
-        <li>
-          <NuxtLink to="/">ユーザ一覧</NuxtLink>
-        </li>
-        <li v-if="userData">
-          <NuxtLink :to="{ name: 'id', params: { id: userData.prop.id } }"
-            >ホーム</NuxtLink
-          >
-        </li>
-        <li v-if="userData">
-          <NuxtLink
-            :to="{ name: 'id-workTimeList', params: { id: userData.prop.id } }"
-            >勤怠一覧</NuxtLink
-          >
-        </li>
-        <li v-if="userData">
-          <button @click="goBack">戻る</button>
-        </li>
-        <li v-if="userData">
-          <NuxtLink
-            :to="{ name: 'id-settings', params: { id: userData.prop.id } }"
-            ><Icon
-              name="fluent:settings-20-filled"
-              style="color: slategray"
-              size="2em"
-          /></NuxtLink>
-        </li>
-      </ul>
-    </nav>
+  <header class="text-basic-700 border-b-2 border-basic-200 flex items-center">
+    <div class="h-12 flex items-center justify-end w-full">
+      <div class="hover:bg-basic-200 h-full">
+        <NuxtLink
+          to="/"
+          class="flex items-center justify-center px-6 w-full h-full"
+        >
+          ユーザ一覧
+        </NuxtLink>
+      </div>
+      <div v-if="userData" class="hover:bg-basic-200 h-full">
+        <NuxtLink
+          :to="{ name: 'id', params: { id: userData.prop.id } }"
+          class="flex items-center justify-center px-6 w-full h-full"
+        >
+          ホーム
+        </NuxtLink>
+      </div>
+      <div v-if="userData" class="hover:bg-basic-200 h-full">
+        <NuxtLink
+          :to="{ name: 'id-workTimeList', params: { id: userData.prop.id } }"
+          class="flex items-center justify-center px-6 w-full h-full"
+        >
+          勤怠一覧
+        </NuxtLink>
+      </div>
+      <div v-if="userData" class="hover:bg-basic-200 h-full">
+        <NuxtLink
+          :to="{ name: 'id-settings', params: { id: userData.prop.id } }"
+          class="flex items-center justify-center px-6 hover:bg-basic-200 w-full h-full"
+        >
+          <Icon name="fluent:settings-20-filled" class="mr-2" size="1.5em" />{{
+            userData.prop.name + "さん"
+          }}
+        </NuxtLink>
+      </div>
+    </div>
   </header>
 </template>
 
@@ -52,40 +58,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-header {
-  background-color: #343a40;
-  padding: 10px 0;
-}
-
-nav {
-  display: flex;
-  justify-content: center;
-}
-
-nav ul {
-  display: flex;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-nav ul li {
-  margin-right: 20px;
-}
-
-nav ul li a,
-nav ul li button {
-  color: white;
-  text-decoration: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-nav ul li button:hover,
-nav ul li a:hover {
-  text-decoration: underline;
-}
-</style>
+<style scoped></style>

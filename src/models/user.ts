@@ -3,8 +3,8 @@ import { format } from "date-fns";
 export class UserData {
   constructor(public prop: user) {}
   get lastLoginTimeText() {
-    if (!this.prop.last_login_time) return "";
-    return format(this.prop.last_login_time, "yyyy/MM/dd HH:mm:ss");
+    if (!this.prop.last_login_time) return "-";
+    return format(this.prop.last_login_time, "yyyy/M/d HH:mm:ss");
   }
 }
 

@@ -1,43 +1,49 @@
 <template>
-  <main>
-    <div v-if="users.length">
+  <main class="text-basic-500 p-4 text-center">
+    <div>
       <h1 class="text-2xl font-semibold">ユーザを選択してください</h1>
-      <div class="flex justify-end mt-4">
-        <NuxtLink
-          to="/addUser"
-          class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
-        >
-          ユーザを追加する
-        </NuxtLink>
-      </div>
-      <div class="user-list mt-4">
-        <NuxtLink
+      <div class="flex justify-end mt-4"></div>
+      <div
+        class="mt-4 grid grid-cols-4 gap-4 w-full border bg-basic-50 p-4 rounded"
+      >
+        <div
           v-for="user in users"
           :key="user.prop.id"
-          class="user-button w-full"
-          :to="{ name: 'id', params: { id: user.prop.id } }"
+          class="cursor-pointer items-center justify-center flex bg-primary-200 w-full h-48 rounded shadow hover:shadow-lg hover:bg-primary-300"
+          @click="onClickUser(user)"
         >
-          {{ user.prop.name }} ({{ user.prop.email }})
-          <div>最終アクセス日：{{ user.lastLoginTimeText }}</div>
-        </NuxtLink>
-      </div>
-    </div>
-    <div
-      v-else
-      class="flex items-center justify-center h-[40rem] w-full flex-col"
-    >
-      <div class="w-full mb-6 font-bold text-gray-500 text-xl">
-        ユーザ情報が未登録です。
-      </div>
-      <div class="w-full mb-6 font-bold text-gray-500 text-xl">
-        ユーザを追加するボタンからユーザを追加してください。
-      </div>
-      <div class="w-full">
+          <div>
+            <div class="items-center justify-center flex">
+              <div class="w-24 h-24 border-2 border-primary-700 rounded-full">
+                <Icon
+                  name="material-symbols:person-edit-rounded"
+                  class="bg-primary-700 w-20 h-20"
+                />
+              </div>
+            </div>
+
+            {{ user.prop.name }} ({{ user.prop.email }})
+            <div class="text-xs">
+              最終アクセス日：{{ user.lastLoginTimeText }}
+            </div>
+          </div>
+        </div>
         <NuxtLink
           to="/addUser"
-          class="bg-indigo-500 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded shadow hover:shadow-lg text-xl"
+          class="items-center justify-center flex text-basic-500 hover:bg-basic-100 py-2 px-4 border-2 rounded shadow hover:shadow-lg text-xl"
         >
-          ユーザを追加する
+          <div>
+            <div
+              class="w-full h-24 border-2 border-dashed border-basic-300 items-center justify-center flex rounded-lg"
+            >
+              <Icon
+                name="fluent:add-20-filled"
+                class="bg-basic-400"
+                size="1.5em"
+              />
+            </div>
+            ユーザを追加する
+          </div>
         </NuxtLink>
       </div>
     </div>
@@ -56,10 +62,15 @@ export default {
   },
   async mounted() {
     await this.loadUsers();
-
-    console.log(this.users);
   },
   methods: {
+    async onClickUser(user: UserData) {
+      await UserRepository.update({
+        id: user.prop.id,
+        lastLoginTime: new Date(),
+      });
+      this.$router.push({ name: "id", params: { id: user.prop.id } });
+    },
     async loadUsers() {
       const users = await UserRepository.getAll();
       this.users = users.map((user: user) => new UserData(user));
@@ -67,66 +78,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-nav ul {
-  display: flex;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  justify-content: center;
-}
-
-nav ul li {
-  margin-right: 20px;
-}
-
-nav ul li a,
-nav ul li button {
-  color: white;
-  text-decoration: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-nav ul li button:hover,
-nav ul li a:hover {
-  text-decoration: underline;
-}
-
-main {
-  padding: 20px;
-  text-align: center;
-}
-
-.user-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
-
-.user-button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-.user-button:hover {
-  background-color: #0056b3;
-}
-
-h2 {
-  color: #343a40;
-}
-
-p {
-  color: #6c757d;
-}
-</style>

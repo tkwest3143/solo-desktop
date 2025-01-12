@@ -1,16 +1,23 @@
 <template>
-  <div class="add-user-container">
-    <h1>ユーザ追加</h1>
-    <form @submit.prevent="addUser" class="add-user-form">
-      <CommonInput id="name" label="名前" v-model="name" required />
+  <div class="flex flex-col items-center">
+    <h1 class="font-bold text-2xl">ユーザ追加</h1>
+    <form @submit.prevent="addUser" class="w-96 mt-4">
+      <CommonInput id="name" label="名前" v-model.trim="name" required />
       <CommonInput
         id="email"
         label="メール"
         type="email"
-        v-model="email"
+        v-model.trim="email"
         required
       />
-      <button type="submit" class="submit-button">追加</button>
+      <div class="flex justify-end w-full mt-4 space-x-1">
+        <button type="button" class="bg-basic-200 w-32 p-1 rounded-lg">
+          キャンセル
+        </button>
+        <button type="submit" class="bg-primary-200 w-32 p-1 rounded-lg">
+          追加
+        </button>
+      </div>
     </form>
   </div>
 </template>
@@ -42,56 +49,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.add-user-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-h1 {
-  margin-bottom: 20px;
-  color: #343a40;
-}
-
-.add-user-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  color: #343a40;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.submit-button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-.submit-button:hover {
-  background-color: #0056b3;
-}
-</style>

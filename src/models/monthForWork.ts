@@ -63,6 +63,9 @@ export class MonthForWork {
       this.workTimes
     );
   }
+  get thisMonth() {
+    return new MonthForWork(new Date(), this.workTimes);
+  }
   set workTimeDatas(workTimes: workTimeData[]) {
     this.workTimes = workTimes;
   }

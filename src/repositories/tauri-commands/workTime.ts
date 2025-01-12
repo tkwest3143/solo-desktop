@@ -39,7 +39,6 @@ export class WorkTimeRepository {
         memo: record.memo,
       }),
     });
-    console.log(res);
   }
   static async update(record: {
     userId: number;

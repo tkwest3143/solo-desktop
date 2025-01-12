@@ -3,35 +3,29 @@
   <div v-else>
     <div class="overflow-x-auto m-2 mb-20">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold text-gray-700">
-          {{ selectedMonth.yearText }}年{{
-            selectedMonth.monthText
-          }}月の勤務時間
-        </h2>
         <div class="flex space-x-2">
           <button
             @click="previousMonth"
-            class="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600 flex items-center"
+            class="px-4 py-2 rounded hover:bg-basic-200 flex items-center"
           >
-            <Icon
-              name="material-symbols:arrow-back-ios"
-              style="color: white"
-              size="1em"
-              class="mr-2"
-            />
-            前の月
+            <Icon name="material-symbols:arrow-back-ios" size="1em" />
           </button>
           <button
             @click="nextMonth"
-            class="px-4 py-2 bg-rose-500 text-white rounded hover:bg-rose-600 flex items-center"
+            class="px-4 py-2 rounded hover:bg-basic-200 flex items-center"
           >
-            次の月
-            <Icon
-              name="material-symbols:arrow-forward-ios"
-              style="color: white"
-              size="1em"
-              class="ml-2"
-            />
+            <Icon name="material-symbols:arrow-forward-ios" size="1em" />
+          </button>
+          <h2 class="text-xl font-semibold flex items-center">
+            {{ selectedMonth.yearText }}年{{
+              selectedMonth.monthText
+            }}月の勤務時間
+          </h2>
+          <button
+            @click="thisMonth"
+            class="px-4 py-1 rounded hover:bg-basic-200 flex items-center border border-basic-200 rounded-full"
+          >
+            今月
           </button>
         </div>
       </div>
@@ -50,129 +44,145 @@
             "
           />
           <button
-            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            v-if="selectedWorkSettingId"
+            class="px-4 py-2 bg-primary-400 text-basic-0 rounded hover:bg-primary-500"
           >
             設定を編集する
           </button>
+          <NuxtLink
+            v-else
+            class="px-4 py-2 bg-primary-400 text-basic-0 rounded hover:bg-primary-500"
+            :to="{
+              name: 'id-settings-workSetting-add',
+              params: { id: user?.prop.id },
+            }"
+          >
+            設定を登録する
+          </NuxtLink>
         </div>
 
         <div class="mb-4 divide-x divide-solid space-x-1">
-          <label class="text-gray-700 text-sm font-bold">
-            開始時間：{{ getSelectedWorkSetting()?.startByText }}
+          <label class="text-basic-700 text-sm font-bold">
+            開始時間：{{ getSelectedWorkSetting()?.startByText ?? " - " }}
           </label>
-          <label class="text-gray-700 text-sm font-bold">
-            終了時間：{{ getSelectedWorkSetting()?.endByText }}
+          <label class="text-basic-700 text-sm font-bold">
+            終了時間：{{ getSelectedWorkSetting()?.endByText ?? " - " }}
           </label>
-          <label class="text-gray-700 text-sm font-bold">
-            休憩開始時間：{{ getSelectedWorkSetting()?.restStartByText }}
+          <label class="text-basic-700 text-sm font-bold">
+            休憩開始時間：{{
+              getSelectedWorkSetting()?.restStartByText ?? " - "
+            }}
           </label>
-          <label class="text-gray-700 text-sm font-bold">
-            休憩終了時間：{{ getSelectedWorkSetting()?.restEndByText }}
+          <label class="text-basic-700 text-sm font-bold">
+            休憩終了時間：{{ getSelectedWorkSetting()?.restEndByText ?? " - " }}
           </label>
-          <label class="text-gray-700 text-sm font-bold">
-            勤務時間単位：{{ getSelectedWorkSetting()?.prop.working_unit }}分
+          <label class="text-basic-700 text-sm font-bold">
+            勤務時間単位：{{
+              getSelectedWorkSetting()?.prop.working_unit ?? " - "
+            }}分
           </label>
         </div>
       </div>
       <div class="flex justify-end mb-2">
         <div class="flex items-center space-x-2">
-          <span class="text-md font-semibold text-gray-700"
-            >今月の勤務時間:</span
-          >
-          <span class="text-md font-semibold text-gray-900">
+          <span class="text-md font-semibold text-basic-700">
+            今月の勤務時間:
+          </span>
+          <span class="text-md font-semibold text-basic-800">
             {{ totalWorkTime() }}
           </span>
         </div>
       </div>
-      <table class="min-w-full border-collapse border border-slate-520">
-        <thead class="bg-gray-50">
+      <table class="min-w-full border-collapse mb-4">
+        <thead class="bg-basic-100">
           <tr>
             <th
               scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
             ></th>
             <th
               scope="col"
-              class="w-2/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+              class="w-2/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
             >
               日付
             </th>
             <th
               scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
             >
               稼働状況
             </th>
             <th
               scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
             >
               開始時間
             </th>
             <th
               scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
             >
               終了時間
             </th>
             <th
               scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
             >
               休憩開始
             </th>
             <th
               scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
             >
               休憩終了
             </th>
             <th
               scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
             >
               休憩時間
             </th>
             <th
               scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300"
+              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
             >
               業務時間
             </th>
             <th
               scope="col"
-              class="w-1/2 py-3 text-center text-xs font-medium text-gray-500 border border-slate-300 w-auto"
+              class="w-1/2 py-3 text-center text-xs font-medium text-basic-500 border border-table-border w-auto"
             >
               備考
             </th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody>
           <tr
             v-for="(workTime, index) in selectedMonth.monthWorkTimes"
             :key="index"
             :class="{
-              'bg-lime-200':
+              'bg-primary-100':
                 editingWorkTime?.prop.target_day === workTime.prop.target_day,
             }"
           >
             <td
-              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+              class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
               <button
+                :disabled="selectedWorkSettingId === 0"
                 @click="setDefaultWorkTime(workTime)"
-                class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs"
+                class="disabled:opacity-25 px-2 py-1 text-white bg-primary-400 enabled:hover:bg-primary-500 text-xs rounded-lg"
               >
                 デフォルト
               </button>
             </td>
             <td
-              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+              class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
               {{ workTime.getDayTextWithWeek(japaneseHolidays) }}
             </td>
             <td
-              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+              class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
               <div
                 v-if="
@@ -187,7 +197,7 @@
             </td>
             <td
               @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+              class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
               <div
                 v-if="
@@ -205,13 +215,13 @@
                       start: ($event.target as HTMLInputElement).value,
                     })
                   "
-                  class="border border-gray-300 rounded"
+                  class="border border-basic-300 rounded"
                 />
               </div>
             </td>
             <td
               @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+              class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
               <div
                 v-if="
@@ -229,13 +239,13 @@
                       end: ($event.target as HTMLInputElement).value,
                     })
                   "
-                  class="border border-gray-300 rounded"
+                  class="border border-basic-300 rounded"
                 />
               </div>
             </td>
             <td
               @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+              class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
               <div
                 v-if="
@@ -253,13 +263,13 @@
                       restStart: ($event.target as HTMLInputElement).value,
                     })
                   "
-                  class="border border-gray-300 rounded"
+                  class="border border-basic-300 rounded"
                 />
               </div>
             </td>
             <td
               @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+              class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
               <div
                 v-if="
@@ -277,23 +287,23 @@
                       restEnd: ($event.target as HTMLInputElement).value,
                     })
                   "
-                  class="border border-gray-300 rounded"
+                  class="border border-basic-300 rounded"
                 />
               </div>
             </td>
             <td
-              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+              class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
               {{ workTime.restDurationByText ?? "00:00" }}
             </td>
             <td
-              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+              class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
               {{ workTime.workDurationByText ?? "00:00" }}
             </td>
             <td
               @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-gray-900 border border-slate-300"
+              class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
               <div
                 v-if="
@@ -311,7 +321,7 @@
                       memo: ($event.target as HTMLInputElement).value,
                     })
                   "
-                  class="border border-gray-300 rounded"
+                  class="border border-basic-300 rounded"
                 />
               </div>
             </td>
@@ -423,8 +433,15 @@ export default defineComponent({
       return `${Math.floor(total / 60)}時間${total % 60}分`;
     },
     async previousMonth() {
-      this.isLoading = true;
       this.selectedMonth = this.selectedMonth.previousMonth;
+      await this.fetchWorkTimeByMonth();
+    },
+    async nextMonth() {
+      this.selectedMonth = this.selectedMonth.nextMonth;
+      await this.fetchWorkTimeByMonth();
+    },
+    async fetchWorkTimeByMonth() {
+      this.isLoading = true;
       if (this.user) {
         await WorkTimeRepository.getWorkTimeByMonth(
           this.user.prop.id.toString(),
@@ -436,19 +453,9 @@ export default defineComponent({
           .finally(() => (this.isLoading = false));
       }
     },
-    async nextMonth() {
-      this.isLoading = true;
-      this.selectedMonth = this.selectedMonth.nextMonth;
-      if (this.user) {
-        await WorkTimeRepository.getWorkTimeByMonth(
-          this.user.prop.id.toString(),
-          this.selectedMonth.byText
-        )
-          .then(
-            (val) => (this.workTimes = val.map((wt) => new workTimeData(wt)))
-          )
-          .finally(() => (this.isLoading = false));
-      }
+    async thisMonth() {
+      this.selectedMonth = this.selectedMonth.thisMonth;
+      await this.fetchWorkTimeByMonth();
     },
     editWorkTime(workTime: workTimeData) {
       this.editingWorkTime = workTime;
@@ -522,7 +529,6 @@ export default defineComponent({
         this.changedWorkTimes.push(workTime);
       }
       this.editingWorkTime = null;
-      console.log(this.changedWorkTimes);
     },
     async saveChanges() {
       this.changedWorkTimes.forEach((workTime) => {

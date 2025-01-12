@@ -10,6 +10,7 @@ pub struct UserForUpdate {
   pub id: i32,
   pub name: Option<String>,
   pub email: Option<String>,
+  pub last_login_time: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

@@ -2,7 +2,7 @@ pub mod user {
   use crate::data::{UserForInsert, UserForUpdate};
   use crate::entities::users;
   use crate::repositories::database::establish_connection;
-  use chrono::Local;
+  use chrono::{Local, NaiveDateTime};
   use sea_orm::{EntityTrait, Set};
   use serde::Serialize;
   #[derive(Serialize)]
@@ -83,6 +83,11 @@ pub mod user {
     }
     if json_to_user.email.is_some() {
       user.email = Set(Some(json_to_user.email.unwrap()));
+    }
+    if json_to_user.last_login_time.is_some() {
+      user.last_login_time = Set(Some(
+        NaiveDateTime::parse_from_str(&json_to_user.last_login_time.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap(),
+      ));
     }
     user.updated_at = Set(Local::now().naive_local());
     users::Entity::update(user).exec(&db).await.unwrap();
@@ -261,6 +266,7 @@ pub mod work_time_settings {
       updated_at: Set(Local::now().naive_local()),
       ..Default::default()
     };
+    log::info!("{:?}", data);
     let result = work_settings::Entity::insert(data).exec(&db).await.unwrap();
     if json_to.is_default {
       let user = crate::entities::users::Entity::find_by_id(json_to.user_id).one(&db).await.unwrap().unwrap();
