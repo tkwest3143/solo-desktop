@@ -7,7 +7,6 @@ export class workTimeData {
     const date = new Date(this.prop.target_day);
     const day = date.getDay();
     const dayText = ["日", "月", "火", "水", "木", "金", "土"][day];
-    console.log(holidays, date);
     const holiday = holidays.find((d) => {
       console.log(
         typeof d.prop.day,

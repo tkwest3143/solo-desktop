@@ -19,7 +19,6 @@ export class MonthForWork {
       const workTime = this.workTimes.find((wt) => {
         return wt.prop.target_day === day;
       });
-      console.log(workTime);
       const startDayTime = new Date(day);
       startDayTime.setHours(0, 0, 0, 0);
       return new workTimeData({
@@ -33,7 +32,6 @@ export class MonthForWork {
         updated_at: workTime?.prop.updated_at ?? startDayTime,
       });
     });
-    console.log(data);
     return data;
   }
 
