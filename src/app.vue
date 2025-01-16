@@ -1,7 +1,7 @@
 <template>
   <div>
     <NuxtLayout>
-      <div v-if="isLoading">
+      <div v-if="isLoading" class="h-screen flex items-center justify-center">
         <Loading loading-text="データ取り込み中" />
       </div>
       <div v-else class="h-screen">
@@ -9,7 +9,6 @@
           <Header :userData="userData" />
         </div>
         <div style="padding-top: 60px">
-          <!-- Adjust padding-top based on Header height -->
           <NuxtPage />
         </div>
       </div>

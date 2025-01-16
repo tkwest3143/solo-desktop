@@ -83,7 +83,21 @@
           </label>
         </div>
       </div>
-      <div class="flex justify-end mb-2">
+      <div class="flex justify-end mb-2 space-x-2">
+        <button
+          :disabled="selectedWorkSettingId === 0"
+          @click="setAllDefaultWorkTime"
+          class="disabled:opacity-25 px-2 pyNOT_SET_WORK_TIME_ID text-white bg-primary-400 enabled:hover:bg-primary-500 text-xs rounded-lg"
+        >
+          未入力を全てデフォルトで登録
+        </button>
+
+        <button
+          @click="downloadWorkTime"
+          class="px-4 py-2 bg-primary-400 text-basic-0 rounded hover:bg-primary-500"
+        >
+          月報をダウンロード
+        </button>
         <div class="flex items-center space-x-2">
           <span class="text-md font-semibold text-basic-700">
             今月の勤務時間:
@@ -178,6 +192,15 @@
             </td>
             <td
               class="py-2 text-center text-sm text-basic-900 border border-table-border"
+              :class="{
+                'text-red-500':
+                  workTime.isHoliday(japaneseHolidays) || workTime.isSunday(),
+                'text-blue-500': workTime.isSaturday(),
+                'text-black':
+                  !workTime.isHoliday(japaneseHolidays) &&
+                  !workTime.isSaturday() &&
+                  !workTime.isSunday(),
+              }"
             >
               {{ workTime.getDayTextWithWeek(japaneseHolidays) }}
             </td>
@@ -363,6 +386,7 @@ import { JapaneseHolidayRepository } from "~/repositories/tauri-commands/japanes
 import { UserRepository } from "~/repositories/tauri-commands/user";
 import { WorkTimeRepository } from "~/repositories/tauri-commands/workTime";
 import { WorkSettingRepository } from "~/repositories/tauri-commands/workTimeSetting";
+const NOT_SET_WORK_TIME_ID = -1;
 
 export default defineComponent({
   components: {
@@ -383,7 +407,10 @@ export default defineComponent({
     };
   },
   async mounted() {
+    this.isLoading = true;
     await this.init();
+    this.selectedMonth = new MonthForWork(new Date(), this.workTimes);
+    this.isLoading = false;
   },
   methods: {
     async init() {
@@ -394,7 +421,6 @@ export default defineComponent({
         this.selectedMonth.byText
       );
       this.workTimes = workTimeRes.map((wt) => new workTimeData(wt));
-      this.selectedMonth = new MonthForWork(new Date(), this.workTimes);
       const workSettingRes = await WorkSettingRepository.getByUserId(
         parseInt(userId)
       );
@@ -407,16 +433,12 @@ export default defineComponent({
       );
       if (holiday.length === 0) {
         await JapaneseHolidayRepository.import();
-        const importHoliday = await JapaneseHolidayRepository.get(
+        this.japaneseHolidays = await JapaneseHolidayRepository.get(
           new Date().getFullYear().toString()
         );
-        this.japaneseHolidays = importHoliday.map(
-          (h) => new JapaneseHolidayData(h)
-        );
       } else {
-        this.japaneseHolidays = holiday.map((h) => new JapaneseHolidayData(h));
+        this.japaneseHolidays = holiday;
       }
-      this.isLoading = false;
     },
     getWorkTime(date: string): workTimeData | undefined {
       const workTime = this.workTimes.find(
@@ -531,9 +553,10 @@ export default defineComponent({
       this.editingWorkTime = null;
     },
     async saveChanges() {
-      this.changedWorkTimes.forEach((workTime) => {
-        if (workTime.prop.id === -1) {
-          WorkTimeRepository.create({
+      this.isLoading = true;
+      for (let workTime of this.changedWorkTimes) {
+        if (workTime.prop.id === NOT_SET_WORK_TIME_ID) {
+          await WorkTimeRepository.create({
             start: workTime.prop.start,
             end: workTime.prop.end,
             restStart: workTime.prop.rest_start,
@@ -543,7 +566,7 @@ export default defineComponent({
             targetDay: workTime.prop.target_day,
           });
         } else {
-          WorkTimeRepository.update({
+          await WorkTimeRepository.update({
             start: workTime.prop.start,
             end: workTime.prop.end,
             restStart: workTime.prop.rest_start,
@@ -553,10 +576,15 @@ export default defineComponent({
             targetDay: workTime.prop.target_day,
           });
         }
-      });
+      }
       this.changedWorkTimes = [];
       this.editingWorkTime = null;
       await this.init();
+      this.selectedMonth = new MonthForWork(
+        this.selectedMonth.month,
+        this.workTimes
+      );
+      this.isLoading = false;
     },
     async resetChanges() {
       this.changedWorkTimes = [];
@@ -577,6 +605,25 @@ export default defineComponent({
         restStart: format(workSetting.prop.rest_start, "HH:mm"),
         restEnd: format(workSetting.prop.rest_end, "HH:mm"),
         memo: workSetting.prop.memo,
+      });
+    },
+    async downloadWorkTime() {
+      await WorkTimeRepository.fileCreate(
+        this.selectedMonth.monthWorkTimes,
+        this.selectedMonth.monthText + "月勤務時間"
+      );
+    },
+    setAllDefaultWorkTime() {
+      this.selectedMonth.monthWorkTimes.forEach((workTime) => {
+        if (workTime.prop.id === NOT_SET_WORK_TIME_ID) {
+          if (
+            !workTime.isHoliday(this.japaneseHolidays) &&
+            !workTime.isSaturday() &&
+            !workTime.isSunday()
+          ) {
+            this.setDefaultWorkTime(workTime);
+          }
+        }
       });
     },
   },

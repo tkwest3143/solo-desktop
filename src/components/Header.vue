@@ -1,5 +1,7 @@
 <template>
-  <header class="text-basic-700 border-b-2 border-basic-200 flex items-center">
+  <header
+    class="bg-basic-50 text-basic-700 border-b-2 border-basic-200 flex items-center"
+  >
     <div class="h-12 flex items-center justify-end w-full">
       <div class="hover:bg-basic-200 h-full">
         <NuxtLink

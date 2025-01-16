@@ -7,18 +7,24 @@ export class workTimeData {
     const date = new Date(this.prop.target_day);
     const day = date.getDay();
     const dayText = ["日", "月", "火", "水", "木", "金", "土"][day];
-    const holiday = holidays.find((d) => {
-      console.log(
-        typeof d.prop.day,
-        typeof this.prop.start,
-        format(d.prop.day, "HH:mm")
-      );
-      return d.isDay(date);
-    });
-    if (holiday) {
+    if (this.isHoliday(holidays)) {
       return `${format(date, "yyyy/M/d")}(${dayText}・祝)`;
     }
     return `${format(date, "yyyy/M/d")}(${dayText})`;
+  }
+  isSaturday() {
+    const date = new Date(this.prop.target_day);
+    const day = date.getDay();
+    return day === 6;
+  }
+  isSunday() {
+    const date = new Date(this.prop.target_day);
+    const day = date.getDay();
+    return day === 0;
+  }
+  isHoliday(holidays: JapaneseHolidayData[]) {
+    const date = new Date(this.prop.target_day);
+    return holidays.some((d) => d.isDay(date));
   }
   get startByText() {
     if (this.prop.start) {

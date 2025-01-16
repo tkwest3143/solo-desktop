@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { getDateTextForDB } from "~/functions/date";
-import type { workTime } from "~/models/workTime";
+import { workTimeData, type workTime } from "~/models/workTime";
+import { FileDownloadRepository } from "../file";
 
 export class WorkTimeRepository {
   static async getWorkTimeByMonth(userId: string, targetMonth: string) {
@@ -69,5 +70,17 @@ export class WorkTimeRepository {
         memo: record.memo,
       }),
     });
+  }
+  static async fileCreate(data: workTimeData[], filename: string) {
+    const csvData = data.map((wt) => {
+      return {
+        target_day: wt.prop.target_day,
+        start: wt.startByText,
+        end: wt.endByText,
+        rest_start: wt.restDurationByText,
+        memo: wt.memo,
+      };
+    });
+    await FileDownloadRepository.createCsv(csvData, filename);
   }
 }

@@ -15,6 +15,14 @@ export class JapaneseHolidayData {
     );
     return differenceInDays(propDate, targetDate) === 0;
   }
+  static fromJson(json: string) {
+    const parsedArray = JSON.parse(json);
+    const holidays = parsedArray.map((parsed: any) => {
+      parsed.day = new Date(parsed.day);
+      return new JapaneseHolidayData(parsed as japaneseHoliday);
+    });
+    return holidays;
+  }
 }
 
 export type japaneseHoliday = {
