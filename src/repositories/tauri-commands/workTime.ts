@@ -29,7 +29,7 @@ export class WorkTimeRepository {
       ? getDateTextForDB(record.restEnd)
       : undefined;
 
-    const res = await invoke<String>("create_work_time", {
+    return await invoke<String>("create_work_time", {
       workTime: JSON.stringify({
         user_id: record.userId,
         target_day: record.targetDay,
@@ -71,16 +71,24 @@ export class WorkTimeRepository {
       }),
     });
   }
-  static async fileCreate(data: workTimeData[], filename: string) {
+  static async fileCreate(
+    data: workTimeData[],
+    filename: string,
+    columns: string[],
+    separator: string,
+    isheader: boolean
+  ) {
     const csvData = data.map((wt) => {
-      return {
-        target_day: wt.prop.target_day,
-        start: wt.startByText,
-        end: wt.endByText,
-        rest_start: wt.restDurationByText,
-        memo: wt.memo,
-      };
+      const exportColumns = [...wt.exportFileColumn.entries()].filter(
+        ([key]) => {
+          return columns.includes(key);
+        }
+      );
+      return exportColumns.map(([, value]) => value);
     });
-    await FileDownloadRepository.createCsv(csvData, filename);
+    if (isheader) {
+      csvData.unshift(columns);
+    }
+    await FileDownloadRepository.createText(csvData, filename, separator);
   }
 }

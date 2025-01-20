@@ -3,6 +3,18 @@ import type { JapaneseHolidayData } from "./japaneseHoliday";
 
 export class workTimeData {
   constructor(public prop: workTime) {}
+  get exportFileColumn(): Map<string, string> {
+    const map = new Map();
+    map.set("日付", this.prop.target_day);
+    map.set("開始時刻", this.startByText);
+    map.set("終了時刻", this.endByText);
+    map.set("休憩開始時刻", this.restStartByText);
+    map.set("休憩終了時刻", this.restEndByText);
+    map.set("休憩時間", this.restDurationByText);
+    map.set("作業時間", this.workDurationByText);
+    map.set("メモ", this.prop.memo);
+    return map;
+  }
   getDayTextWithWeek(holidays: JapaneseHolidayData[]) {
     const date = new Date(this.prop.target_day);
     const day = date.getDay();

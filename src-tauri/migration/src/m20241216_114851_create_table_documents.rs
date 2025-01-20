@@ -12,7 +12,7 @@ impl MigrationTrait for Migration {
           .table(Documents::Table)
           .if_not_exists()
           .col(pk_auto(Documents::Id))
-          .col(string(Documents::Title).not_null())
+          .col(string(Documents::TargetMonth).not_null())
           .col(string(Documents::DocumentId).not_null())
           .col(integer(Documents::UserId).not_null())
           .col(date_time(Documents::CreatedAt).not_null())
@@ -31,7 +31,7 @@ impl MigrationTrait for Migration {
 pub enum Documents {
   Table,
   Id,
-  Title,
+  TargetMonth,
   DocumentId,
   CreatedAt,
   UpdatedAt,

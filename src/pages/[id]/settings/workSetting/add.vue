@@ -1,4 +1,10 @@
 <template>
+  <div
+    v-if="isLoading"
+    class="w-screen h-screen bg-gray-800 bg-opacity-75 flex items-center justify-center z-50"
+  >
+    <Loading />
+  </div>
   <div>
     <div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-6">
       <h2 class="text-2xl font-bold mb-4">勤務設定を追加</h2>
@@ -100,7 +106,7 @@
           <button
             @click="form.isDefaultWorkSetting = !form.isDefaultWorkSetting"
             :class="{
-              'bg-sky-500 text-white': form.isDefaultWorkSetting,
+              'bg-primary-200 text-gray-500': form.isDefaultWorkSetting,
               'bg-gray-200 text-gray-700': !form.isDefaultWorkSetting,
             }"
             class="flex items-left justify-start py-2 px-4 rounded shadow-outline"
@@ -109,14 +115,13 @@
             <div
               class="flex items-center justify-center w-6 h-6 border-2 border-gray-400 rounded mr-2"
               :class="{
-                'bg-sky-500 border-blue-500': form.isDefaultWorkSetting,
+                'bg-primary-200': form.isDefaultWorkSetting,
                 'bg-white': !form.isDefaultWorkSetting,
               }"
             >
               <Icon
                 name="fluent:checkmark-20-filled"
                 v-if="form.isDefaultWorkSetting"
-                style="color: greenyellow"
                 size="2em"
               />
             </div>
@@ -139,12 +144,16 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { useRoute } from "vue-router";
+import Loading from "~/components/Loading.vue";
 import { UserData } from "~/models/user";
 import { workSettingData } from "~/models/workSetting";
 import { UserRepository } from "~/repositories/tauri-commands/user";
 import { WorkSettingRepository } from "~/repositories/tauri-commands/workTimeSetting";
 
 export default defineComponent({
+  components: {
+    Loading,
+  },
   data() {
     return {
       user: undefined as UserData | undefined,
@@ -159,6 +168,7 @@ export default defineComponent({
         memo: "",
         isDefaultWorkSetting: false,
       },
+      isLoading: false,
     };
   },
   async mounted() {
@@ -173,6 +183,7 @@ export default defineComponent({
     async submitForm() {
       // フォーム送信処理を実装
       if (!this.user) return;
+      this.isLoading = true;
       await WorkSettingRepository.create({
         userId: this.user.prop.id,
         title: this.form.title,
@@ -195,11 +206,8 @@ export default defineComponent({
         memo: "",
         isDefaultWorkSetting: false,
       };
+      this.isLoading = false;
     },
   },
 });
 </script>
-
-<style scoped>
-/* 追加のスタイルが必要な場合はここに記述 */
-</style>

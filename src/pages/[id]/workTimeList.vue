@@ -87,17 +87,16 @@
         <button
           :disabled="selectedWorkSettingId === 0"
           @click="setAllDefaultWorkTime"
-          class="disabled:opacity-25 px-2 pyNOT_SET_WORK_TIME_ID text-white bg-primary-400 enabled:hover:bg-primary-500 text-xs rounded-lg"
+          class="disabled:opacity-25 px-2 py-2 text-white bg-primary-400 enabled:hover:bg-primary-500 text-xs rounded-lg"
         >
           未入力を全てデフォルトで登録
         </button>
-
-        <button
-          @click="downloadWorkTime"
-          class="px-4 py-2 bg-primary-400 text-basic-0 rounded hover:bg-primary-500"
-        >
-          月報をダウンロード
-        </button>
+        <ExportFileDialog
+          :selectableColumns="[
+            ...selectedMonth.monthWorkTimes[0].exportFileColumn.keys(),
+          ]"
+          @download="downloadWorkTime"
+        />
         <div class="flex items-center space-x-2">
           <span class="text-md font-semibold text-basic-700">
             今月の勤務時間:
@@ -196,7 +195,7 @@
                 'text-red-500':
                   workTime.isHoliday(japaneseHolidays) || workTime.isSunday(),
                 'text-blue-500': workTime.isSaturday(),
-                'text-black':
+                'text-basic-900':
                   !workTime.isHoliday(japaneseHolidays) &&
                   !workTime.isSaturday() &&
                   !workTime.isSunday(),
@@ -207,15 +206,7 @@
             <td
               class="py-2 text-center text-sm text-basic-900 border border-table-border"
             >
-              <div
-                v-if="
-                  workTimes.some(
-                    (wt) => wt.prop.target_day === workTime.prop.target_day
-                  )
-                "
-              >
-                稼働
-              </div>
+              <div v-if="workTime.workDurationByMinute !== 0">稼働</div>
               <div v-else>非稼働</div>
             </td>
             <td
@@ -377,6 +368,7 @@ import { format } from "date-fns";
 import { defineComponent } from "vue";
 import CommonSelect from "~/components/CommonSelect.vue";
 import Loading from "~/components/Loading.vue";
+import ExportFileDialog from "~/components/worktime/ExportFileDialog.vue";
 import { JapaneseHolidayData } from "~/models/japaneseHoliday";
 import { MonthForWork } from "~/models/monthForWork";
 import { UserData } from "~/models/user";
@@ -392,6 +384,7 @@ export default defineComponent({
   components: {
     Loading,
     CommonSelect,
+    ExportFileDialog,
   },
   data() {
     return {
@@ -607,10 +600,17 @@ export default defineComponent({
         memo: workSetting.prop.memo,
       });
     },
-    async downloadWorkTime() {
+    async downloadWorkTime(
+      selectedColumns: string[],
+      separator: string,
+      isHeader: boolean
+    ) {
       await WorkTimeRepository.fileCreate(
         this.selectedMonth.monthWorkTimes,
-        this.selectedMonth.monthText + "月勤務時間"
+        this.selectedMonth.monthText + "月勤務時間",
+        selectedColumns,
+        separator,
+        isHeader
       );
     },
     setAllDefaultWorkTime() {

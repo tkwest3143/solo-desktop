@@ -146,6 +146,15 @@ pub mod work_times {
   pub async fn create_work_time(work_time: &str) -> Result<String, String> {
     let json_to: WorkTimeForInsert = serde_json::from_str(work_time).unwrap();
     let db = establish_connection().await.unwrap();
+    let exist_data = work_times::Entity::find()
+      .filter(work_times::Column::UserId.eq(json_to.user_id))
+      .filter(work_times::Column::TargetDay.eq(json_to.target_day.to_owned()))
+      .one(&db)
+      .await
+      .unwrap();
+    if exist_data.is_some() {
+      work_times::Entity::delete_by_id(exist_data.unwrap().id).exec(&db).await.unwrap();
+    }
 
     let mut data = work_times::ActiveModel {
       user_id: Set(json_to.user_id),

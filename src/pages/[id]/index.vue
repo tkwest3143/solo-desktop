@@ -2,6 +2,9 @@
   <Loading v-if="isLoading" />
   <div v-else>
     <div class="text-center text-4xl mt-5">{{ user?.prop.name }} さん</div>
+    <ResizeWindowButton
+      class="flex items-center justify-center px-6 w-full h-full"
+    />
     <div class="w-full mt-4 grid justify-items-center">
       <div class="flex">
         <div v-if="!isWorking() && !isResting()">
@@ -148,10 +151,11 @@ button .nuxt-icon {
 import { formatDate } from "date-fns";
 import { defineComponent } from "vue";
 import { useRoute } from "vue-router";
-import Loading from "~/components/Loading.vue";
 import { UserData } from "~/models/user";
+import { workSettingData } from "~/models/workSetting";
 import { UserRepository } from "~/repositories/tauri-commands/user";
 import { WorkTimeRepository } from "~/repositories/tauri-commands/workTime";
+import { WorkSettingRepository } from "~/repositories/tauri-commands/workTimeSetting";
 
 enum Working {
   working = "working",
@@ -159,9 +163,6 @@ enum Working {
   none = "none",
 }
 export default defineComponent({
-  components: {
-    Loading,
-  },
   data() {
     return {
       user: undefined as UserData | undefined,
@@ -170,12 +171,22 @@ export default defineComponent({
       currentTime: new Date().toLocaleTimeString(),
       working: Working.none,
       isLoading: true,
+      workSetting: undefined as workSettingData | undefined,
     };
   },
   async mounted() {
     const route = useRoute();
     const userId = route.params.id as string;
     this.user = new UserData(await UserRepository.getById(parseInt(userId)));
+    const workSettingRes = await WorkSettingRepository.getByUserId(
+      parseInt(userId)
+    );
+    const userWorkSetting = workSettingRes.find(
+      (ws) => ws.id === this.user?.prop.default_work_setting_id
+    );
+    if (this.user.prop.default_work_setting_id && userWorkSetting) {
+      this.workSetting = new workSettingData(userWorkSetting);
+    }
     setInterval(() => {
       this.currentTime = new Date().toLocaleTimeString();
     }, 1000);
@@ -193,6 +204,20 @@ export default defineComponent({
     },
     async startWork() {
       this.working = Working.working;
+      if (this.workSetting) {
+        const startTime = new Date();
+        startTime.setMinutes(
+          Math.ceil(
+            startTime.getMinutes() / this.workSetting.prop.working_unit
+          ) * this.workSetting.prop.working_unit
+        );
+        await WorkTimeRepository.create({
+          userId: this.user!.prop.id,
+          targetDay: formatDate(new Date(), "yyyy-MM-dd"),
+          start: startTime,
+        });
+        return;
+      }
       await WorkTimeRepository.create({
         userId: this.user!.prop.id,
         targetDay: formatDate(new Date(), "yyyy-MM-dd"),
@@ -201,6 +226,19 @@ export default defineComponent({
     },
     async endWork() {
       this.working = Working.none;
+      if (this.workSetting) {
+        const endTime = new Date();
+        endTime.setMinutes(
+          Math.ceil(endTime.getMinutes() / this.workSetting.prop.working_unit) *
+            this.workSetting.prop.working_unit
+        );
+        await WorkTimeRepository.update({
+          userId: this.user!.prop.id,
+          targetDay: formatDate(new Date(), "yyyy-MM-dd"),
+          end: endTime,
+        });
+        return;
+      }
       await WorkTimeRepository.update({
         userId: this.user!.prop.id,
         targetDay: formatDate(new Date(), "yyyy-MM-dd"),
@@ -209,6 +247,20 @@ export default defineComponent({
     },
     async startRest() {
       this.working = Working.resting;
+      if (this.workSetting) {
+        const restStartTime = new Date();
+        restStartTime.setMinutes(
+          Math.ceil(
+            restStartTime.getMinutes() / this.workSetting.prop.working_unit
+          ) * this.workSetting.prop.working_unit
+        );
+        await WorkTimeRepository.update({
+          userId: this.user!.prop.id,
+          targetDay: formatDate(new Date(), "yyyy-MM-dd"),
+          restStart: restStartTime,
+        });
+        return;
+      }
       await WorkTimeRepository.update({
         userId: this.user!.prop.id,
         targetDay: formatDate(new Date(), "yyyy-MM-dd"),
@@ -217,6 +269,20 @@ export default defineComponent({
     },
     async endRest() {
       this.working = Working.working;
+      if (this.workSetting) {
+        const restEndTime = new Date();
+        restEndTime.setMinutes(
+          Math.ceil(
+            restEndTime.getMinutes() / this.workSetting.prop.working_unit
+          ) * this.workSetting.prop.working_unit
+        );
+        await WorkTimeRepository.update({
+          userId: this.user!.prop.id,
+          targetDay: formatDate(new Date(), "yyyy-MM-dd"),
+          restEnd: restEndTime,
+        });
+        return;
+      }
       await WorkTimeRepository.update({
         userId: this.user!.prop.id,
         targetDay: formatDate(new Date(), "yyyy-MM-dd"),

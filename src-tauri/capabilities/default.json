@@ -8,6 +8,8 @@
     "opener:default",
     "log:default",
     "fs:default",
+    "core:window:allow-set-size",
+    "core:window:allow-set-position",
     {
       "identifier": "fs:allow-exists",
       "allow": [{ "path": "$DOWNLOAD/*" }]

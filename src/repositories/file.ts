@@ -2,23 +2,20 @@ import { BaseDirectory, create } from "@tauri-apps/plugin-fs";
 
 export class FileDownloadRepository {
   constructor() {}
-  static async createCsv(
-    rows: {
-      [key: string]: string;
-    }[],
-    fileName: string
+  static async createText(
+    rows: Array<Array<string | number>>,
+    fileName: string,
+    separator: string = ","
   ) {
-    const csvHeaders = Object.keys(rows[0]).join(",") + "\n";
     const csvRows = rows
       .map((row) => {
-        return Object.values(row).join(",") + "\n";
+        return Object.values(row).join(separator).trim() + "\n";
       })
       .join("");
-    const csvContent = csvHeaders + csvRows;
-    const file = await create(fileName + ".csv", {
+    const file = await create(fileName + ".txt", {
       baseDir: BaseDirectory.Download,
     });
-    await file.write(new TextEncoder().encode(csvContent));
+    await file.write(new TextEncoder().encode(csvRows));
     await file.close();
   }
 }
