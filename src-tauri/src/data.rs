@@ -67,3 +67,38 @@ pub struct WorkTimeSettingForUpdate {
   pub user_id: i32,
   pub is_default: bool,
 }
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct TodoCategoryForInsert {
+  pub name: String,
+  pub memo: Option<String>,
+  pub user_id: i32,
+}
+#[derive(Serialize, Deserialize, Clone)]
+pub struct TodoCategoryForUpdate {
+  pub id: i32,
+  pub name: Option<String>,
+  pub memo: Option<String>,
+  pub user_id: i32,
+}
+#[derive(Serialize, Deserialize, Clone)]
+pub struct TodoItemForInsert {
+  pub title: String,
+  pub content: Option<String>,
+  pub link: Option<String>,
+  pub color: Option<String>,
+  pub due_date: String,
+  pub category_id: Option<i32>,
+  pub user_id: i32,
+}
+#[derive(Serialize, Deserialize, Clone)]
+pub struct TodoItemForUpdate {
+  pub id: i32,
+  pub title: Option<String>,
+  pub content: Option<String>,
+  pub link: Option<String>,
+  pub color: Option<String>,
+  pub due_date: String,
+  pub category_id: Option<i32>,
+  pub user_id: i32,
+}

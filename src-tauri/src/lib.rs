@@ -5,6 +5,7 @@ pub mod repositories;
 mod tauri_command;
 use tauri_command::{
   japanese_holiday::{get_all_japanese_holidays, import_japanese_holiday},
+  todo_items::{create_todo_item, delete_all_todo_items, delete_todo_item, get_todo_items_by_category_id, update_todo_item},
   user::{create_user, get_all_users, get_user_by_id, update_user},
   work_time_settings::{create_work_time_setting, get_work_setting_by_user_id, update_work_time_setting},
   work_times::{create_work_time, get_work_time_by_month, update_work_time},
@@ -26,7 +27,12 @@ pub fn run() {
       create_work_time_setting,
       update_work_time_setting,
       get_all_japanese_holidays,
-      import_japanese_holiday
+      import_japanese_holiday,
+      delete_todo_item,
+      delete_all_todo_items,
+      update_todo_item,
+      create_todo_item,
+      get_todo_items_by_category_id
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

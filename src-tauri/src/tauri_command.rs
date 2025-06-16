@@ -377,3 +377,103 @@ pub mod japanese_holiday {
     Ok("create_japanese_holiday finish".to_string())
   }
 }
+
+pub mod todo_items {
+  use crate::data::{TodoItemForInsert, TodoItemForUpdate};
+  use crate::entities::todo_items;
+  use crate::repositories::database::establish_connection;
+  use chrono::{Local, NaiveDateTime};
+  use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, Set};
+
+  use serde::Serialize;
+  #[derive(Serialize)]
+  pub struct ResponseTodoItem {
+    pub id: i32,
+    pub title: String,
+    pub content: Option<String>,
+    pub link: Option<String>,
+    pub color: Option<String>,
+    pub due_date: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub category_id: Option<i32>,
+  }
+  #[tauri::command]
+  pub async fn get_todo_items_by_category_id(category_id: i32) -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    let todo_items = todo_items::Entity::find().filter(todo_items::Column::CategoryId.eq(category_id)).all(&db).await.unwrap();
+    let mut response_todo_items: Vec<ResponseTodoItem> = vec![];
+    for todo_item in todo_items {
+      response_todo_items.push(ResponseTodoItem {
+        id: todo_item.id,
+        title: todo_item.title.unwrap_or_default(),
+        content: todo_item.content,
+        link: todo_item.link,
+        color: todo_item.color,
+        due_date: todo_item.due_date.to_string(),
+        created_at: todo_item.created_at.to_string(),
+        updated_at: todo_item.updated_at.to_string(),
+        category_id: todo_item.category_id,
+      });
+    }
+    Ok(serde_json::to_string(&response_todo_items).unwrap())
+  }
+  #[tauri::command]
+  pub async fn create_todo_item(todo_item: &str) -> Result<String, String> {
+    let json_to: TodoItemForInsert = serde_json::from_str(todo_item).unwrap();
+    let db = establish_connection().await.unwrap();
+    let data = todo_items::ActiveModel {
+      title: Set(Some(json_to.title)),
+      content: Set(json_to.content),
+      link: Set(json_to.link),
+      color: Set(json_to.color),
+      due_date: Set(NaiveDateTime::parse_from_str(&json_to.due_date, "%Y-%m-%d %H:%M:%S").unwrap()),
+      category_id: Set(json_to.category_id),
+      created_at: Set(Local::now().naive_local()),
+      updated_at: Set(Local::now().naive_local()),
+      ..Default::default()
+    };
+    todo_items::Entity::insert(data).exec(&db).await.unwrap();
+    Ok("create_todo_item finish".to_string())
+  }
+  #[tauri::command]
+  pub async fn update_todo_item(todo_item: &str) -> Result<String, String> {
+    let json_to: TodoItemForUpdate = serde_json::from_str(todo_item).unwrap();
+    let db = establish_connection().await.unwrap();
+    let data = todo_items::Entity::find_by_id(json_to.id).one(&db).await.unwrap();
+    let mut data: todo_items::ActiveModel = data.unwrap().into();
+    if json_to.title.is_some() {
+      data.title = Set(json_to.title);
+    }
+    if json_to.content.is_some() {
+      data.content = Set(json_to.content);
+    }
+    if json_to.link.is_some() {
+      data.link = Set(json_to.link);
+    }
+    if json_to.color.is_some() {
+      data.color = Set(json_to.color);
+    }
+    if !json_to.due_date.is_empty() {
+      data.due_date = Set(NaiveDateTime::parse_from_str(&json_to.due_date, "%Y-%m-%d %H:%M:%S").unwrap());
+    }
+    if json_to.category_id.is_some() {
+      data.category_id = Set(json_to.category_id);
+    }
+    data.updated_at = Set(Local::now().naive_local());
+    todo_items::Entity::update(data).exec(&db).await.unwrap();
+    Ok("update_todo_item finish".to_string())
+  }
+  #[tauri::command]
+  pub async fn delete_todo_item(id: i32) -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    todo_items::Entity::delete_by_id(id).exec(&db).await.unwrap();
+    Ok("delete_todo_item finish".to_string())
+  }
+  #[tauri::command]
+  pub async fn delete_all_todo_items() -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    todo_items::Entity::delete_many().exec(&db).await.unwrap();
+    Ok("delete_all_todo_items finish".to_string())
+  }
+}

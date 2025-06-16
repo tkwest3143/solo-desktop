@@ -3,17 +3,12 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "work_settings")]
+#[sea_orm(table_name = "todo_categories")]
 pub struct Model {
   #[sea_orm(primary_key)]
   pub id: i32,
-  pub title: String,
-  pub start: DateTime,
-  pub end: DateTime,
-  pub rest_start: DateTime,
-  pub rest_end: DateTime,
+  pub name: Option<String>,
   pub memo: Option<String>,
-  pub working_unit: i32,
   pub user_id: i32,
   pub created_at: DateTime,
   pub updated_at: DateTime,

@@ -3,18 +3,16 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "work_settings")]
+#[sea_orm(table_name = "todo_items")]
 pub struct Model {
   #[sea_orm(primary_key)]
   pub id: i32,
-  pub title: String,
-  pub start: DateTime,
-  pub end: DateTime,
-  pub rest_start: DateTime,
-  pub rest_end: DateTime,
-  pub memo: Option<String>,
-  pub working_unit: i32,
-  pub user_id: i32,
+  pub category_id: Option<i32>,
+  pub title: Option<String>,
+  pub content: Option<String>,
+  pub link: Option<String>,
+  pub color: Option<String>,
+  pub due_date: DateTime,
   pub created_at: DateTime,
   pub updated_at: DateTime,
 }
@@ -23,10 +21,10 @@ pub struct Model {
 pub enum Relation {
   #[sea_orm(
     belongs_to = "Entity",
-    from = "Column::UserId",
+    from = "Column::CategoryId",
     to = "Column::Id",
-    on_update = "NoAction",
-    on_delete = "NoAction"
+    on_update = "Cascade",
+    on_delete = "Cascade"
   )]
   SelfRef,
 }
