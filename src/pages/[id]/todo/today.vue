@@ -27,124 +27,54 @@
             <option>未完了</option>
             <option>完了済み</option>
           </select>
-          <select class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>すべてのカテゴリ</option>
-            <option>実装</option>
-            <option>デザイン</option>
-            <option>会議</option>
+          <select v-model="selectedCategoryId" class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">すべてのカテゴリ</option>
+            <option v-for="category in categories" :key="category.id" :value="category.id">
+              {{ category.name }}
+            </option>
           </select>
         </div>
         <div class="text-sm text-slate-500">
-          5件のタスク
+          {{ filteredTodos.length }}件のタスク
         </div>
       </div>
 
       <!-- Task Items -->
-      <div class="space-y-4">
-        <!-- High Priority Task -->
-        <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 transition-all hover:shadow-lg">
-          <div class="flex items-start space-x-4">
-            <div class="mt-1">
-              <input type="checkbox" class="w-5 h-5 text-red-500 rounded border-2 border-red-300 focus:ring-red-500" />
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-slate-800">緊急バグ修正</h3>
-                <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">高優先度</span>
-                <div class="w-3 h-3 rounded-full bg-red-400"></div>
-              </div>
-              <p class="text-slate-600 mb-3">ユーザーログイン機能の重要なバグを修正する必要があります</p>
-              <div class="flex items-center space-x-4 text-sm text-slate-500">
-                <span>期限: 今日 18:00</span>
-                <span>カテゴリ: 実装</span>
-                <span>作成日: 2024-06-18</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div v-if="loading" class="flex justify-center py-8">
+        <div class="text-slate-500">読み込み中...</div>
+      </div>
 
-        <!-- Normal Task -->
-        <div class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg hover:border-slate-300">
+      <div v-else-if="filteredTodos.length === 0" class="text-center py-8">
+        <div class="text-slate-500 text-lg">今日のタスクはありません</div>
+        <p class="text-slate-400 mt-2">新しいタスクを追加してみましょう</p>
+      </div>
+
+      <div v-else class="space-y-4">
+        <div
+          v-for="todo in filteredTodos"
+          :key="todo.id"
+          class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg hover:border-slate-300"
+          :class="getTodoPriorityClass(todo)"
+        >
           <div class="flex items-start space-x-4">
             <div class="mt-1">
               <input type="checkbox" class="w-5 h-5 text-blue-500 rounded border-2 border-slate-300 focus:ring-blue-500" />
             </div>
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-slate-800">UIデザイン見直し</h3>
+                <h3 class="text-lg font-semibold text-slate-800">{{ todo.title }}</h3>
                 <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">通常</span>
-                <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                <div
+                  v-if="todo.color"
+                  class="w-3 h-3 rounded-full"
+                  :style="{ backgroundColor: todo.color }"
+                ></div>
               </div>
-              <p class="text-slate-600 mb-3">メインページのUIを現代的なデザインに更新</p>
+              <p v-if="todo.content" class="text-slate-600 mb-3">{{ todo.content }}</p>
               <div class="flex items-center space-x-4 text-sm text-slate-500">
-                <span>期限: 今日 17:00</span>
-                <span>カテゴリ: デザイン</span>
-                <span>作成日: 2024-06-17</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Completed Task -->
-        <div class="bg-green-50 border-2 border-green-200 rounded-xl p-6 transition-all hover:shadow-lg opacity-75">
-          <div class="flex items-start space-x-4">
-            <div class="mt-1">
-              <input type="checkbox" checked class="w-5 h-5 text-green-500 rounded border-2 border-green-300 focus:ring-green-500" />
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-slate-800 line-through">チーム会議準備</h3>
-                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">完了</span>
-                <div class="w-3 h-3 rounded-full bg-blue-400"></div>
-              </div>
-              <p class="text-slate-600 mb-3 line-through">明日の会議のアジェンダと資料を準備</p>
-              <div class="flex items-center space-x-4 text-sm text-slate-500">
-                <span>完了時刻: 今日 14:30</span>
-                <span>カテゴリ: 会議</span>
-                <span>作成日: 2024-06-15</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Additional Tasks -->
-        <div class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg hover:border-slate-300">
-          <div class="flex items-start space-x-4">
-            <div class="mt-1">
-              <input type="checkbox" class="w-5 h-5 text-blue-500 rounded border-2 border-slate-300 focus:ring-blue-500" />
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-slate-800">データベース最適化</h3>
-                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">通常</span>
-                <div class="w-3 h-3 rounded-full bg-red-400"></div>
-              </div>
-              <p class="text-slate-600 mb-3">クエリのパフォーマンスを改善してレスポンス時間を短縮</p>
-              <div class="flex items-center space-x-4 text-sm text-slate-500">
-                <span>期限: 今日 19:00</span>
-                <span>カテゴリ: 実装</span>
-                <span>作成日: 2024-06-16</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg hover:border-slate-300">
-          <div class="flex items-start space-x-4">
-            <div class="mt-1">
-              <input type="checkbox" class="w-5 h-5 text-blue-500 rounded border-2 border-slate-300 focus:ring-blue-500" />
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-slate-800">ドキュメント更新</h3>
-                <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">低優先度</span>
-                <div class="w-3 h-3 rounded-full bg-green-400"></div>
-              </div>
-              <p class="text-slate-600 mb-3">API仕様書とユーザーマニュアルの更新</p>
-              <div class="flex items-center space-x-4 text-sm text-slate-500">
-                <span>期限: 今日 16:00</span>
-                <span>カテゴリ: デザイン</span>
-                <span>作成日: 2024-06-14</span>
+                <span>期限: {{ formatDueDate(todo.due_date) }}</span>
+                <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                <span>作成日: {{ formatDate(todo.created_at) }}</span>
               </div>
             </div>
           </div>
@@ -156,16 +86,34 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
+import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
+import type { TodoItem, TodoCategory } from "~/models/todo";
 
 export default defineComponent({
   layout: "todo",
   data() {
     return {
       currentDate: "",
+      todos: [] as TodoItem[],
+      categories: [] as TodoCategory[],
+      selectedCategoryId: "",
+      loading: true,
     };
   },
-  mounted() {
+  computed: {
+    filteredTodos(): TodoItem[] {
+      if (!this.selectedCategoryId) {
+        return this.todos;
+      }
+      return this.todos.filter(todo => 
+        todo.category_id === parseInt(this.selectedCategoryId)
+      );
+    }
+  },
+  async mounted() {
     this.updateDateTime();
+    await this.fetchData();
   },
   methods: {
     updateDateTime() {
@@ -177,6 +125,66 @@ export default defineComponent({
       };
       this.currentDate = now.toLocaleDateString("ja-JP", options);
     },
+    async fetchData() {
+      try {
+        this.loading = true;
+        const userId = 1; // TODO: Get from user context/auth
+        
+        // Fetch today's todos and categories in parallel
+        const [todosResponse, categoriesResponse] = await Promise.all([
+          TodoItemRepository.getTodayTodoItems(userId),
+          TodoCategoryRepository.getTodoCategoriesByUserId(userId)
+        ]);
+        
+        this.todos = todosResponse;
+        this.categories = categoriesResponse;
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    formatDueDate(dateString: string): string {
+      const date = new Date(dateString);
+      const today = new Date();
+      const isToday = date.toDateString() === today.toDateString();
+      
+      if (isToday) {
+        return `今日 ${date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}`;
+      }
+      
+      return date.toLocaleDateString("ja-JP", {
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    },
+    formatDate(dateString: string): string {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("ja-JP", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric"
+      });
+    },
+    getCategoryName(categoryId?: number): string {
+      if (!categoryId) return "";
+      const category = this.categories.find(c => c.id === categoryId);
+      return category?.name || "";
+    },
+    getTodoPriorityClass(todo: TodoItem): string {
+      const dueDate = new Date(todo.due_date);
+      const now = new Date();
+      const hoursUntilDue = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+      
+      if (hoursUntilDue < 2) {
+        return "bg-red-50 border-red-300";
+      } else if (hoursUntilDue < 6) {
+        return "bg-orange-50 border-orange-200";
+      }
+      return "";
+    }
   },
 });
 </script>

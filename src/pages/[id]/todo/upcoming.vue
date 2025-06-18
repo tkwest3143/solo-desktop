@@ -27,118 +27,133 @@
             <option>未完了</option>
             <option>完了済み</option>
           </select>
-          <select class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
-            <option>すべてのカテゴリ</option>
-            <option>実装</option>
-            <option>デザイン</option>
-            <option>会議</option>
+          <select v-model="selectedCategoryId" class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            <option value="">すべてのカテゴリ</option>
+            <option v-for="category in categories" :key="category.id" :value="category.id">
+              {{ category.name }}
+            </option>
           </select>
         </div>
         <div class="text-sm text-slate-500">
-          3件の期日が近いタスク
+          {{ filteredTodos.length }}件の期日が近いタスク
         </div>
       </div>
 
-      <!-- Urgent Tasks (Today) -->
-      <div class="mb-8">
-        <h2 class="text-xl font-semibold text-red-600 mb-4 flex items-center">
-          <Icon name="fluent:warning-20-filled" class="mr-2" />
-          今日期限（緊急）
-        </h2>
-        <div class="space-y-4">
-          <div class="bg-red-50 border-2 border-red-300 rounded-xl p-6 transition-all hover:shadow-lg">
-            <div class="flex items-start space-x-4">
-              <div class="mt-1">
-                <input type="checkbox" class="w-5 h-5 text-red-500 rounded border-2 border-red-300 focus:ring-red-500" />
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center space-x-3 mb-2">
-                  <h3 class="text-lg font-semibold text-slate-800">緊急バグ修正</h3>
-                  <span class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full font-medium">今日期限</span>
-                  <div class="w-3 h-3 rounded-full bg-red-400"></div>
+      <div v-if="loading" class="flex justify-center py-8">
+        <div class="text-slate-500">読み込み中...</div>
+      </div>
+
+      <div v-else-if="filteredTodos.length === 0" class="text-center py-8">
+        <div class="text-slate-500 text-lg">期日が近いタスクはありません</div>
+        <p class="text-slate-400 mt-2">素晴らしいです！スケジュール通りに進んでいますね</p>
+      </div>
+
+      <div v-else>
+        <!-- Urgent Tasks (Today) -->
+        <div v-if="todayTasks.length > 0" class="mb-8">
+          <h2 class="text-xl font-semibold text-red-600 mb-4 flex items-center">
+            <Icon name="fluent:warning-20-filled" class="mr-2" />
+            今日期限（緊急）
+          </h2>
+          <div class="space-y-4">
+            <div
+              v-for="todo in todayTasks"
+              :key="todo.id"
+              class="bg-red-50 border-2 border-red-300 rounded-xl p-6 transition-all hover:shadow-lg"
+            >
+              <div class="flex items-start space-x-4">
+                <div class="mt-1">
+                  <input type="checkbox" class="w-5 h-5 text-red-500 rounded border-2 border-red-300 focus:ring-red-500" />
                 </div>
-                <p class="text-slate-600 mb-3">ユーザーログイン機能の重要なバグを修正する必要があります</p>
-                <div class="flex items-center space-x-4 text-sm text-slate-500">
-                  <span class="text-red-600 font-medium">期限: 今日 18:00（残り3時間）</span>
-                  <span>カテゴリ: 実装</span>
+                <div class="flex-1">
+                  <div class="flex items-center space-x-3 mb-2">
+                    <h3 class="text-lg font-semibold text-slate-800">{{ todo.title }}</h3>
+                    <span class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full font-medium">今日期限</span>
+                    <div
+                      v-if="todo.color"
+                      class="w-3 h-3 rounded-full"
+                      :style="{ backgroundColor: todo.color }"
+                    ></div>
+                  </div>
+                  <p v-if="todo.content" class="text-slate-600 mb-3">{{ todo.content }}</p>
+                  <div class="flex items-center space-x-4 text-sm text-slate-500">
+                    <span class="text-red-600 font-medium">期限: {{ formatDueDate(todo.due_date) }}（{{ getTimeUntilDue(todo.due_date) }}）</span>
+                    <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Tomorrow's Tasks -->
-      <div class="mb-8">
-        <h2 class="text-xl font-semibold text-orange-600 mb-4 flex items-center">
-          <Icon name="fluent:calendar-20-filled" class="mr-2" />
-          明日期限
-        </h2>
-        <div class="space-y-4">
-          <div class="bg-orange-50 border-2 border-orange-200 rounded-xl p-6 transition-all hover:shadow-lg">
-            <div class="flex items-start space-x-4">
-              <div class="mt-1">
-                <input type="checkbox" class="w-5 h-5 text-orange-500 rounded border-2 border-orange-300 focus:ring-orange-500" />
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center space-x-3 mb-2">
-                  <h3 class="text-lg font-semibold text-slate-800">プレゼンテーション準備</h3>
-                  <span class="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">明日期限</span>
-                  <div class="w-3 h-3 rounded-full bg-blue-400"></div>
+        <!-- Tomorrow's Tasks -->
+        <div v-if="tomorrowTasks.length > 0" class="mb-8">
+          <h2 class="text-xl font-semibold text-orange-600 mb-4 flex items-center">
+            <Icon name="fluent:calendar-20-filled" class="mr-2" />
+            明日期限
+          </h2>
+          <div class="space-y-4">
+            <div
+              v-for="todo in tomorrowTasks"
+              :key="todo.id"
+              class="bg-orange-50 border-2 border-orange-200 rounded-xl p-6 transition-all hover:shadow-lg"
+            >
+              <div class="flex items-start space-x-4">
+                <div class="mt-1">
+                  <input type="checkbox" class="w-5 h-5 text-orange-500 rounded border-2 border-orange-300 focus:ring-orange-500" />
                 </div>
-                <p class="text-slate-600 mb-3">来週のプロジェクト会議用のプレゼンテーション資料作成</p>
-                <div class="flex items-center space-x-4 text-sm text-slate-500">
-                  <span class="text-orange-600 font-medium">期限: 明日 15:00</span>
-                  <span>カテゴリ: 会議</span>
+                <div class="flex-1">
+                  <div class="flex items-center space-x-3 mb-2">
+                    <h3 class="text-lg font-semibold text-slate-800">{{ todo.title }}</h3>
+                    <span class="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">明日期限</span>
+                    <div
+                      v-if="todo.color"
+                      class="w-3 h-3 rounded-full"
+                      :style="{ backgroundColor: todo.color }"
+                    ></div>
+                  </div>
+                  <p v-if="todo.content" class="text-slate-600 mb-3">{{ todo.content }}</p>
+                  <div class="flex items-center space-x-4 text-sm text-slate-500">
+                    <span class="text-orange-600 font-medium">期限: {{ formatDueDate(todo.due_date) }}</span>
+                    <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- This Week's Tasks -->
-      <div class="mb-8">
-        <h2 class="text-xl font-semibold text-yellow-600 mb-4 flex items-center">
-          <Icon name="fluent:calendar-week-start-20-filled" class="mr-2" />
-          今週期限
-        </h2>
-        <div class="space-y-4">
-          <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 transition-all hover:shadow-lg">
-            <div class="flex items-start space-x-4">
-              <div class="mt-1">
-                <input type="checkbox" class="w-5 h-5 text-yellow-500 rounded border-2 border-yellow-300 focus:ring-yellow-500" />
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center space-x-3 mb-2">
-                  <h3 class="text-lg font-semibold text-slate-800">新機能テスト</h3>
-                  <span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">今週期限</span>
-                  <div class="w-3 h-3 rounded-full bg-red-400"></div>
+        <!-- This Week's Tasks -->
+        <div v-if="thisWeekTasks.length > 0" class="mb-8">
+          <h2 class="text-xl font-semibold text-yellow-600 mb-4 flex items-center">
+            <Icon name="fluent:calendar-week-start-20-filled" class="mr-2" />
+            今週期限
+          </h2>
+          <div class="space-y-4">
+            <div
+              v-for="todo in thisWeekTasks"
+              :key="todo.id"
+              class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 transition-all hover:shadow-lg"
+            >
+              <div class="flex items-start space-x-4">
+                <div class="mt-1">
+                  <input type="checkbox" class="w-5 h-5 text-yellow-500 rounded border-2 border-yellow-300 focus:ring-yellow-500" />
                 </div>
-                <p class="text-slate-600 mb-3">新しく実装した機能の統合テストとバグ修正</p>
-                <div class="flex items-center space-x-4 text-sm text-slate-500">
-                  <span class="text-yellow-600 font-medium">期限: 6月21日（金）</span>
-                  <span>カテゴリ: 実装</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 transition-all hover:shadow-lg">
-            <div class="flex items-start space-x-4">
-              <div class="mt-1">
-                <input type="checkbox" class="w-5 h-5 text-yellow-500 rounded border-2 border-yellow-300 focus:ring-yellow-500" />
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center space-x-3 mb-2">
-                  <h3 class="text-lg font-semibold text-slate-800">UIデザインレビュー</h3>
-                  <span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">今週期限</span>
-                  <div class="w-3 h-3 rounded-full bg-green-400"></div>
-                </div>
-                <p class="text-slate-600 mb-3">デザインチームとの最終レビューミーティング</p>
-                <div class="flex items-center space-x-4 text-sm text-slate-500">
-                  <span class="text-yellow-600 font-medium">期限: 6月22日（土）</span>
-                  <span>カテゴリ: デザイン</span>
+                <div class="flex-1">
+                  <div class="flex items-center space-x-3 mb-2">
+                    <h3 class="text-lg font-semibold text-slate-800">{{ todo.title }}</h3>
+                    <span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">今週期限</span>
+                    <div
+                      v-if="todo.color"
+                      class="w-3 h-3 rounded-full"
+                      :style="{ backgroundColor: todo.color }"
+                    ></div>
+                  </div>
+                  <p v-if="todo.content" class="text-slate-600 mb-3">{{ todo.content }}</p>
+                  <div class="flex items-center space-x-4 text-sm text-slate-500">
+                    <span class="text-yellow-600 font-medium">期限: {{ formatDueDate(todo.due_date) }}</span>
+                    <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -167,8 +182,131 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
+import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
+import type { TodoItem, TodoCategory } from "~/models/todo";
 
 export default defineComponent({
   layout: "todo",
+  data() {
+    return {
+      todos: [] as TodoItem[],
+      categories: [] as TodoCategory[],
+      selectedCategoryId: "",
+      loading: true,
+    };
+  },
+  computed: {
+    filteredTodos(): TodoItem[] {
+      if (!this.selectedCategoryId) {
+        return this.todos;
+      }
+      return this.todos.filter(todo => 
+        todo.category_id === parseInt(this.selectedCategoryId)
+      );
+    },
+    todayTasks(): TodoItem[] {
+      const today = new Date();
+      const todayStr = today.toDateString();
+      return this.filteredTodos.filter(todo => {
+        const dueDate = new Date(todo.due_date);
+        return dueDate.toDateString() === todayStr;
+      });
+    },
+    tomorrowTasks(): TodoItem[] {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toDateString();
+      return this.filteredTodos.filter(todo => {
+        const dueDate = new Date(todo.due_date);
+        return dueDate.toDateString() === tomorrowStr;
+      });
+    },
+    thisWeekTasks(): TodoItem[] {
+      const today = new Date();
+      const dayOfWeek = today.getDay();
+      const daysUntilSunday = (7 - dayOfWeek) % 7;
+      const endOfWeek = new Date(today);
+      endOfWeek.setDate(today.getDate() + daysUntilSunday);
+      
+      return this.filteredTodos.filter(todo => {
+        const dueDate = new Date(todo.due_date);
+        const todayStr = today.toDateString();
+        const tomorrowStr = new Date(today.getTime() + 24 * 60 * 60 * 1000).toDateString();
+        
+        // Exclude today and tomorrow tasks
+        return dueDate > today && 
+               dueDate <= endOfWeek && 
+               dueDate.toDateString() !== todayStr && 
+               dueDate.toDateString() !== tomorrowStr;
+      });
+    }
+  },
+  async mounted() {
+    await this.fetchData();
+  },
+  methods: {
+    async fetchData() {
+      try {
+        this.loading = true;
+        const userId = 1; // TODO: Get from user context/auth
+        
+        // Fetch upcoming todos (7 days) and categories in parallel
+        const [todosResponse, categoriesResponse] = await Promise.all([
+          TodoItemRepository.getUpcomingTodoItems(userId, 7),
+          TodoCategoryRepository.getTodoCategoriesByUserId(userId)
+        ]);
+        
+        this.todos = todosResponse;
+        this.categories = categoriesResponse;
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    formatDueDate(dateString: string): string {
+      const date = new Date(dateString);
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      
+      if (date.toDateString() === today.toDateString()) {
+        return `今日 ${date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}`;
+      } else if (date.toDateString() === tomorrow.toDateString()) {
+        return `明日 ${date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}`;
+      }
+      
+      return date.toLocaleDateString("ja-JP", {
+        month: "numeric",
+        day: "numeric",
+        weekday: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    },
+    getCategoryName(categoryId?: number): string {
+      if (!categoryId) return "";
+      const category = this.categories.find(c => c.id === categoryId);
+      return category?.name || "";
+    },
+    getTimeUntilDue(dateString: string): string {
+      const dueDate = new Date(dateString);
+      const now = new Date();
+      const hoursUntilDue = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+      
+      if (hoursUntilDue < 0) {
+        return "期限超過";
+      } else if (hoursUntilDue < 1) {
+        const minutes = Math.floor(hoursUntilDue * 60);
+        return `残り${minutes}分`;
+      } else if (hoursUntilDue < 24) {
+        return `残り${Math.floor(hoursUntilDue)}時間`;
+      } else {
+        const days = Math.floor(hoursUntilDue / 24);
+        return `残り${days}日`;
+      }
+    }
+  },
 });
 </script>

@@ -89,10 +89,9 @@
                 class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
               >
                 <option value="">カテゴリを選択</option>
-                <option value="1">実装</option>
-                <option value="2">デザイン</option>
-                <option value="3">会議</option>
-                <option value="4">その他</option>
+                <option v-for="category in categories" :key="category.id" :value="category.id">
+                  {{ category.name }}
+                </option>
               </select>
             </div>
             <div>
@@ -155,10 +154,12 @@
             </NuxtLink>
             <button
               type="submit"
-              class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors shadow-lg"
+              :disabled="loading"
+              class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Icon name="fluent:save-20-filled" class="mr-2" />
-              保存
+              <Icon v-if="loading" name="fluent:spinner-ios-20-filled" class="mr-2 animate-spin" />
+              <Icon v-else name="fluent:save-20-filled" class="mr-2" />
+              {{ loading ? '保存中...' : '保存' }}
             </button>
           </div>
         </form>
@@ -186,6 +187,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
+import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
+import type { TodoCategory, TodoItemForInsert } from "~/models/todo";
 
 export default defineComponent({
   layout: "todo",
@@ -201,6 +205,7 @@ export default defineComponent({
         color: "#3b82f6",
         link: "",
       },
+      categories: [] as TodoCategory[],
       colorOptions: [
         { name: "ブルー", value: "#3b82f6", bg: "#3b82f6" },
         { name: "レッド", value: "#ef4444", bg: "#ef4444" },
@@ -211,35 +216,63 @@ export default defineComponent({
         { name: "インディゴ", value: "#6366f1", bg: "#6366f1" },
         { name: "グレー", value: "#6b7280", bg: "#6b7280" },
       ],
+      loading: false,
     };
   },
-  mounted() {
+  async mounted() {
     // Set default due date to today
     const today = new Date();
     this.todo.due_date = today.toISOString().split('T')[0];
+    
+    // Load categories
+    await this.loadCategories();
   },
   methods: {
-    saveTodo() {
-      // Create full datetime string
-      const dueDateTime = this.todo.due_time 
-        ? `${this.todo.due_date} ${this.todo.due_time}:00`
-        : `${this.todo.due_date} 23:59:59`;
+    async loadCategories() {
+      try {
+        const userId = 1; // TODO: Get from user context/auth
+        this.categories = await TodoCategoryRepository.getTodoCategoriesByUserId(userId);
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+      }
+    },
+    async saveTodo() {
+      if (!this.todo.title.trim()) {
+        alert("タイトルを入力してください");
+        return;
+      }
 
-      const todoData = {
-        title: this.todo.title,
-        content: this.todo.content || null,
-        due_date: dueDateTime,
-        category_id: this.todo.category_id ? parseInt(this.todo.category_id) : null,
-        color: this.todo.color,
-        link: this.todo.link || null,
-      };
+      try {
+        this.loading = true;
+        
+        // Create full datetime string
+        const dueDateTime = this.todo.due_time 
+          ? `${this.todo.due_date} ${this.todo.due_time}:00`
+          : `${this.todo.due_date} 23:59:59`;
 
-      console.log("Todo data to save:", todoData);
-      
-      // TODO: Save to backend using Tauri commands
-      // For now, just show success message and navigate back
-      alert("Todoが作成されました！\n（実際の保存機能は今後実装予定です）");
-      this.$router.push({ name: 'id-todo', params: { id: this.$route.params.id } });
+        const todoData: TodoItemForInsert = {
+          title: this.todo.title.trim(),
+          content: this.todo.content.trim() || undefined,
+          due_date: dueDateTime,
+          category_id: this.todo.category_id ? parseInt(this.todo.category_id) : undefined,
+          color: this.todo.color,
+          link: this.todo.link.trim() || undefined,
+          user_id: 1, // TODO: Get from user context/auth
+        };
+
+        console.log("Saving todo data:", todoData);
+        
+        const result = await TodoItemRepository.createTodoItem(todoData);
+        console.log("Save result:", result);
+        
+        alert("Todoが正常に作成されました！");
+        this.$router.push({ name: 'id-todo', params: { id: this.$route.params.id } });
+      } catch (error) {
+        console.error("Failed to save todo:", error);
+        alert("Todoの作成に失敗しました。もう一度試してください。");
+      } finally {
+        this.loading = false;
+      }
     },
   },
 });
