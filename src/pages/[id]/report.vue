@@ -46,12 +46,18 @@
             />
           </div>
           <div class="flex-1 min-w-40">
-            <button
-              @click="loadReportData"
-              class="w-full px-4 py-2 text-basic-0 bg-primary-400 hover:bg-primary-500 rounded-lg transition-colors"
-            >
-              データ更新
-            </button>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                &nbsp;
+              </label>
+              <button
+                @click="loadReportData"
+                class="w-full px-4 py-2 text-basic-0 bg-primary-400 hover:bg-primary-500 rounded-lg transition-colors"
+                style="min-height: 2rem"
+              >
+                データ更新
+              </button>
+            </div>
           </div>
         </div>
       </div>
