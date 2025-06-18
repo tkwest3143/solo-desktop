@@ -29,6 +29,14 @@
       </div>
       <div v-if="userData" class="hover:bg-basic-200 h-full">
         <NuxtLink
+          :to="{ name: 'id-report', params: { id: userData.prop.id } }"
+          class="flex items-center justify-center px-6 w-full h-full"
+        >
+          レポート
+        </NuxtLink>
+      </div>
+      <div v-if="userData" class="hover:bg-basic-200 h-full">
+        <NuxtLink
           :to="{ name: 'id-settings', params: { id: userData.prop.id } }"
           class="flex items-center justify-center px-6 hover:bg-basic-200 w-full h-full"
         >
