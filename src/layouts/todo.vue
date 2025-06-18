@@ -66,21 +66,28 @@
               </NuxtLink>
             </div>
             <div class="space-y-1">
-              <!-- Sample categories - these will be dynamic -->
-              <div class="flex items-center p-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer group">
-                <div class="w-3 h-3 rounded-full bg-red-400 mr-3"></div>
-                <span class="text-sm text-slate-600 group-hover:text-slate-800">実装</span>
-                <span class="ml-auto text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">3</span>
+              <!-- Dynamic Categories -->
+              <div v-if="loading" class="text-center py-2">
+                <div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-slate-400"></div>
               </div>
-              <div class="flex items-center p-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer group">
-                <div class="w-3 h-3 rounded-full bg-green-400 mr-3"></div>
-                <span class="text-sm text-slate-600 group-hover:text-slate-800">デザイン</span>
-                <span class="ml-auto text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">1</span>
+              <div v-else-if="categories.length === 0" class="text-center py-2">
+                <p class="text-xs text-slate-400">カテゴリなし</p>
               </div>
-              <div class="flex items-center p-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer group">
-                <div class="w-3 h-3 rounded-full bg-blue-400 mr-3"></div>
-                <span class="text-sm text-slate-600 group-hover:text-slate-800">会議</span>
-                <span class="ml-auto text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">2</span>
+              <div v-else>
+                <div 
+                  v-for="category in categories" 
+                  :key="category.id"
+                  class="flex items-center p-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer group"
+                >
+                  <div 
+                    class="w-3 h-3 rounded-full mr-3"
+                    :style="{ backgroundColor: category.color || '#6b7280' }"
+                  ></div>
+                  <span class="text-sm text-slate-600 group-hover:text-slate-800">{{ category.name }}</span>
+                  <span class="ml-auto text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">
+                    {{ categoryTaskCounts[category.id] || 0 }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -104,9 +111,58 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
+import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
+import type { TodoCategory } from "~/models/todo";
 
 export default defineComponent({
   name: "TodoLayout",
+  data() {
+    return {
+      categories: [] as TodoCategory[],
+      categoryTaskCounts: {} as Record<number, number>,
+      loading: true,
+    };
+  },
+  async mounted() {
+    await this.fetchCategories();
+  },
+  watch: {
+    '$route.params.id': {
+      handler() {
+        this.fetchCategories();
+      },
+      immediate: false,
+    },
+  },
+  methods: {
+    async fetchCategories() {
+      if (!this.$route.params.id) return;
+      
+      try {
+        this.loading = true;
+        const userId = this.$route.params.id as string;
+        
+        // Fetch categories
+        this.categories = await TodoCategoryRepository.getTodoCategoriesByUserId(userId);
+        
+        // Fetch task counts for each category
+        for (const category of this.categories) {
+          try {
+            const todos = await TodoItemRepository.getTodoItemsByCategoryId(category.id);
+            this.categoryTaskCounts[category.id] = todos.length;
+          } catch (error) {
+            console.error(`Failed to fetch todos for category ${category.id}:`, error);
+            this.categoryTaskCounts[category.id] = 0;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
 });
 </script>
 

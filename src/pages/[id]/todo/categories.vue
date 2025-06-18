@@ -54,116 +54,6 @@
             <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">アクティブ</span>
           </div>
         </div>
-
-        <div class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-3">
-              <div class="w-4 h-4 rounded-full bg-green-400"></div>
-              <h3 class="text-xl font-semibold text-slate-800">デザイン</h3>
-            </div>
-            <div class="flex space-x-2">
-              <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                <Icon name="fluent:edit-20-filled" size="1.2em" />
-              </button>
-              <button class="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                <Icon name="fluent:delete-20-filled" size="1.2em" />
-              </button>
-            </div>
-          </div>
-          <p class="text-slate-600 mb-4">UI/UXデザインに関するタスク</p>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500">2個のタスク</span>
-            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">アクティブ</span>
-          </div>
-        </div>
-
-        <div class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-3">
-              <div class="w-4 h-4 rounded-full bg-blue-400"></div>
-              <h3 class="text-xl font-semibold text-slate-800">会議</h3>
-            </div>
-            <div class="flex space-x-2">
-              <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                <Icon name="fluent:edit-20-filled" size="1.2em" />
-              </button>
-              <button class="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                <Icon name="fluent:delete-20-filled" size="1.2em" />
-              </button>
-            </div>
-          </div>
-          <p class="text-slate-600 mb-4">会議・打ち合わせに関するタスク</p>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500">4個のタスク</span>
-            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">アクティブ</span>
-          </div>
-        </div>
-
-        <div class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-3">
-              <div class="w-4 h-4 rounded-full bg-yellow-400"></div>
-              <h3 class="text-xl font-semibold text-slate-800">レビュー</h3>
-            </div>
-            <div class="flex space-x-2">
-              <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                <Icon name="fluent:edit-20-filled" size="1.2em" />
-              </button>
-              <button class="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                <Icon name="fluent:delete-20-filled" size="1.2em" />
-              </button>
-            </div>
-          </div>
-          <p class="text-slate-600 mb-4">コードレビュー・品質チェック</p>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500">1個のタスク</span>
-            <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">アクティブ</span>
-          </div>
-        </div>
-
-        <div class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-3">
-              <div class="w-4 h-4 rounded-full bg-purple-400"></div>
-              <h3 class="text-xl font-semibold text-slate-800">学習</h3>
-            </div>
-            <div class="flex space-x-2">
-              <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                <Icon name="fluent:edit-20-filled" size="1.2em" />
-              </button>
-              <button class="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                <Icon name="fluent:delete-20-filled" size="1.2em" />
-              </button>
-            </div>
-          </div>
-          <p class="text-slate-600 mb-4">技術学習・研修に関するタスク</p>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500">2個のタスク</span>
-            <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full font-medium">アクティブ</span>
-          </div>
-        </div>
-
-        <div class="bg-slate-50 border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg opacity-60">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-3">
-              <div class="w-4 h-4 rounded-full bg-slate-400"></div>
-              <h3 class="text-xl font-semibold text-slate-800">その他</h3>
-            </div>
-            <div class="flex space-x-2">
-              <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                <Icon name="fluent:edit-20-filled" size="1.2em" />
-              </button>
-              <button class="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                <Icon name="fluent:delete-20-filled" size="1.2em" />
-              </button>
-            </div>
-          </div>
-          <p class="text-slate-600 mb-4">その他の雑多なタスク</p>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500">0個のタスク</span>
-            <span class="bg-slate-100 text-slate-800 text-xs px-2 py-1 rounded-full font-medium">非アクティブ</span>
-          </div>
-        </div>
       </div>
 
       <!-- Tips Section -->
@@ -300,7 +190,7 @@ export default defineComponent({
     async fetchData() {
       try {
         this.loading = true;
-        const userId = 1; // TODO: Get from user context/auth
+        const userId = this.$route.params.id as string;
         
         // Fetch categories
         this.categories = await TodoCategoryRepository.getTodoCategoriesByUserId(userId);
@@ -339,7 +229,7 @@ export default defineComponent({
       }
 
       try {
-        const userId = 1; // TODO: Get from user context/auth
+        const userId = this.$route.params.id as string;
         await TodoCategoryRepository.createTodoCategory({
           name: this.categoryForm.name.trim(),
           memo: this.categoryForm.description.trim() || undefined,

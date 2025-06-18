@@ -22,8 +22,8 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-blue-100 text-sm">今日のタスク</p>
-              <p class="text-3xl font-bold">5</p>
-              <p class="text-blue-200 text-sm">3個完了済み</p>
+              <p class="text-3xl font-bold">{{ stats.today }}</p>
+              <p class="text-blue-200 text-sm">{{ stats.todayCompleted }}個完了済み</p>
             </div>
             <Icon name="fluent:calendar-today-20-filled" size="3em" class="text-blue-200" />
           </div>
@@ -34,7 +34,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-orange-100 text-sm">期日が近い</p>
-              <p class="text-3xl font-bold">3</p>
+              <p class="text-3xl font-bold">{{ stats.upcoming }}</p>
               <p class="text-orange-200 text-sm">要注意タスク</p>
             </div>
             <Icon name="fluent:calendar-clock-20-filled" size="3em" class="text-orange-200" />
@@ -46,8 +46,8 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-green-100 text-sm">総タスク数</p>
-              <p class="text-3xl font-bold">12</p>
-              <p class="text-green-200 text-sm">4カテゴリ</p>
+              <p class="text-3xl font-bold">{{ stats.total }}</p>
+              <p class="text-green-200 text-sm">{{ stats.categoryCount }}カテゴリ</p>
             </div>
             <Icon name="fluent:task-list-square-20-filled" size="3em" class="text-green-200" />
           </div>
@@ -107,35 +107,47 @@
           </div>
         </div>
         <div class="p-6">
-          <!-- Sample task items -->
-          <div class="space-y-3">
-            <div class="flex items-center p-3 bg-slate-50 rounded-lg">
-              <div class="w-4 h-4 border-2 border-slate-300 rounded mr-3"></div>
-              <div class="flex-1">
-                <div class="text-slate-800 font-medium">サンプルタスク1</div>
-                <div class="text-sm text-slate-500">期限: 2024-06-20</div>
-              </div>
-              <div class="w-3 h-3 rounded-full bg-red-400"></div>
-            </div>
-            <div class="flex items-center p-3 bg-slate-50 rounded-lg">
-              <div class="w-4 h-4 border-2 border-slate-300 rounded mr-3"></div>
-              <div class="flex-1">
-                <div class="text-slate-800 font-medium">サンプルタスク2</div>
-                <div class="text-sm text-slate-500">期限: 2024-06-22</div>
-              </div>
-              <div class="w-3 h-3 rounded-full bg-green-400"></div>
-            </div>
-            <div class="flex items-center p-3 bg-slate-50 rounded-lg">
-              <div class="w-4 h-4 border-2 border-slate-300 rounded mr-3"></div>
-              <div class="flex-1">
-                <div class="text-slate-800 font-medium">サンプルタスク3</div>
-                <div class="text-sm text-slate-500">期限: 2024-06-25</div>
-              </div>
-              <div class="w-3 h-3 rounded-full bg-blue-400"></div>
-            </div>
+          <div v-if="loading" class="text-center py-8">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p class="mt-2 text-slate-600">読み込み中...</p>
           </div>
-          <div class="mt-4 text-center text-slate-500 text-sm">
-            実際のデータはこれから実装予定です
+          <div v-else-if="recentTasks.length === 0" class="text-center py-8">
+            <Icon name="fluent:document-add-20-filled" size="3em" class="text-slate-300 mb-4" />
+            <p class="text-slate-500">まだタスクがありません</p>
+            <NuxtLink
+              :to="{ name: 'id-todo-add', params: { id: $route.params.id } }"
+              class="mt-2 inline-block text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
+              最初のタスクを作成 →
+            </NuxtLink>
+          </div>
+          <div v-else class="space-y-3">
+            <div 
+              v-for="task in recentTasks" 
+              :key="task.id"
+              class="flex items-center p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              <div 
+                :class="[
+                  'w-4 h-4 border-2 rounded mr-3',
+                  task.completed ? 'bg-green-500 border-green-500' : 'border-slate-300'
+                ]"
+              ></div>
+              <div class="flex-1">
+                <div :class="['font-medium', task.completed ? 'text-slate-500 line-through' : 'text-slate-800']">
+                  {{ task.title }}
+                </div>
+                <div class="text-sm text-slate-500">
+                  期限: {{ formatDate(task.due_date) }}
+                </div>
+              </div>
+              <div 
+                v-if="task.category"
+                class="w-3 h-3 rounded-full"
+                :style="{ backgroundColor: task.category.color || '#6b7280' }"
+                :title="task.category.name"
+              ></div>
+            </div>
           </div>
         </div>
       </div>
@@ -145,6 +157,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
+import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
+import type { TodoItem, TodoCategory } from "~/models/todo";
 
 export default defineComponent({
   layout: "todo",
@@ -152,10 +167,20 @@ export default defineComponent({
     return {
       currentDate: "",
       currentDay: "",
+      loading: true,
+      stats: {
+        today: 0,
+        todayCompleted: 0,
+        upcoming: 0,
+        total: 0,
+        categoryCount: 0,
+      },
+      recentTasks: [] as TodoItem[],
     };
   },
-  mounted() {
+  async mounted() {
     this.updateDateTime();
+    await this.fetchData();
   },
   methods: {
     updateDateTime() {
@@ -169,6 +194,42 @@ export default defineComponent({
       
       const days = ["日", "月", "火", "水", "木", "金", "土"];
       this.currentDay = days[now.getDay()] + "曜日";
+    },
+    async fetchData() {
+      try {
+        this.loading = true;
+        const userId = this.$route.params.id as string;
+        
+        // Fetch all data in parallel
+        const [allTodos, todayTodos, upcomingTodos, categories] = await Promise.all([
+          TodoItemRepository.getAllTodoItems(userId),
+          TodoItemRepository.getTodayTodoItems(userId),
+          TodoItemRepository.getUpcomingTodoItems(userId),
+          TodoCategoryRepository.getTodoCategoriesByUserId(userId),
+        ]);
+        
+        // Update stats
+        this.stats.today = todayTodos.length;
+        this.stats.todayCompleted = todayTodos.filter(todo => todo.completed).length;
+        this.stats.upcoming = upcomingTodos.length;
+        this.stats.total = allTodos.length;
+        this.stats.categoryCount = categories.length;
+        
+        // Get recent tasks (last 5 tasks sorted by creation date)
+        this.recentTasks = allTodos
+          .sort((a, b) => new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime())
+          .slice(0, 5);
+        
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    formatDate(dateString: string): string {
+      if (!dateString) return "";
+      const date = new Date(dateString);
+      return date.toLocaleDateString("ja-JP");
     },
   },
 });
