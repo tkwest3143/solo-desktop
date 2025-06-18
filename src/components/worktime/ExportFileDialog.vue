@@ -14,22 +14,11 @@
         <label for="columns" class="block mb-2"
           >エクスポートする列を選択してください</label
         >
-        <div
-          class="flex items-center p-2 mx-2 cursor-pointer border border-basic-300 rounded-lg mb-1 w-1/2"
-          :class="{ 'bg-primary-200': isHeader, 'bg-basic-50': !isHeader }"
-          @click="isHeader = !isHeader"
-        >
-          <div
-            class="flex justify-center w-6 h-6 border rounded border-basic-300"
-          >
-            <Icon
-              name="material-symbols:check-rounded"
-              class="h-5 w-5"
-              v-if="isHeader"
-            />
-          </div>
-          <label class="ml-2">ヘッダも含める</label>
-        </div>
+        <CommonCheckbox
+          v-model="isHeader"
+          label="ヘッダも含める"
+          container-class="p-2 mx-2 border border-basic-300 rounded-lg mb-1 w-1/2 bg-basic-50"
+        />
         <div id="columns" class="w-full p-2 grid grid-cols-2 gap-2">
           <div
             v-for="(column, index) in selectableColumns"
@@ -72,16 +61,11 @@
             :class="{ 'bg-primary-100': selectedSeparatorIndex === index }"
             @click="selectedSeparatorIndex = index"
           >
-            <div
-              class="flex items-center justify-center w-6 h-6 border rounded"
-            >
-              <Icon
-                name="material-symbols:check-rounded"
-                class="h-5 w-5"
-                v-if="selectedSeparatorIndex === index"
-              />
-            </div>
-            <label for="columns" class="ml-2">{{ separator.text }}</label>
+            <CommonCheckbox
+              :model-value="selectedSeparatorIndex === index"
+              @update:model-value="() => {}"
+              :label="separator.text"
+            />
           </div>
         </div>
       </div>
@@ -123,9 +107,14 @@
 <script lang="ts">
 import { Switch } from "@headlessui/vue";
 import { defineComponent } from "vue";
+import CommonCheckbox from "~/components/CommonCheckbox.vue";
 import { SeparatorArray } from "~/constants/separetor";
 
 export default defineComponent({
+  components: {
+    Switch,
+    CommonCheckbox,
+  },
   props: {
     selectableColumns: {
       type: Array<string>,

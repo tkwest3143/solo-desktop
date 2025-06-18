@@ -1,15 +1,16 @@
 <template>
-  <div class="form-group mb-4">
-    <label :for="id" class="block text-gray-700 text-sm font-bold mb-2">{{ label }}</label>
+  <div class="form-group">
+    <label :for="id" class="block text-gray-700 text-sm font-bold mb-2">
+      {{ label }}
+    </label>
     <input
-      :type="type"
       :id="id"
+      type="time"
       :value="modelValue"
       @input="
         $emit('update:modelValue', ($event.target as HTMLInputElement).value)
       "
       :required="required"
-      :placeholder="placeholder"
       :class="[
         'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',
         { 'border-error-500': errorMessage },
@@ -20,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from "vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
@@ -36,17 +37,9 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    type: {
-      type: String as PropType<"text" | "email" | "password">,
-      default: "text",
-    },
     required: {
       type: Boolean,
       default: false,
-    },
-    placeholder: {
-      type: String,
-      default: "",
     },
     errorMessage: {
       type: String,
