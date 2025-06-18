@@ -1,0 +1,179 @@
+name: タスク / Task
+description: GitHub Copilot agentを利用したコード生成に最適化されたタスクテンプレート
+title: "[TASK] "
+labels: ["task", "copilot-friendly"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## タスクの詳細 / Task Details
+        このテンプレートは GitHub Copilot agent がコードを生成しやすいように設計されています。
+        各項目を詳細に記入することで、より正確なコード生成が可能になります。
+
+  - type: input
+    id: task-title
+    attributes:
+      label: タスクタイトル / Task Title
+      description: 実装したい機能や修正したい内容を簡潔に記述
+      placeholder: "例: ユーザー設定画面にテーマ切り替え機能を追加"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task-type
+    attributes:
+      label: タスクタイプ / Task Type
+      description: 実装するタスクの種類を選択
+      options:
+        - 新機能 / New Feature
+        - バグ修正 / Bug Fix
+        - UI/UX改善 / UI/UX Improvement
+        - リファクタリング / Refactoring
+        - テスト追加 / Add Tests
+        - ドキュメント / Documentation
+        - パフォーマンス改善 / Performance Improvement
+        - その他 / Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-components
+    attributes:
+      label: 影響コンポーネント / Affected Components
+      description: 変更が必要な主要コンポーネント
+      multiple: true
+      options:
+        - Frontend (Vue/Nuxt)
+        - Backend (Tauri/Rust)
+        - Database (SQLite/SeaORM)
+        - UI Components
+        - Models/Data Classes
+        - Repositories
+        - Pages/Views
+        - Tests
+        - Configuration
+        - その他 / Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: 現在の動作 / Current Behavior
+      description: 現在のアプリケーションの動作や状態を詳細に記述
+      placeholder: |
+        例:
+        - 現在はユーザー設定画面にテーマ設定項目がない
+        - アプリケーションは常にライトテーマで表示される
+        - src/pages/[id]/settings/user.vue にユーザー設定フォームが存在する
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 期待する動作 / Expected Behavior
+      description: 実装後の期待する動作を具体的に記述
+      placeholder: |
+        例:
+        - ユーザー設定画面にテーマ選択ドロップダウンを追加
+        - ライト/ダークテーマの切り替えが可能
+        - 選択したテーマがローカルストレージに保存される
+        - アプリケーション全体でテーマが適用される
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-requirements
+    attributes:
+      label: 技術的要件 / Technical Requirements
+      description: |
+        実装に必要な技術的な詳細を記述（コンポーネント、API、データ構造など）
+        GitHub Copilot が理解しやすいよう、具体的なファイル名やクラス名を含める
+      placeholder: |
+        例:
+        - src/models/user.ts のUserDataクラスにthemeプロパティを追加
+        - src/repositories/tauri-commands/user.ts のUserRepositoryでテーマ保存機能を実装
+        - src/pages/[id]/settings/user.vue にテーマ選択UIを追加
+        - TailwindCSS のdark:クラスを使用したダークテーマスタイル
+        - composables/useTheme.ts でテーマ管理ロジックを実装
+    validations:
+      required: true
+
+  - type: textarea
+    id: file-locations
+    attributes:
+      label: 関連ファイル / Related Files
+      description: 変更が必要と思われるファイルのパスを列挙
+      placeholder: |
+        例:
+        - src/models/user.ts
+        - src/repositories/tauri-commands/user.ts
+        - src/pages/[id]/settings/user.vue
+        - src/composables/useTheme.ts
+        - src/assets/css/tailwind.css
+        - tests/unit/models/user.spec.ts
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: 受入条件 / Acceptance Criteria
+      description: タスク完了の判定基準をチェックリスト形式で記述
+      placeholder: |
+        例:
+        - [ ] ユーザー設定画面にテーマ選択UIが表示される
+        - [ ] ライト/ダークテーマの切り替えができる
+        - [ ] 選択したテーマがローカルストレージに保存される
+        - [ ] アプリケーション再起動後もテーマ設定が保持される
+        - [ ] 既存のテストが全て通る
+        - [ ] 新機能のユニットテストが追加される
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度 / Priority
+      description: タスクの実装優先度
+      options:
+        - 🔴 高 / High
+        - 🟡 中 / Medium
+        - 🟢 低 / Low
+    validations:
+      required: true
+
+  - type: input
+    id: estimated-time
+    attributes:
+      label: 見積時間 / Estimated Time
+      description: 実装にかかる予想時間
+      placeholder: "例: 2-3 hours, 1 day, 1 week"
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 追加情報 / Additional Context
+      description: その他の関連情報、参考資料、注意事項など
+      placeholder: |
+        例:
+        - 参考URL: https://tailwindcss.com/docs/dark-mode
+        - 他のプロジェクトでの実装例
+        - 既知の制約や注意点
+        - 関連するIssueやPRへのリンク
+
+  - type: checkboxes
+    id: copilot-optimization
+    attributes:
+      label: Copilot最適化チェック / Copilot Optimization Check
+      description: GitHub Copilot が効果的にコード生成できるよう、以下の項目を確認してください
+      options:
+        - label: 具体的なファイル名とパスを記載した
+          required: false
+        - label: 既存のコード構造を参考にした要件を記載した
+          required: false
+        - label: 期待する動作を具体的に記述した
+          required: false
+        - label: 技術的な実装詳細を含めた
+          required: false
+        - label: テストの観点も考慮した
+          required: false

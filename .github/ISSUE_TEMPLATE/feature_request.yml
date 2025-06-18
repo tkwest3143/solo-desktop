@@ -1,0 +1,175 @@
+name: 機能要求 / Feature Request  
+description: 新機能の提案（GitHub Copilot最適化）
+title: "[FEATURE] "
+labels: ["enhancement", "copilot-friendly"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 機能要求 / Feature Request
+        このテンプレートは GitHub Copilot agent が新機能のコードを生成しやすいように設計されています。
+
+  - type: input
+    id: feature-title
+    attributes:
+      label: 機能タイトル / Feature Title
+      description: 提案する機能の名前
+      placeholder: "例: ダークテーマ対応機能"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: 解決したい課題 / Problem Statement
+      description: この機能によって解決したい問題や課題
+      placeholder: |
+        例:
+        - 現在のアプリケーションは明るい背景のみで、夜間の使用時に目に負担がかかる
+        - ユーザーから暗いテーマでの使用要望が寄せられている
+        - 長時間の作業時に画面の明るさが気になる
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: 提案する解決策 / Proposed Solution
+      description: 具体的にどのような機能を実装したいか
+      placeholder: |
+        例:
+        - ライトテーマとダークテーマの切り替え機能を追加
+        - ユーザー設定画面にテーマ選択オプションを追加
+        - システムの設定に合わせて自動切り替える機能
+        - 時間帯に応じた自動切り替え機能（オプション）
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature-category
+    attributes:
+      label: 機能カテゴリ / Feature Category
+      description: 機能の分類
+      options:
+        - UI/UX改善 / UI/UX Improvement
+        - パフォーマンス / Performance
+        - アクセシビリティ / Accessibility
+        - セキュリティ / Security
+        - データ管理 / Data Management
+        - ユーザビリティ / Usability
+        - 統合機能 / Integration
+        - 自動化 / Automation
+        - その他 / Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-approach
+    attributes:
+      label: 技術的アプローチ / Technical Approach
+      description: |
+        実装方法の提案（GitHub Copilot が理解しやすいよう具体的に）
+      placeholder: |
+        例:
+        - TailwindCSS の dark: クラスを使用したダークテーマ実装
+        - Nuxt3 の useColorMode() composable を活用
+        - localStorage でユーザーの選択を永続化
+        - CSS変数を使用したテーマ切り替え
+        - システム設定検知用に prefers-color-scheme メディアクエリを使用
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected-components
+    attributes:
+      label: 影響するコンポーネント / Affected Components
+      description: 変更が必要と思われるファイルやコンポーネント
+      placeholder: |
+        例:
+        - src/layouts/default.vue - メインレイアウト
+        - src/pages/[id]/settings/user.vue - ユーザー設定画面
+        - src/composables/useTheme.ts - テーマ管理ロジック（新規）
+        - src/assets/css/tailwind.css - スタイル定義
+        - nuxt.config.ts - TailwindCSS設定
+
+  - type: textarea
+    id: user-stories
+    attributes:
+      label: ユーザーストーリー / User Stories
+      description: この機能を使用するユーザーの具体的な使用シナリオ
+      placeholder: |
+        例:
+        - ユーザーとして、夜間に作業する際にダークテーマに切り替えて目の負担を軽減したい
+        - ユーザーとして、設定画面でテーマを選択して、次回起動時もその設定を保持したい
+        - ユーザーとして、システムの設定に合わせて自動的にテーマが変更されてほしい
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: 受入条件 / Acceptance Criteria
+      description: 機能完成の判定基準
+      placeholder: |
+        例:
+        - [ ] ユーザー設定画面にテーマ選択UIが追加される
+        - [ ] ライト/ダークテーマの切り替えができる
+        - [ ] 選択したテーマが localStorage に保存される
+        - [ ] アプリケーション再起動後もテーマ設定が保持される
+        - [ ] システムの設定と連動する機能が実装される
+        - [ ] 既存の機能に影響がない
+        - [ ] レスポンシブデザインが維持される
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度 / Priority
+      description: 機能の実装優先度
+      options:
+        - 🔴 高 / High
+        - 🟡 中 / Medium  
+        - 🟢 低 / Low
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 代替案 / Alternatives
+      description: 検討した他の実装方法や解決策
+      placeholder: |
+        例:
+        - CSS-in-JSライブラリを使用する方法
+        - 完全カスタムのテーマシステムを構築する方法
+        - 既存のUIライブラリのテーマ機能を利用する方法
+
+  - type: textarea
+    id: mockups-references
+    attributes:
+      label: モックアップ・参考資料 / Mockups & References
+      description: UIのモックアップ、参考になるサイトやアプリケーション
+      placeholder: |
+        例:
+        - 参考UI: GitHub のテーマ切り替え機能
+        - 参考URL: https://tailwindcss.com/docs/dark-mode
+        - デザインシステム: Material Design のダークテーマ
+        - 添付ファイル: モックアップ画像（あれば）
+
+  - type: checkboxes
+    id: copilot-feature-info
+    attributes:
+      label: Copilot 機能情報 / Copilot Feature Info
+      description: GitHub Copilot が効果的に機能実装できるよう、以下の項目を確認してください
+      options:
+        - label: 具体的な技術的アプローチを記載した
+          required: false
+        - label: 影響するファイルとコンポーネントを特定した
+          required: false
+        - label: ユーザーストーリーを明確にした
+          required: false
+        - label: 受入条件を具体的に定義した
+          required: false
+        - label: 参考資料や技術情報を含めた
+          required: false
