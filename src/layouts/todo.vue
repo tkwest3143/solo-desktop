@@ -141,7 +141,7 @@ export default defineComponent({
       
       try {
         this.loading = true;
-        const userId = this.$route.params.id as string;
+        const userId = parseInt(this.$route.params.id as string);
         
         // Fetch categories
         this.categories = await TodoCategoryRepository.getTodoCategoriesByUserId(userId);

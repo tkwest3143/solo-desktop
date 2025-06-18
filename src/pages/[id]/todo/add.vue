@@ -230,7 +230,7 @@ export default defineComponent({
   methods: {
     async loadCategories() {
       try {
-        const userId = 1; // TODO: Get from user context/auth
+        const userId = parseInt(this.$route.params.id as string);
         this.categories = await TodoCategoryRepository.getTodoCategoriesByUserId(userId);
       } catch (error) {
         console.error("Failed to load categories:", error);
@@ -257,7 +257,7 @@ export default defineComponent({
           category_id: this.todo.category_id ? parseInt(this.todo.category_id) : undefined,
           color: this.todo.color,
           link: this.todo.link.trim() || undefined,
-          user_id: 1, // TODO: Get from user context/auth
+          user_id: parseInt(this.$route.params.id as string),
         };
 
         console.log("Saving todo data:", todoData);

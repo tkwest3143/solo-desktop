@@ -180,7 +180,7 @@ export default defineComponent({
     async fetchData() {
       try {
         this.loading = true;
-        const userId = 1; // TODO: Get from user context/auth
+        const userId = parseInt(this.$route.params.id as string);
         
         // Fetch all todos and categories in parallel
         const [todosResponse, categoriesResponse] = await Promise.all([

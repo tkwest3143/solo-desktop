@@ -190,7 +190,7 @@ export default defineComponent({
     async fetchData() {
       try {
         this.loading = true;
-        const userId = this.$route.params.id as string;
+        const userId = parseInt(this.$route.params.id as string);
         
         // Fetch categories
         this.categories = await TodoCategoryRepository.getTodoCategoriesByUserId(userId);
@@ -229,7 +229,7 @@ export default defineComponent({
       }
 
       try {
-        const userId = this.$route.params.id as string;
+        const userId = parseInt(this.$route.params.id as string);
         await TodoCategoryRepository.createTodoCategory({
           name: this.categoryForm.name.trim(),
           memo: this.categoryForm.description.trim() || undefined,

@@ -130,11 +130,11 @@
               <div 
                 :class="[
                   'w-4 h-4 border-2 rounded mr-3',
-                  task.completed ? 'bg-green-500 border-green-500' : 'border-slate-300'
+                  'border-slate-300'
                 ]"
               ></div>
               <div class="flex-1">
-                <div :class="['font-medium', task.completed ? 'text-slate-500 line-through' : 'text-slate-800']">
+                <div class="font-medium text-slate-800">
                   {{ task.title }}
                 </div>
                 <div class="text-sm text-slate-500">
@@ -142,10 +142,10 @@
                 </div>
               </div>
               <div 
-                v-if="task.category"
+                v-if="task.category_id"
                 class="w-3 h-3 rounded-full"
-                :style="{ backgroundColor: task.category.color || '#6b7280' }"
-                :title="task.category.name"
+                :style="{ backgroundColor: getCategoryById(task.category_id)?.color || '#6b7280' }"
+                :title="getCategoryById(task.category_id)?.name || 'カテゴリなし'"
               ></div>
             </div>
           </div>
@@ -176,6 +176,7 @@ export default defineComponent({
         categoryCount: 0,
       },
       recentTasks: [] as TodoItem[],
+      categories: [] as TodoCategory[],
     };
   },
   async mounted() {
@@ -198,7 +199,7 @@ export default defineComponent({
     async fetchData() {
       try {
         this.loading = true;
-        const userId = this.$route.params.id as string;
+        const userId = parseInt(this.$route.params.id as string);
         
         // Fetch all data in parallel
         const [allTodos, todayTodos, upcomingTodos, categories] = await Promise.all([
@@ -210,10 +211,13 @@ export default defineComponent({
         
         // Update stats
         this.stats.today = todayTodos.length;
-        this.stats.todayCompleted = todayTodos.filter(todo => todo.completed).length;
+        this.stats.todayCompleted = 0; // TODO: Add completed field to database if needed
         this.stats.upcoming = upcomingTodos.length;
         this.stats.total = allTodos.length;
         this.stats.categoryCount = categories.length;
+        
+        // Store categories for lookup
+        this.categories = categories;
         
         // Get recent tasks (last 5 tasks sorted by creation date)
         this.recentTasks = allTodos
@@ -230,6 +234,9 @@ export default defineComponent({
       if (!dateString) return "";
       const date = new Date(dateString);
       return date.toLocaleDateString("ja-JP");
+    },
+    getCategoryById(categoryId: number): TodoCategory | undefined {
+      return this.categories.find((cat: TodoCategory) => cat.id === categoryId);
     },
   },
 });
