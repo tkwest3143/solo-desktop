@@ -12,11 +12,12 @@ impl MigrationTrait for Migration {
           .table(TodoCategories::Table)
           .if_not_exists()
           .col(pk_auto(TodoCategories::Id))
-          .col(string_null(TodoCategories::Name))
+          .col(string(TodoCategories::Name))
           .col(string_null(TodoCategories::Memo))
           .col(integer(TodoCategories::UserId))
           .col(date_time(TodoCategories::CreatedAt).not_null())
           .col(date_time(TodoCategories::UpdatedAt).not_null())
+          .col(string_null(TodoCategories::Color))
           .foreign_key(ForeignKey::create().name("FK_users_todo_categories_id").from(Users::Table, TodoCategories::UserId).to(TodoCategories::Table, Users::Id))
           .to_owned(),
       )
@@ -33,6 +34,7 @@ pub enum TodoCategories {
   Id,
   Name,
   Memo,
+  Color,
   CreatedAt,
   UpdatedAt,
   UserId,
