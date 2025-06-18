@@ -11,6 +11,35 @@ export class WorkTimeRepository {
     });
     return JSON.parse(res as string) as workTime[];
   }
+  
+  static async getWorkTimeByYear(userId: string, year: number) {
+    const workTimes: workTime[] = [];
+    
+    // Fetch data for all 12 months of the year
+    for (let month = 1; month <= 12; month++) {
+      const targetMonth = `${year}-${month.toString().padStart(2, "0")}`;
+      try {
+        const monthData = await this.getWorkTimeByMonth(userId, targetMonth);
+        workTimes.push(...monthData);
+      } catch (error) {
+        // Continue if month data doesn't exist
+        console.warn(`No data for ${targetMonth}:`, error);
+      }
+    }
+    
+    return workTimes;
+  }
+  
+  static async getWorkTimeByYearRange(userId: string, startYear: number, endYear: number) {
+    const workTimes: workTime[] = [];
+    
+    for (let year = startYear; year <= endYear; year++) {
+      const yearData = await this.getWorkTimeByYear(userId, year);
+      workTimes.push(...yearData);
+    }
+    
+    return workTimes;
+  }
   static async create(record: {
     userId: number;
     targetDay: string;
