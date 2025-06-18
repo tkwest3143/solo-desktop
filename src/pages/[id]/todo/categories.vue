@@ -20,26 +20,38 @@
     <!-- Categories List -->
     <div class="p-8">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Sample Categories -->
-        <div class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg">
+        <!-- Dynamic Categories -->
+        <div
+          v-for="category in categories"
+          :key="category.id"
+          class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg"
+        >
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center space-x-3">
-              <div class="w-4 h-4 rounded-full bg-red-400"></div>
-              <h3 class="text-xl font-semibold text-slate-800">実装</h3>
+              <div 
+                class="w-4 h-4 rounded-full"
+                :style="{ backgroundColor: category.color || '#6b7280' }"
+              ></div>
+              <h3 class="text-xl font-semibold text-slate-800">{{ category.name }}</h3>
             </div>
             <div class="flex space-x-2">
               <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
                 <Icon name="fluent:edit-20-filled" size="1.2em" />
               </button>
-              <button class="p-2 text-slate-400 hover:text-red-500 transition-colors">
+              <button 
+                @click="deleteCategory(category.id, category.name)"
+                class="p-2 text-slate-400 hover:text-red-500 transition-colors"
+              >
                 <Icon name="fluent:delete-20-filled" size="1.2em" />
               </button>
             </div>
           </div>
-          <p class="text-slate-600 mb-4">開発・実装に関するタスク</p>
+          <p class="text-slate-600 mb-4">{{ category.memo || 'メモなし' }}</p>
           <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-500">3個のタスク</span>
-            <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">アクティブ</span>
+            <span class="text-sm text-slate-500">
+              {{ categoryTaskCounts[category.id] || 0 }}個のタスク
+            </span>
+            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">アクティブ</span>
           </div>
         </div>
 
@@ -252,11 +264,17 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
+import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
+import type { TodoCategory } from "~/models/todo";
 
 export default defineComponent({
   layout: "todo",
   data() {
     return {
+      categories: [] as TodoCategory[],
+      categoryTaskCounts: {} as Record<number, number>,
+      loading: true,
       showModal: false,
       categoryForm: {
         name: "",
@@ -275,7 +293,34 @@ export default defineComponent({
       ],
     };
   },
+  async mounted() {
+    await this.fetchData();
+  },
   methods: {
+    async fetchData() {
+      try {
+        this.loading = true;
+        const userId = 1; // TODO: Get from user context/auth
+        
+        // Fetch categories
+        this.categories = await TodoCategoryRepository.getTodoCategoriesByUserId(userId);
+        
+        // Fetch task counts for each category
+        for (const category of this.categories) {
+          try {
+            const todos = await TodoItemRepository.getTodoItemsByCategoryId(category.id);
+            this.categoryTaskCounts[category.id] = todos.length;
+          } catch (error) {
+            console.error(`Failed to fetch todos for category ${category.id}:`, error);
+            this.categoryTaskCounts[category.id] = 0;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
     openCreateModal() {
       this.showModal = true;
       this.categoryForm = {
@@ -287,13 +332,41 @@ export default defineComponent({
     closeModal() {
       this.showModal = false;
     },
-    saveCategory() {
-      console.log("Category data to save:", this.categoryForm);
-      
-      // TODO: Save to backend using Tauri commands
-      // For now, just show success message
-      alert(`カテゴリ「${this.categoryForm.name}」が作成されました！\n（実際の保存機能は今後実装予定です）`);
-      this.closeModal();
+    async saveCategory() {
+      if (!this.categoryForm.name.trim()) {
+        alert("カテゴリ名を入力してください");
+        return;
+      }
+
+      try {
+        const userId = 1; // TODO: Get from user context/auth
+        await TodoCategoryRepository.createTodoCategory({
+          name: this.categoryForm.name.trim(),
+          memo: this.categoryForm.description.trim() || undefined,
+          user_id: userId,
+        });
+
+        alert(`カテゴリ「${this.categoryForm.name}」が作成されました！`);
+        this.closeModal();
+        await this.fetchData(); // Refresh the list
+      } catch (error) {
+        console.error("Failed to create category:", error);
+        alert("カテゴリの作成に失敗しました");
+      }
+    },
+    async deleteCategory(id: number, name: string) {
+      if (!confirm(`カテゴリ「${name}」を削除しますか？\n\nこのカテゴリに属するタスクも影響を受ける可能性があります。`)) {
+        return;
+      }
+
+      try {
+        await TodoCategoryRepository.deleteTodoCategory(id);
+        alert("カテゴリが削除されました");
+        await this.fetchData(); // Refresh the list
+      } catch (error) {
+        console.error("Failed to delete category:", error);
+        alert("カテゴリの削除に失敗しました");
+      }
     },
   },
 });
