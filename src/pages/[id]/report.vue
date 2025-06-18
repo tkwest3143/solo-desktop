@@ -10,40 +10,36 @@
       <div class="bg-white rounded-lg shadow-md p-6 mb-6">
         <div class="flex flex-wrap gap-4 items-end">
           <div class="flex-1 min-w-40">
-            <label class="block text-sm font-medium text-basic-700 mb-2">
-              表示タイプ
-            </label>
             <CommonSelect
+              id="reportType"
+              label="表示タイプ"
               v-model="reportType"
               :options="reportTypeOptions"
               @change="onReportTypeChange"
             />
           </div>
           <div class="flex-1 min-w-40">
-            <label class="block text-sm font-medium text-basic-700 mb-2">
-              開始年
-            </label>
             <CommonSelect
+              id="startYear"
+              label="開始年"
               v-model="startYear"
               :options="yearOptions"
               @change="loadReportData"
             />
           </div>
           <div v-if="reportType === 'yearly'" class="flex-1 min-w-40">
-            <label class="block text-sm font-medium text-basic-700 mb-2">
-              終了年
-            </label>
             <CommonSelect
+              id="endYear"
+              label="終了年"
               v-model="endYear"
               :options="yearOptions"
               @change="loadReportData"
             />
           </div>
           <div v-if="reportType === 'monthly'" class="flex-1 min-w-40">
-            <label class="block text-sm font-medium text-basic-700 mb-2">
-              表示年
-            </label>
             <CommonSelect
+              id="displayYear"
+              label="表示年"
               v-model="displayYear"
               :options="yearOptions"
               @change="loadReportData"
@@ -141,15 +137,15 @@ export default defineComponent({
   computed: {
     reportTypeOptions() {
       return [
-        { value: "monthly", label: "月別表示" },
-        { value: "yearly", label: "年別表示" },
+        { value: "monthly", text: "月別表示" },
+        { value: "yearly", text: "年別表示" },
       ];
     },
     yearOptions() {
       const currentYear = new Date().getFullYear();
       const options = [];
       for (let year = currentYear - 10; year <= currentYear + 1; year++) {
-        options.push({ value: year, label: `${year}年` });
+        options.push({ value: year, text: `${year}年` });
       }
       return options;
     },

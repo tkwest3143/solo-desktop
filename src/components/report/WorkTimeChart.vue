@@ -5,13 +5,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, onMounted, ref, watch } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
+import type { PropType } from "vue";
 import {
   Chart,
-  ChartConfiguration,
-  ChartType,
   registerables,
 } from "chart.js";
+import type { ChartConfiguration, ChartType } from "chart.js";
 import type { MonthlyReportData, YearlyReportData } from "~/functions/reportData";
 
 Chart.register(...registerables);

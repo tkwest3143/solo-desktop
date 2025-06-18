@@ -69,7 +69,8 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/vue";
-import { computed, defineComponent, ref, type PropType } from "vue";
+import { computed, defineComponent, ref } from "vue";
+import type { PropType } from "vue";
 
 export default defineComponent({
   components: {
