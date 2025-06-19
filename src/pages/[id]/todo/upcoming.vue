@@ -82,9 +82,16 @@
                       <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
                     </div>
                     <div class="flex space-x-2">
-                      <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                      <NuxtLink
+                        :to="{
+                          name: 'id-todo-edit',
+                          params: { id: $route.params.id },
+                          query: { id: todo.id }
+                        }"
+                        class="p-2 text-slate-400 hover:text-blue-500 transition-colors"
+                      >
                         <Icon name="fluent:edit-20-filled" size="1.2em" />
-                      </button>
+                      </NuxtLink>
                       <button 
                         @click="showDeleteDialog(todo)"
                         class="p-2 text-slate-400 hover:text-red-500 transition-colors"
@@ -132,9 +139,16 @@
                       <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
                     </div>
                     <div class="flex space-x-2">
-                      <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                      <NuxtLink
+                        :to="{
+                          name: 'id-todo-edit',
+                          params: { id: $route.params.id },
+                          query: { id: todo.id }
+                        }"
+                        class="p-2 text-slate-400 hover:text-blue-500 transition-colors"
+                      >
                         <Icon name="fluent:edit-20-filled" size="1.2em" />
-                      </button>
+                      </NuxtLink>
                       <button 
                         @click="showDeleteDialog(todo)"
                         class="p-2 text-slate-400 hover:text-red-500 transition-colors"
@@ -182,9 +196,16 @@
                       <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
                     </div>
                     <div class="flex space-x-2">
-                      <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                      <NuxtLink
+                        :to="{
+                          name: 'id-todo-edit',
+                          params: { id: $route.params.id },
+                          query: { id: todo.id }
+                        }"
+                        class="p-2 text-slate-400 hover:text-blue-500 transition-colors"
+                      >
                         <Icon name="fluent:edit-20-filled" size="1.2em" />
-                      </button>
+                      </NuxtLink>
                       <button 
                         @click="showDeleteDialog(todo)"
                         class="p-2 text-slate-400 hover:text-red-500 transition-colors"

@@ -114,15 +114,13 @@
             >
               カテゴリ
             </h3>
-            <NuxtLink
-              :to="{
-                name: 'id-todo-categories',
-                params: { id: $route.params.id },
-              }"
-              class="text-slate-400 hover:text-slate-600 transition-colors"
+            <button
+              @click="showCategoryAddDialog = true"
+              class="text-slate-400 hover:text-blue-600 transition-colors"
+              title="カテゴリを追加"
             >
-              <Icon name="fluent:settings-20-filled" size="1.2em" />
-            </NuxtLink>
+              <Icon name="fluent:add-20-filled" size="1.2em" />
+            </button>
           </div>
           <div class="space-y-1">
             <!-- Dynamic Categories -->
@@ -175,6 +173,92 @@
     <div class="flex-1 overflow-y-auto" style="margin-left: 320px;">
       <slot />
     </div>
+
+    <!-- Category Add Dialog -->
+    <div v-if="showCategoryAddDialog" class="fixed inset-0 z-[1000] overflow-y-auto">
+      <!-- Backdrop -->
+      <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="closeCategoryAddDialog"></div>
+      
+      <!-- Dialog -->
+      <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-auto transform transition-all">
+          <!-- Header -->
+          <div class="p-6 pb-4">
+            <h3 class="text-lg font-medium text-gray-900">新しいカテゴリを追加</h3>
+          </div>
+          
+          <!-- Form -->
+          <form @submit.prevent="createCategory" class="px-6 pb-6">
+            <div class="space-y-4">
+              <div>
+                <label for="categoryName" class="block text-sm font-medium text-gray-700 mb-1">
+                  カテゴリ名 *
+                </label>
+                <input
+                  id="categoryName"
+                  v-model="newCategory.name"
+                  type="text"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="例: 仕事、プライベート"
+                />
+              </div>
+              
+              <div>
+                <label for="categoryMemo" class="block text-sm font-medium text-gray-700 mb-1">
+                  メモ
+                </label>
+                <textarea
+                  id="categoryMemo"
+                  v-model="newCategory.memo"
+                  rows="2"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="カテゴリの説明（任意）"
+                ></textarea>
+              </div>
+              
+              <div>
+                <label for="categoryColor" class="block text-sm font-medium text-gray-700 mb-1">
+                  カラー
+                </label>
+                <div class="flex space-x-2">
+                  <input
+                    id="categoryColor"
+                    v-model="newCategory.color"
+                    type="color"
+                    class="w-12 h-8 border border-gray-300 rounded cursor-pointer"
+                  />
+                  <input
+                    v-model="newCategory.color"
+                    type="text"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="#6b7280"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="mt-6 flex space-x-3 justify-end">
+              <button
+                type="button"
+                @click="closeCategoryAddDialog"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+              >
+                キャンセル
+              </button>
+              <button
+                type="submit"
+                :disabled="creatingCategory || !newCategory.name.trim()"
+                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+              >
+                {{ creatingCategory ? '作成中...' : '作成' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -191,6 +275,13 @@ export default defineComponent({
       categories: [] as TodoCategory[],
       categoryTaskCounts: {} as Record<number, number>,
       loading: true,
+      showCategoryAddDialog: false,
+      creatingCategory: false,
+      newCategory: {
+        name: '',
+        memo: '',
+        color: '#6b7280'
+      }
     };
   },
   async mounted() {
@@ -235,6 +326,46 @@ export default defineComponent({
         console.error("Failed to fetch categories:", error);
       } finally {
         this.loading = false;
+      }
+    },
+    
+    closeCategoryAddDialog() {
+      this.showCategoryAddDialog = false;
+      this.newCategory = {
+        name: '',
+        memo: '',
+        color: '#6b7280'
+      };
+    },
+    
+    async createCategory() {
+      if (!this.newCategory.name.trim()) return;
+
+      try {
+        this.creatingCategory = true;
+        const userId = parseInt(this.$route.params.id as string);
+
+        const categoryData = {
+          user_id: userId,
+          name: this.newCategory.name.trim(),
+          memo: this.newCategory.memo.trim() || null,
+          color: this.newCategory.color || '#6b7280'
+        };
+
+        await TodoCategoryRepository.createTodoCategory(categoryData);
+        
+        // Refresh categories list
+        await this.fetchCategories();
+        
+        // Close dialog
+        this.closeCategoryAddDialog();
+        
+        alert('カテゴリを作成しました');
+      } catch (error) {
+        console.error("Failed to create category:", error);
+        alert('カテゴリの作成に失敗しました');
+      } finally {
+        this.creatingCategory = false;
       }
     },
   },
