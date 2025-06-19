@@ -82,52 +82,20 @@
             </div>
           </div>
 
-          <!-- Category and Priority -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label for="category" class="block text-sm font-semibold text-slate-700 mb-2">
-                カテゴリ
-              </label>
-              <select
-                id="category"
-                v-model="todo.category_id"
-                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              >
-                <option value="">カテゴリを選択</option>
-                <option v-for="category in categories" :key="category.id" :value="category.id">
-                  {{ category.name }}
-                </option>
-              </select>
-            </div>
-            <div>
-              <label for="priority" class="block text-sm font-semibold text-slate-700 mb-2">
-                優先度
-              </label>
-              <select
-                id="priority"
-                v-model="todo.priority"
-                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              >
-                <option value="low">低</option>
-                <option value="medium">通常</option>
-                <option value="high">高</option>
-                <option value="urgent">緊急</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Status -->
+          <!-- Category -->
           <div>
-            <label for="status" class="block text-sm font-semibold text-slate-700 mb-2">
-              ステータス
+            <label for="category" class="block text-sm font-semibold text-slate-700 mb-2">
+              カテゴリ
             </label>
             <select
-              id="status"
-              v-model="todo.status"
+              id="category"
+              v-model="todo.category_id"
               class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             >
-              <option value="pending">未完了</option>
-              <option value="completed">完了</option>
+              <option value="">カテゴリを選択</option>
+              <option v-for="category in categories" :key="category.id" :value="category.id">
+                {{ category.name }}
+              </option>
             </select>
           </div>
 

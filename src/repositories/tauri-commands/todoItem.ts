@@ -2,6 +2,11 @@ import { invoke } from "@tauri-apps/api/core";
 import type { TodoItem, TodoItemForInsert, TodoItemForUpdate } from "~/models/todo";
 
 export class TodoItemRepository {
+  static async getTodoItem(id: number): Promise<TodoItem> {
+    const res = await invoke<string>("get_todo_item_by_id", { id });
+    return JSON.parse(res) as TodoItem;
+  }
+
   static async getAllTodoItems(userId: number): Promise<TodoItem[]> {
     const res = await invoke<string>("get_all_todo_items", { userId });
     return JSON.parse(res) as TodoItem[];

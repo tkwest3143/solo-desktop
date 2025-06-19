@@ -44,6 +44,7 @@ export interface TodoItemForUpdate {
 export interface TodoCategoryForInsert {
   name: string;
   memo?: string;
+  color?: string;
   user_id: number;
 }
 
@@ -51,5 +52,6 @@ export interface TodoCategoryForUpdate {
   id: number;
   name?: string;
   memo?: string;
+  color?: string;
   user_id: number;
 }

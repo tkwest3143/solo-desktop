@@ -427,6 +427,7 @@ pub mod todo_categories {
     let data = todo_categories::ActiveModel {
       name: Set(json_to.name),
       memo: Set(json_to.memo),
+      color: Set(json_to.color),
       user_id: Set(json_to.user_id),
       created_at: Set(Local::now().naive_local()),
       updated_at: Set(Local::now().naive_local()),
@@ -447,6 +448,9 @@ pub mod todo_categories {
     }
     if json_to.memo.is_some() {
       data.memo = Set(json_to.memo);
+    }
+    if json_to.color.is_some() {
+      data.color = Set(json_to.color);
     }
     data.updated_at = Set(Local::now().naive_local());
     todo_categories::Entity::update(data).exec(&db).await.unwrap();
@@ -480,6 +484,28 @@ pub mod todo_items {
     pub created_at: String,
     pub updated_at: String,
     pub category_id: Option<i32>,
+  }
+
+  #[tauri::command]
+  pub async fn get_todo_item_by_id(id: i32) -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    let todo_item = todo_items::Entity::find_by_id(id).one(&db).await.unwrap();
+    if todo_item.is_none() {
+      return Err("Todo item not found".to_string());
+    }
+    let todo_item = todo_item.unwrap();
+    let response_todo_item = ResponseTodoItem {
+      id: todo_item.id,
+      title: todo_item.title.unwrap_or_default(),
+      content: todo_item.content,
+      link: todo_item.link,
+      color: todo_item.color,
+      due_date: todo_item.due_date.to_string(),
+      created_at: todo_item.created_at.to_string(),
+      updated_at: todo_item.updated_at.to_string(),
+      category_id: todo_item.category_id,
+    };
+    Ok(serde_json::to_string(&response_todo_item).unwrap())
   }
 
   #[tauri::command]
