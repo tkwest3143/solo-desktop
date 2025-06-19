@@ -110,6 +110,7 @@
 
     <!-- Task Detail Dialog -->
     <TaskDetailDialog
+      v-if="taskDetailDialog.todo"
       :show="taskDetailDialog.show"
       :todo="taskDetailDialog.todo"
       :category="taskDetailDialog.category"
