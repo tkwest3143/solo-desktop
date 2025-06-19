@@ -1,9 +1,12 @@
 <template>
-  <div class="flex bg-gradient-to-br from-slate-50 to-blue-50" style="height: calc(100vh - 60px);">
+  <div
+    class="flex bg-gradient-to-br from-slate-50 to-blue-50"
+    style="height: calc(100vh - 60px)"
+  >
     <!-- Left Sidebar -->
     <div
       class="w-80 bg-white shadow-xl border-r border-slate-200 flex flex-col fixed left-0"
-      style="top: 60px; height: calc(100vh - 60px); z-index: 900;"
+      style="top: 60px; height: calc(100vh - 60px); z-index: 900"
     >
       <!-- Sidebar Header -->
       <div class="p-6 border-b border-slate-200">
@@ -170,28 +173,41 @@
     </div>
 
     <!-- Main Content Area -->
-    <div class="flex-1 overflow-y-auto" style="margin-left: 320px;">
+    <div class="flex-1 overflow-y-auto" style="margin-left: 320px">
       <slot />
     </div>
 
     <!-- Category Add Dialog -->
-    <div v-if="showCategoryAddDialog" class="fixed inset-0 z-[1000] overflow-y-auto">
+    <div
+      v-if="showCategoryAddDialog"
+      class="fixed inset-0 z-[1000] overflow-y-auto"
+    >
       <!-- Backdrop -->
-      <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="closeCategoryAddDialog"></div>
-      
+      <div
+        class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        @click="closeCategoryAddDialog"
+      ></div>
+
       <!-- Dialog -->
       <div class="flex min-h-screen items-center justify-center p-4">
-        <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-auto transform transition-all">
+        <div
+          class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-auto transform transition-all"
+        >
           <!-- Header -->
           <div class="p-6 pb-4">
-            <h3 class="text-lg font-medium text-gray-900">新しいカテゴリを追加</h3>
+            <h3 class="text-lg font-medium text-gray-900">
+              新しいカテゴリを追加
+            </h3>
           </div>
-          
+
           <!-- Form -->
           <form @submit.prevent="createCategory" class="px-6 pb-6">
             <div class="space-y-4">
               <div>
-                <label for="categoryName" class="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  for="categoryName"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
                   カテゴリ名 *
                 </label>
                 <input
@@ -203,9 +219,12 @@
                   placeholder="例: 仕事、プライベート"
                 />
               </div>
-              
+
               <div>
-                <label for="categoryMemo" class="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  for="categoryMemo"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
                   メモ
                 </label>
                 <textarea
@@ -216,9 +235,12 @@
                   placeholder="カテゴリの説明（任意）"
                 ></textarea>
               </div>
-              
+
               <div>
-                <label for="categoryColor" class="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  for="categoryColor"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
                   カラー
                 </label>
                 <div class="flex space-x-2">
@@ -237,7 +259,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Actions -->
             <div class="mt-6 flex space-x-3 justify-end">
               <button
@@ -252,7 +274,7 @@
                 :disabled="creatingCategory || !newCategory.name.trim()"
                 class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
               >
-                {{ creatingCategory ? '作成中...' : '作成' }}
+                {{ creatingCategory ? "作成中..." : "作成" }}
               </button>
             </div>
           </form>
@@ -278,10 +300,10 @@ export default defineComponent({
       showCategoryAddDialog: false,
       creatingCategory: false,
       newCategory: {
-        name: '',
-        memo: '',
-        color: '#6b7280'
-      }
+        name: "",
+        memo: "",
+        color: "#6b7280",
+      },
     };
   },
   async mounted() {
@@ -328,16 +350,16 @@ export default defineComponent({
         this.loading = false;
       }
     },
-    
+
     closeCategoryAddDialog() {
       this.showCategoryAddDialog = false;
       this.newCategory = {
-        name: '',
-        memo: '',
-        color: '#6b7280'
+        name: "",
+        memo: "",
+        color: "#6b7280",
       };
     },
-    
+
     async createCategory() {
       if (!this.newCategory.name.trim()) return;
 
@@ -348,22 +370,22 @@ export default defineComponent({
         const categoryData = {
           user_id: userId,
           name: this.newCategory.name.trim(),
-          memo: this.newCategory.memo.trim() || null,
-          color: this.newCategory.color || '#6b7280'
+          memo: this.newCategory.memo.trim(),
+          color: this.newCategory.color || "#6b7280",
         };
 
         await TodoCategoryRepository.createTodoCategory(categoryData);
-        
+
         // Refresh categories list
         await this.fetchCategories();
-        
+
         // Close dialog
         this.closeCategoryAddDialog();
-        
-        alert('カテゴリを作成しました');
+
+        alert("カテゴリを作成しました");
       } catch (error) {
         console.error("Failed to create category:", error);
-        alert('カテゴリの作成に失敗しました');
+        alert("カテゴリの作成に失敗しました");
       } finally {
         this.creatingCategory = false;
       }
