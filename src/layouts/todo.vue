@@ -1,8 +1,9 @@
 <template>
-  <div class="flex bg-gradient-to-br from-slate-50 to-blue-50">
+  <div class="flex bg-gradient-to-br from-slate-50 to-blue-50" style="height: calc(100vh - 60px);">
     <!-- Left Sidebar -->
     <div
-      class="w-80 bg-white shadow-xl border-r border-slate-200 flex flex-col"
+      class="w-80 bg-white shadow-xl border-r border-slate-200 flex flex-col fixed left-0"
+      style="top: 60px; height: calc(100vh - 60px); z-index: 900;"
     >
       <!-- Sidebar Header -->
       <div class="p-6 border-b border-slate-200">
@@ -171,7 +172,7 @@
     </div>
 
     <!-- Main Content Area -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto" style="margin-left: 320px;">
       <slot />
     </div>
   </div>
