@@ -22,17 +22,20 @@
       <!-- Filter/Sort Options -->
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center space-x-4">
-          <select class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>すべて</option>
-            <option>未完了</option>
-            <option>完了済み</option>
-          </select>
-          <select v-model="selectedCategoryId" class="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">すべてのカテゴリ</option>
-            <option v-for="category in categories" :key="category.id" :value="category.id">
-              {{ category.name }}
-            </option>
-          </select>
+          <CustomSelect
+            v-model="selectedStatusFilter"
+            :options="statusFilterOptions"
+            placeholder="すべて"
+            size="sm"
+            class="w-32"
+          />
+          <CustomSelect
+            v-model="selectedCategoryId"
+            :options="categoryOptions"
+            placeholder="すべてのカテゴリ"
+            size="sm"
+            class="w-48"
+          />
         </div>
         <div class="text-sm text-slate-500">
           {{ filteredTodos.length }}件のタスク
@@ -139,6 +142,7 @@ import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCatego
 import type { TodoItem, TodoCategory } from "~/models/todo";
 import ConfirmDialog from "~/components/ConfirmDialog.vue";
 import TaskDetailDialog from "~/components/TaskDetailDialog.vue";
+import CustomSelect from "~/components/CustomSelect.vue";
 
 definePageMeta({
   layout: 'todo'
@@ -148,6 +152,7 @@ export default defineComponent({
   components: {
     ConfirmDialog,
     TaskDetailDialog,
+    CustomSelect,
   },
   data() {
     return {
@@ -155,6 +160,7 @@ export default defineComponent({
       todos: [] as TodoItem[],
       categories: [] as TodoCategory[],
       selectedCategoryId: "",
+      selectedStatusFilter: "",
       loading: true,
       deleteDialog: {
         show: false,
@@ -168,13 +174,44 @@ export default defineComponent({
     };
   },
   computed: {
+    statusFilterOptions() {
+      return [
+        { value: "", label: "すべて" },
+        { value: "incomplete", label: "未完了" },
+        { value: "completed", label: "完了済み" }
+      ];
+    },
+    categoryOptions() {
+      const options = [{ value: "", label: "すべてのカテゴリ" }];
+      
+      this.categories.forEach(category => {
+        options.push({
+          value: category.id?.toString() || "",
+          label: category.name,
+          color: category.color
+        });
+      });
+      
+      return options;
+    },
     filteredTodos(): TodoItem[] {
-      if (!this.selectedCategoryId) {
-        return this.todos;
+      let filtered = this.todos;
+      
+      // Filter by category
+      if (this.selectedCategoryId) {
+        filtered = filtered.filter(todo => 
+          todo.category_id === parseInt(this.selectedCategoryId)
+        );
       }
-      return this.todos.filter(todo => 
-        todo.category_id === parseInt(this.selectedCategoryId)
-      );
+      
+      // Filter by status (placeholder for future implementation)
+      if (this.selectedStatusFilter === "completed") {
+        // Filter completed todos when status field is added
+      } else if (this.selectedStatusFilter === "incomplete") {
+        // Filter incomplete todos when status field is added
+      }
+      
+      return filtered;
     }
   },
   async mounted() {

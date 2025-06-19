@@ -9,7 +9,7 @@
   >
     <div
       v-if="show"
-      class="fixed inset-0 z-50 overflow-y-auto"
+      class="fixed inset-0 z-[1000] overflow-y-auto"
       @click="handleBackdropClick"
     >
       <!-- Backdrop -->
