@@ -1,58 +1,67 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-    <div class="flex" style="height: calc(100vh - 60px);">
-      <!-- Left Sidebar -->
-      <div class="w-80 bg-white shadow-xl border-r border-slate-200 flex flex-col">
-        <!-- Sidebar Header -->
-        <div class="p-6 border-b border-slate-200">
-          <h1 class="text-2xl font-bold text-slate-800 flex items-center">
-            <Icon name="fluent:task-list-square-20-filled" class="mr-3 text-blue-600" size="2em" />
-            Todo管理
-          </h1>
+  <div class="flex bg-gradient-to-br from-slate-50 to-blue-50" style="height: calc(100vh - 60px);">
+    <!-- Left Sidebar -->
+    <div class="w-80 bg-white shadow-xl border-r border-slate-200 flex flex-col">
+      <!-- Sidebar Header -->
+      <div class="p-6 border-b border-slate-200">
+        <h1 class="text-2xl font-bold text-slate-800 flex items-center">
+          <Icon name="fluent:task-list-square-20-filled" class="mr-3 text-blue-600" size="2em" />
+          Todo管理
+        </h1>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+        <!-- Quick Actions -->
+        <div class="mb-6">
+          <NuxtLink
+            :to="{ name: 'id-todo-add', params: { id: $route.params.id } }"
+            class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg px-4 py-3 flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            <Icon name="fluent:add-20-filled" class="mr-2" size="1.2em" />
+            新しいTodoを作成
+          </NuxtLink>
         </div>
 
-        <!-- Navigation Menu -->
-        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-          <!-- Quick Actions -->
-          <div class="mb-6">
-            <NuxtLink
-              :to="{ name: 'id-todo-add', params: { id: $route.params.id } }"
-              class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg px-4 py-3 flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-            >
-              <Icon name="fluent:add-20-filled" class="mr-2" size="1.2em" />
-              新しいTodoを作成
-            </NuxtLink>
-          </div>
+        <!-- Menu Items -->
+        <div class="space-y-1">
+          <!-- Todo Top Page -->
+          <NuxtLink
+            :to="{ name: 'id-todo', params: { id: $route.params.id } }"
+            class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
+            :class="{ 'bg-blue-50 border-r-4 border-blue-500': $route.name === 'id-todo' }"
+          >
+            <Icon name="fluent:home-20-filled" class="mr-3 text-purple-500 group-hover:text-purple-600" size="1.5em" />
+            <span class="font-medium text-slate-700 group-hover:text-slate-900">Todo トップ</span>
+          </NuxtLink>
 
-          <!-- Menu Items -->
-          <div class="space-y-1">
-            <NuxtLink
-              :to="{ name: 'id-todo-today', params: { id: $route.params.id } }"
-              class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
-              :class="{ 'bg-blue-50 border-r-4 border-blue-500': $route.name === 'id-todo-today' }"
-            >
-              <Icon name="fluent:calendar-today-20-filled" class="mr-3 text-blue-500 group-hover:text-blue-600" size="1.5em" />
-              <span class="font-medium text-slate-700 group-hover:text-slate-900">今日のTodo</span>
-            </NuxtLink>
+          <NuxtLink
+            :to="{ name: 'id-todo-today', params: { id: $route.params.id } }"
+            class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
+            :class="{ 'bg-blue-50 border-r-4 border-blue-500': $route.name === 'id-todo-today' }"
+          >
+            <Icon name="fluent:calendar-today-20-filled" class="mr-3 text-blue-500 group-hover:text-blue-600" size="1.5em" />
+            <span class="font-medium text-slate-700 group-hover:text-slate-900">今日のTodo</span>
+          </NuxtLink>
 
-            <NuxtLink
-              :to="{ name: 'id-todo-upcoming', params: { id: $route.params.id } }"
-              class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
-              :class="{ 'bg-blue-50 border-r-4 border-blue-500': $route.name === 'id-todo-upcoming' }"
-            >
-              <Icon name="fluent:calendar-clock-20-filled" class="mr-3 text-orange-500 group-hover:text-orange-600" size="1.5em" />
-              <span class="font-medium text-slate-700 group-hover:text-slate-900">期日が近いTodo</span>
-            </NuxtLink>
+          <NuxtLink
+            :to="{ name: 'id-todo-upcoming', params: { id: $route.params.id } }"
+            class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
+            :class="{ 'bg-blue-50 border-r-4 border-blue-500': $route.name === 'id-todo-upcoming' }"
+          >
+            <Icon name="fluent:calendar-clock-20-filled" class="mr-3 text-orange-500 group-hover:text-orange-600" size="1.5em" />
+            <span class="font-medium text-slate-700 group-hover:text-slate-900">期日が近いTodo</span>
+          </NuxtLink>
 
-            <NuxtLink
-              :to="{ name: 'id-todo-all', params: { id: $route.params.id } }"
-              class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
-              :class="{ 'bg-blue-50 border-r-4 border-blue-500': $route.name === 'id-todo-all' }"
-            >
-              <Icon name="fluent:list-20-filled" class="mr-3 text-slate-500 group-hover:text-slate-600" size="1.5em" />
-              <span class="font-medium text-slate-700 group-hover:text-slate-900">すべてのTodo</span>
-            </NuxtLink>
-          </div>
+          <NuxtLink
+            :to="{ name: 'id-todo-all', params: { id: $route.params.id } }"
+            class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
+            :class="{ 'bg-blue-50 border-r-4 border-blue-500': $route.name === 'id-todo-all' }"
+          >
+            <Icon name="fluent:list-20-filled" class="mr-3 text-slate-500 group-hover:text-slate-600" size="1.5em" />
+            <span class="font-medium text-slate-700 group-hover:text-slate-900">すべてのTodo</span>
+          </NuxtLink>
+        </div>
 
           <!-- Categories Section -->
           <div class="mt-8">
@@ -103,10 +112,9 @@
         </div>
       </div>
 
-      <!-- Main Content Area -->
-      <div class="flex-1 flex flex-col overflow-hidden">
-        <slot />
-      </div>
+    <!-- Main Content Area -->
+    <div class="flex-1 overflow-y-auto">
+      <slot />
     </div>
   </div>
 </template>
