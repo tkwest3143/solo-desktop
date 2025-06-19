@@ -10,6 +10,7 @@ export interface TodoItem {
   updated_at: string;
   category_id?: number;
   user_id: number;
+  status?: string;
 }
 
 export interface TodoCategory {
@@ -31,6 +32,7 @@ export interface TodoItemForInsert {
   due_date: string;
   category_id?: number;
   user_id: number;
+  status?: string;
 }
 
 export interface TodoItemForUpdate {
@@ -43,6 +45,7 @@ export interface TodoItemForUpdate {
   due_date: string;
   category_id?: number;
   user_id: number;
+  status?: string;
 }
 
 export interface TodoCategoryForInsert {

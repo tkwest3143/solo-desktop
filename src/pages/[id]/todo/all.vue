@@ -37,7 +37,7 @@
         <div class="flex space-x-3">
           <select v-model="statusFilter" class="border border-slate-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">すべて</option>
-            <option value="pending">未完了</option>
+            <option value="incomplete">未完了</option>
             <option value="completed">完了済み</option>
           </select>
           <select v-model="selectedCategoryId" class="border border-slate-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -82,7 +82,12 @@
         >
           <div class="flex items-start space-x-4">
             <div class="mt-1">
-              <input type="checkbox" class="w-5 h-5 text-blue-500 rounded border-2 border-slate-300 focus:ring-blue-500" />
+              <input 
+                type="checkbox" 
+                :checked="todo.status === 'completed'"
+                @click.stop="toggleTodoStatus(todo)"
+                class="w-5 h-5 text-blue-500 rounded border-2 border-slate-300 focus:ring-blue-500" 
+              />
             </div>
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
@@ -194,8 +199,12 @@ export default defineComponent({
         );
       }
 
-      // Filter by status (not implemented in backend yet, so just return all for now)
-      // TODO: Add status/completed field to todo items
+      // Filter by status
+      if (this.statusFilter === "completed") {
+        filtered = filtered.filter(todo => todo.status === "completed");
+      } else if (this.statusFilter === "incomplete") {
+        filtered = filtered.filter(todo => todo.status !== "completed");
+      }
 
       // Sort
       if (this.sortBy === "due_date") {
@@ -306,6 +315,34 @@ export default defineComponent({
         params: { id: this.$route.params.id },
         query: { id: todo.id }
       });
+    },
+    async toggleTodoStatus(todo: TodoItem) {
+      try {
+        const newStatus = todo.status === "completed" ? "incomplete" : "completed";
+        const updateData: any = {
+          id: todo.id,
+          title: todo.title,
+          content: todo.content,
+          link: todo.link,
+          color: todo.color,
+          priority: todo.priority,
+          due_date: todo.due_date,
+          category_id: todo.category_id,
+          user_id: todo.user_id,
+          status: newStatus,
+        };
+        
+        await TodoItemRepository.updateTodoItem(updateData);
+        
+        // Update the local state
+        const index = this.todos.findIndex(t => t.id === todo.id);
+        if (index !== -1) {
+          this.todos[index].status = newStatus;
+        }
+      } catch (error) {
+        console.error("Failed to toggle todo status:", error);
+        alert("ステータスの更新に失敗しました");
+      }
     },
     getPriorityLabel(priority?: string): string {
       switch (priority) {

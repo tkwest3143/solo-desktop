@@ -67,7 +67,12 @@
             >
               <div class="flex items-start space-x-4">
                 <div class="mt-1">
-                  <input type="checkbox" class="w-5 h-5 text-red-500 rounded border-2 border-red-300 focus:ring-red-500" />
+                  <input 
+                    type="checkbox" 
+                    :checked="todo.status === 'completed'"
+                    @click.stop="toggleTodoStatus(todo)"
+                    class="w-5 h-5 text-red-500 rounded border-2 border-red-300 focus:ring-red-500" 
+                  />
                 </div>
                 <div class="flex-1">
                   <div class="flex items-center space-x-3 mb-2">
@@ -131,7 +136,12 @@
             >
               <div class="flex items-start space-x-4">
                 <div class="mt-1">
-                  <input type="checkbox" class="w-5 h-5 text-orange-500 rounded border-2 border-orange-300 focus:ring-orange-500" />
+                  <input 
+                    type="checkbox" 
+                    :checked="todo.status === 'completed'"
+                    @click.stop="toggleTodoStatus(todo)"
+                    class="w-5 h-5 text-orange-500 rounded border-2 border-orange-300 focus:ring-orange-500" 
+                  />
                 </div>
                 <div class="flex-1">
                   <div class="flex items-center space-x-3 mb-2">
@@ -195,7 +205,12 @@
             >
               <div class="flex items-start space-x-4">
                 <div class="mt-1">
-                  <input type="checkbox" class="w-5 h-5 text-yellow-500 rounded border-2 border-yellow-300 focus:ring-yellow-500" />
+                  <input 
+                    type="checkbox" 
+                    :checked="todo.status === 'completed'"
+                    @click.stop="toggleTodoStatus(todo)"
+                    class="w-5 h-5 text-yellow-500 rounded border-2 border-yellow-300 focus:ring-yellow-500" 
+                  />
                 </div>
                 <div class="flex-1">
                   <div class="flex items-center space-x-3 mb-2">
@@ -354,11 +369,11 @@ export default defineComponent({
         );
       }
       
-      // Filter by status (placeholder for future implementation)
+      // Filter by status
       if (this.selectedStatusFilter === "completed") {
-        // Filter completed todos when status field is added
+        filtered = filtered.filter(todo => todo.status === "completed");
       } else if (this.selectedStatusFilter === "incomplete") {
-        // Filter incomplete todos when status field is added
+        filtered = filtered.filter(todo => todo.status !== "completed");
       }
       
       return filtered;
@@ -503,6 +518,34 @@ export default defineComponent({
         params: { id: this.$route.params.id },
         query: { id: todo.id }
       });
+    },
+    async toggleTodoStatus(todo: TodoItem) {
+      try {
+        const newStatus = todo.status === "completed" ? "incomplete" : "completed";
+        const updateData: any = {
+          id: todo.id,
+          title: todo.title,
+          content: todo.content,
+          link: todo.link,
+          color: todo.color,
+          priority: todo.priority,
+          due_date: todo.due_date,
+          category_id: todo.category_id,
+          user_id: todo.user_id,
+          status: newStatus,
+        };
+        
+        await TodoItemRepository.updateTodoItem(updateData);
+        
+        // Update the local state
+        const index = this.todos.findIndex(t => t.id === todo.id);
+        if (index !== -1) {
+          this.todos[index].status = newStatus;
+        }
+      } catch (error) {
+        console.error("Failed to toggle todo status:", error);
+        alert("ステータスの更新に失敗しました");
+      }
     },
     getPriorityLabel(priority?: string): string {
       switch (priority) {

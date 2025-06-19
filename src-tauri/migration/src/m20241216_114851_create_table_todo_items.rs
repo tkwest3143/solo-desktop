@@ -51,4 +51,5 @@ pub enum TodoItems {
   CreatedAt,
   UpdatedAt,
   CategoryId,
+  Status,
 }

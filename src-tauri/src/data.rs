@@ -93,6 +93,7 @@ pub struct TodoItemForInsert {
   pub due_date: String,
   pub category_id: Option<i32>,
   pub user_id: i32,
+  pub status: Option<String>,
 }
 #[derive(Serialize, Deserialize, Clone)]
 pub struct TodoItemForUpdate {
@@ -105,4 +106,5 @@ pub struct TodoItemForUpdate {
   pub due_date: String,
   pub category_id: Option<i32>,
   pub user_id: i32,
+  pub status: Option<String>,
 }
