@@ -56,47 +56,36 @@
           </div>
 
           <!-- Due Date and Time -->
+          <CustomDateTimePicker
+            :date="dueDateFormatted"
+            :time="dueTimeFormatted"
+            :required="true"
+            @update:date="updateDueDate"
+            @update:time="updateDueTime"
+          />
+
+          <!-- Category and Priority -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label for="due_date" class="block text-sm font-semibold text-slate-700 mb-2">
-                期日 *
+              <label for="category" class="block text-sm font-semibold text-slate-700 mb-2">
+                カテゴリ
               </label>
-              <input
-                id="due_date"
-                v-model="dueDateFormatted"
-                type="date"
-                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                required
+              <CustomSelect
+                v-model="todo.category_id"
+                :options="categoryOptions"
+                placeholder="カテゴリを選択"
               />
             </div>
             <div>
-              <label for="due_time" class="block text-sm font-semibold text-slate-700 mb-2">
-                時刻
+              <label for="priority" class="block text-sm font-semibold text-slate-700 mb-2">
+                優先度
               </label>
-              <input
-                id="due_time"
-                v-model="dueTimeFormatted"
-                type="time"
-                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              <CustomSelect
+                v-model="todo.priority"
+                :options="priorityOptions"
+                placeholder="優先度を選択"
               />
             </div>
-          </div>
-
-          <!-- Category -->
-          <div>
-            <label for="category" class="block text-sm font-semibold text-slate-700 mb-2">
-              カテゴリ
-            </label>
-            <select
-              id="category"
-              v-model="todo.category_id"
-              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-            >
-              <option value="">カテゴリを選択</option>
-              <option v-for="category in categories" :key="category.id" :value="category.id">
-                {{ category.name }}
-              </option>
-            </select>
           </div>
 
           <!-- Submit Button -->
@@ -131,12 +120,19 @@ import { defineComponent } from "vue";
 import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
 import type { TodoItem, TodoCategory } from "~/models/todo";
+import CustomSelect from "~/components/CustomSelect.vue";
+import CustomDateTimePicker from "~/components/CustomDateTimePicker.vue";
+import type { SelectOption } from "~/components/CustomSelect.vue";
 
 definePageMeta({
   layout: 'todo'
 });
 
 export default defineComponent({
+  components: {
+    CustomSelect,
+    CustomDateTimePicker,
+  },
   data() {
     return {
       todo: null as TodoItem | null,
@@ -176,6 +172,20 @@ export default defineComponent({
           this.todo.due_date = date.toISOString();
         }
       }
+    },
+    categoryOptions(): SelectOption[] {
+      return this.categories.map(category => ({
+        value: category.id,
+        label: category.name,
+        color: category.color
+      }));
+    },
+    priorityOptions(): SelectOption[] {
+      return [
+        { value: 'low', label: '低優先度' },
+        { value: 'normal', label: '通常' },
+        { value: 'high', label: '高優先度' },
+      ];
     }
   },
   async mounted() {
@@ -224,6 +234,23 @@ export default defineComponent({
         alert("Todoの更新に失敗しました");
       } finally {
         this.saving = false;
+      }
+    },
+    updateDueDate(date: string) {
+      if (this.todo) {
+        // Preserve existing time if it exists
+        const existingDate = new Date(this.todo.due_date);
+        const newDate = new Date(date);
+        newDate.setHours(existingDate.getHours(), existingDate.getMinutes());
+        this.todo.due_date = newDate.toISOString();
+      }
+    },
+    updateDueTime(time: string) {
+      if (this.todo && time) {
+        const [hours, minutes] = time.split(':');
+        const date = new Date(this.todo.due_date);
+        date.setHours(parseInt(hours), parseInt(minutes));
+        this.todo.due_date = date.toISOString();
       }
     },
   },

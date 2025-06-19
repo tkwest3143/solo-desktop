@@ -4,6 +4,7 @@ export interface TodoItem {
   content?: string;
   link?: string;
   color?: string;
+  priority?: string;
   due_date: string;
   created_at: string;
   updated_at: string;
@@ -25,6 +26,7 @@ export interface TodoItemForInsert {
   content?: string;
   link?: string;
   color?: string;
+  priority?: string;
   due_date: string;
   category_id?: number;
   user_id: number;
@@ -36,6 +38,7 @@ export interface TodoItemForUpdate {
   content?: string;
   link?: string;
   color?: string;
+  priority?: string;
   due_date: string;
   category_id?: number;
   user_id: number;

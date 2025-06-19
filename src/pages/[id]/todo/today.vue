@@ -53,8 +53,9 @@
         <div
           v-for="todo in filteredTodos"
           :key="todo.id"
-          class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg hover:border-slate-300"
+          class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg hover:border-slate-300 cursor-pointer"
           :class="getTodoPriorityClass(todo)"
+          @click="showTaskDetail(todo)"
         >
           <div class="flex items-start space-x-4">
             <div class="mt-1">
@@ -63,7 +64,12 @@
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
                 <h3 class="text-lg font-semibold text-slate-800">{{ todo.title }}</h3>
-                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">通常</span>
+                <span 
+                  class="text-xs px-2 py-1 rounded-full font-medium"
+                  :class="getPriorityBadgeClass(todo.priority)"
+                >
+                  {{ getPriorityLabel(todo.priority) }}
+                </span>
                 <div
                   v-if="todo.color"
                   class="w-3 h-3 rounded-full"
@@ -89,7 +95,7 @@
                     <Icon name="fluent:edit-20-filled" size="1.2em" />
                   </NuxtLink>
                   <button 
-                    @click="showDeleteDialog(todo)"
+                    @click.stop="showDeleteDialog(todo)"
                     class="p-2 text-slate-400 hover:text-red-500 transition-colors"
                   >
                     <Icon name="fluent:delete-20-filled" size="1.2em" />
@@ -101,6 +107,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Task Detail Dialog -->
+    <TaskDetailDialog
+      :show="taskDetailDialog.show"
+      :todo="taskDetailDialog.todo"
+      :category="taskDetailDialog.category"
+      @close="closeTaskDetail"
+      @edit="editTask"
+      @delete="showDeleteDialog"
+    />
 
     <!-- Delete Confirmation Dialog -->
     <ConfirmDialog
@@ -121,6 +137,7 @@ import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
 import type { TodoItem, TodoCategory } from "~/models/todo";
 import ConfirmDialog from "~/components/ConfirmDialog.vue";
+import TaskDetailDialog from "~/components/TaskDetailDialog.vue";
 
 definePageMeta({
   layout: 'todo'
@@ -129,6 +146,7 @@ definePageMeta({
 export default defineComponent({
   components: {
     ConfirmDialog,
+    TaskDetailDialog,
   },
   data() {
     return {
@@ -140,6 +158,11 @@ export default defineComponent({
       deleteDialog: {
         show: false,
         todo: null as TodoItem | null,
+      },
+      taskDetailDialog: {
+        show: false,
+        todo: null as TodoItem | null,
+        category: null as TodoCategory | null,
       },
     };
   },
@@ -246,6 +269,38 @@ export default defineComponent({
       } catch (error) {
         console.error("Failed to delete todo:", error);
         alert("タスクの削除に失敗しました");
+      }
+    },
+    showTaskDetail(todo: TodoItem) {
+      const category = this.categories.find(cat => cat.id === todo.category_id) || null;
+      this.taskDetailDialog.todo = todo;
+      this.taskDetailDialog.category = category;
+      this.taskDetailDialog.show = true;
+    },
+    closeTaskDetail() {
+      this.taskDetailDialog.show = false;
+      this.taskDetailDialog.todo = null;
+      this.taskDetailDialog.category = null;
+    },
+    editTask(todo: TodoItem) {
+      this.$router.push({
+        name: 'id-todo-edit',
+        params: { id: this.$route.params.id },
+        query: { id: todo.id }
+      });
+    },
+    getPriorityLabel(priority?: string): string {
+      switch (priority) {
+        case 'high': return '高優先度'
+        case 'low': return '低優先度'
+        default: return '通常'
+      }
+    },
+    getPriorityBadgeClass(priority?: string): string {
+      switch (priority) {
+        case 'high': return 'bg-red-100 text-red-800'
+        case 'low': return 'bg-gray-100 text-gray-800'
+        default: return 'bg-blue-100 text-blue-800'
       }
     }
   },

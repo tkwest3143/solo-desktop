@@ -51,31 +51,13 @@
           </div>
 
           <!-- Due Date and Time -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label for="due_date" class="block text-sm font-semibold text-slate-700 mb-2">
-                期日 *
-              </label>
-              <input
-                id="due_date"
-                v-model="todo.due_date"
-                type="date"
-                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                required
-              />
-            </div>
-            <div>
-              <label for="due_time" class="block text-sm font-semibold text-slate-700 mb-2">
-                時刻
-              </label>
-              <input
-                id="due_time"
-                v-model="todo.due_time"
-                type="time"
-                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              />
-            </div>
-          </div>
+          <CustomDateTimePicker
+            :date="todo.due_date"
+            :time="todo.due_time"
+            :required="true"
+            @update:date="todo.due_date = $event"
+            @update:time="todo.due_time = $event"
+          />
 
           <!-- Category and Priority -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -83,30 +65,21 @@
               <label for="category" class="block text-sm font-semibold text-slate-700 mb-2">
                 カテゴリ
               </label>
-              <select
-                id="category"
+              <CustomSelect
                 v-model="todo.category_id"
-                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              >
-                <option value="">カテゴリを選択</option>
-                <option v-for="category in categories" :key="category.id" :value="category.id">
-                  {{ category.name }}
-                </option>
-              </select>
+                :options="categoryOptions"
+                placeholder="カテゴリを選択"
+              />
             </div>
             <div>
               <label for="priority" class="block text-sm font-semibold text-slate-700 mb-2">
                 優先度
               </label>
-              <select
-                id="priority"
+              <CustomSelect
                 v-model="todo.priority"
-                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              >
-                <option value="low">低優先度</option>
-                <option value="normal" selected>通常</option>
-                <option value="high">高優先度</option>
-              </select>
+                :options="priorityOptions"
+                placeholder="優先度を選択"
+              />
             </div>
           </div>
 
@@ -190,12 +163,19 @@ import { defineComponent } from "vue";
 import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
 import type { TodoCategory, TodoItemForInsert } from "~/models/todo";
+import CustomSelect from "~/components/CustomSelect.vue";
+import CustomDateTimePicker from "~/components/CustomDateTimePicker.vue";
+import type { SelectOption } from "~/components/CustomSelect.vue";
 
 definePageMeta({
   layout: 'todo'
 });
 
 export default defineComponent({
+  components: {
+    CustomSelect,
+    CustomDateTimePicker,
+  },
   data() {
     return {
       todo: {
@@ -221,6 +201,22 @@ export default defineComponent({
       ],
       loading: false,
     };
+  },
+  computed: {
+    categoryOptions(): SelectOption[] {
+      return this.categories.map(category => ({
+        value: category.id,
+        label: category.name,
+        color: category.color
+      }));
+    },
+    priorityOptions(): SelectOption[] {
+      return [
+        { value: 'low', label: '低優先度' },
+        { value: 'normal', label: '通常' },
+        { value: 'high', label: '高優先度' },
+      ];
+    }
   },
   async mounted() {
     // Set default due date to today
@@ -259,6 +255,7 @@ export default defineComponent({
           due_date: dueDateTime,
           category_id: this.todo.category_id ? parseInt(this.todo.category_id) : undefined,
           color: this.todo.color,
+          priority: this.todo.priority,
           link: this.todo.link.trim() || undefined,
           user_id: parseInt(this.$route.params.id as string),
         };

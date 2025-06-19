@@ -480,6 +480,7 @@ pub mod todo_items {
     pub content: Option<String>,
     pub link: Option<String>,
     pub color: Option<String>,
+    pub priority: Option<String>,
     pub due_date: String,
     pub created_at: String,
     pub updated_at: String,
@@ -500,6 +501,7 @@ pub mod todo_items {
       content: todo_item.content,
       link: todo_item.link,
       color: todo_item.color,
+      priority: todo_item.priority,
       due_date: todo_item.due_date.to_string(),
       created_at: todo_item.created_at.to_string(),
       updated_at: todo_item.updated_at.to_string(),
@@ -523,6 +525,7 @@ pub mod todo_items {
         content: todo_item.content,
         link: todo_item.link,
         color: todo_item.color,
+        priority: todo_item.priority,
         due_date: todo_item.due_date.to_string(),
         created_at: todo_item.created_at.to_string(),
         updated_at: todo_item.updated_at.to_string(),
@@ -552,6 +555,7 @@ pub mod todo_items {
         content: todo_item.content,
         link: todo_item.link,
         color: todo_item.color,
+        priority: todo_item.priority,
         due_date: todo_item.due_date.to_string(),
         created_at: todo_item.created_at.to_string(),
         updated_at: todo_item.updated_at.to_string(),
@@ -583,6 +587,7 @@ pub mod todo_items {
         content: todo_item.content,
         link: todo_item.link,
         color: todo_item.color,
+        priority: todo_item.priority,
         due_date: todo_item.due_date.to_string(),
         created_at: todo_item.created_at.to_string(),
         updated_at: todo_item.updated_at.to_string(),
@@ -621,6 +626,7 @@ pub mod todo_items {
       content: Set(json_to.content),
       link: Set(json_to.link),
       color: Set(json_to.color),
+      priority: Set(json_to.priority),
       due_date: Set(NaiveDateTime::parse_from_str(&json_to.due_date, "%Y-%m-%d %H:%M:%S").unwrap()),
       category_id: Set(json_to.category_id),
       created_at: Set(Local::now().naive_local()),
@@ -647,6 +653,9 @@ pub mod todo_items {
     }
     if json_to.color.is_some() {
       data.color = Set(json_to.color);
+    }
+    if json_to.priority.is_some() {
+      data.priority = Set(json_to.priority);
     }
     if !json_to.due_date.is_empty() {
       data.due_date = Set(NaiveDateTime::parse_from_str(&json_to.due_date, "%Y-%m-%d %H:%M:%S").unwrap());
