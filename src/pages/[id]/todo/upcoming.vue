@@ -59,7 +59,8 @@
             <div
               v-for="todo in todayTasks"
               :key="todo.id"
-              class="bg-red-50 border-2 border-red-300 rounded-xl p-6 transition-all hover:shadow-lg"
+              class="bg-red-50 border-2 border-red-300 rounded-xl p-6 transition-all hover:shadow-lg cursor-pointer"
+              @click="showTaskDetail(todo)"
             >
               <div class="flex items-start space-x-4">
                 <div class="mt-1">
@@ -68,6 +69,12 @@
                 <div class="flex-1">
                   <div class="flex items-center space-x-3 mb-2">
                     <h3 class="text-lg font-semibold text-slate-800">{{ todo.title }}</h3>
+                    <span 
+                      class="text-xs px-2 py-1 rounded-full font-medium"
+                      :class="getPriorityBadgeClass(todo.priority)"
+                    >
+                      {{ getPriorityLabel(todo.priority) }}
+                    </span>
                     <span class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full font-medium">今日期限</span>
                     <div
                       v-if="todo.color"
@@ -93,7 +100,7 @@
                         <Icon name="fluent:edit-20-filled" size="1.2em" />
                       </NuxtLink>
                       <button 
-                        @click="showDeleteDialog(todo)"
+                        @click.stop="showDeleteDialog(todo)"
                         class="p-2 text-slate-400 hover:text-red-500 transition-colors"
                       >
                         <Icon name="fluent:delete-20-filled" size="1.2em" />
@@ -116,7 +123,8 @@
             <div
               v-for="todo in tomorrowTasks"
               :key="todo.id"
-              class="bg-orange-50 border-2 border-orange-200 rounded-xl p-6 transition-all hover:shadow-lg"
+              class="bg-orange-50 border-2 border-orange-200 rounded-xl p-6 transition-all hover:shadow-lg cursor-pointer"
+              @click="showTaskDetail(todo)"
             >
               <div class="flex items-start space-x-4">
                 <div class="mt-1">
@@ -125,6 +133,12 @@
                 <div class="flex-1">
                   <div class="flex items-center space-x-3 mb-2">
                     <h3 class="text-lg font-semibold text-slate-800">{{ todo.title }}</h3>
+                    <span 
+                      class="text-xs px-2 py-1 rounded-full font-medium"
+                      :class="getPriorityBadgeClass(todo.priority)"
+                    >
+                      {{ getPriorityLabel(todo.priority) }}
+                    </span>
                     <span class="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">明日期限</span>
                     <div
                       v-if="todo.color"
@@ -150,7 +164,7 @@
                         <Icon name="fluent:edit-20-filled" size="1.2em" />
                       </NuxtLink>
                       <button 
-                        @click="showDeleteDialog(todo)"
+                        @click.stop="showDeleteDialog(todo)"
                         class="p-2 text-slate-400 hover:text-red-500 transition-colors"
                       >
                         <Icon name="fluent:delete-20-filled" size="1.2em" />
@@ -173,7 +187,8 @@
             <div
               v-for="todo in thisWeekTasks"
               :key="todo.id"
-              class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 transition-all hover:shadow-lg"
+              class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 transition-all hover:shadow-lg cursor-pointer"
+              @click="showTaskDetail(todo)"
             >
               <div class="flex items-start space-x-4">
                 <div class="mt-1">
@@ -182,6 +197,12 @@
                 <div class="flex-1">
                   <div class="flex items-center space-x-3 mb-2">
                     <h3 class="text-lg font-semibold text-slate-800">{{ todo.title }}</h3>
+                    <span 
+                      class="text-xs px-2 py-1 rounded-full font-medium"
+                      :class="getPriorityBadgeClass(todo.priority)"
+                    >
+                      {{ getPriorityLabel(todo.priority) }}
+                    </span>
                     <span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">今週期限</span>
                     <div
                       v-if="todo.color"
@@ -207,7 +228,7 @@
                         <Icon name="fluent:edit-20-filled" size="1.2em" />
                       </NuxtLink>
                       <button 
-                        @click="showDeleteDialog(todo)"
+                        @click.stop="showDeleteDialog(todo)"
                         class="p-2 text-slate-400 hover:text-red-500 transition-colors"
                       >
                         <Icon name="fluent:delete-20-filled" size="1.2em" />
@@ -238,6 +259,16 @@
       </div>
     </div>
 
+    <!-- Task Detail Dialog -->
+    <TaskDetailDialog
+      :show="taskDetailDialog.show"
+      :todo="taskDetailDialog.todo"
+      :category="taskDetailDialog.category"
+      @close="closeTaskDetail"
+      @edit="editTask"
+      @delete="showDeleteDialog"
+    />
+
     <!-- Delete Confirmation Dialog -->
     <ConfirmDialog
       :show="deleteDialog.show"
@@ -257,6 +288,7 @@ import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
 import type { TodoItem, TodoCategory } from "~/models/todo";
 import ConfirmDialog from "~/components/ConfirmDialog.vue";
+import TaskDetailDialog from "~/components/TaskDetailDialog.vue";
 
 definePageMeta({
   layout: 'todo'
@@ -265,6 +297,7 @@ definePageMeta({
 export default defineComponent({
   components: {
     ConfirmDialog,
+    TaskDetailDialog,
   },
   data() {
     return {
@@ -275,6 +308,11 @@ export default defineComponent({
       deleteDialog: {
         show: false,
         todo: null as TodoItem | null,
+      },
+      taskDetailDialog: {
+        show: false,
+        todo: null as TodoItem | null,
+        category: null as TodoCategory | null,
       },
     };
   },
@@ -408,6 +446,38 @@ export default defineComponent({
       } catch (error) {
         console.error("Failed to delete todo:", error);
         alert("タスクの削除に失敗しました");
+      }
+    },
+    showTaskDetail(todo: TodoItem) {
+      const category = this.categories.find(cat => cat.id === todo.category_id) || null;
+      this.taskDetailDialog.todo = todo;
+      this.taskDetailDialog.category = category;
+      this.taskDetailDialog.show = true;
+    },
+    closeTaskDetail() {
+      this.taskDetailDialog.show = false;
+      this.taskDetailDialog.todo = null;
+      this.taskDetailDialog.category = null;
+    },
+    editTask(todo: TodoItem) {
+      this.$router.push({
+        name: 'id-todo-edit',
+        params: { id: this.$route.params.id },
+        query: { id: todo.id }
+      });
+    },
+    getPriorityLabel(priority?: string): string {
+      switch (priority) {
+        case 'high': return '高優先度'
+        case 'low': return '低優先度'
+        default: return '通常'
+      }
+    },
+    getPriorityBadgeClass(priority?: string): string {
+      switch (priority) {
+        case 'high': return 'bg-red-100 text-red-800'
+        case 'low': return 'bg-gray-100 text-gray-800'
+        default: return 'bg-blue-100 text-blue-800'
       }
     }
   },
