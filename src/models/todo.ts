@@ -9,6 +9,7 @@ export interface TodoItem {
   created_at: string;
   updated_at: string;
   category_id?: number;
+  user_id: number;
 }
 
 export interface TodoCategory {

@@ -400,11 +400,7 @@ pub mod todo_categories {
   #[tauri::command]
   pub async fn get_todo_categories_by_user_id(user_id: i32) -> Result<String, String> {
     let db = establish_connection().await.unwrap();
-    let todo_categories = todo_categories::Entity::find()
-      .filter(todo_categories::Column::UserId.eq(user_id))
-      .all(&db)
-      .await
-      .unwrap();
+    let todo_categories = todo_categories::Entity::find().filter(todo_categories::Column::UserId.eq(user_id)).all(&db).await.unwrap();
     let mut response_categories: Vec<ResponseTodoCategory> = vec![];
     for category in todo_categories {
       response_categories.push(ResponseTodoCategory {
@@ -513,10 +509,7 @@ pub mod todo_items {
   #[tauri::command]
   pub async fn get_all_todo_items(_user_id: i32) -> Result<String, String> {
     let db = establish_connection().await.unwrap();
-    let todo_items = todo_items::Entity::find()
-      .all(&db)
-      .await
-      .unwrap();
+    let todo_items = todo_items::Entity::find().all(&db).await.unwrap();
     let mut response_todo_items: Vec<ResponseTodoItem> = vec![];
     for todo_item in todo_items {
       response_todo_items.push(ResponseTodoItem {
@@ -541,12 +534,8 @@ pub mod todo_items {
     let today = Local::now().date_naive();
     let start_of_day = today.and_hms_opt(0, 0, 0).unwrap();
     let end_of_day = today.and_hms_opt(23, 59, 59).unwrap();
-    
-    let todo_items = todo_items::Entity::find()
-      .filter(todo_items::Column::DueDate.between(start_of_day, end_of_day))
-      .all(&db)
-      .await
-      .unwrap();
+
+    let todo_items = todo_items::Entity::find().filter(todo_items::Column::DueDate.between(start_of_day, end_of_day)).all(&db).await.unwrap();
     let mut response_todo_items: Vec<ResponseTodoItem> = vec![];
     for todo_item in todo_items {
       response_todo_items.push(ResponseTodoItem {
@@ -573,12 +562,8 @@ pub mod todo_items {
     let end_date = today + chrono::Duration::days(days_ahead as i64);
     let start_of_today = today.and_hms_opt(0, 0, 0).unwrap();
     let end_of_period = end_date.and_hms_opt(23, 59, 59).unwrap();
-    
-    let todo_items = todo_items::Entity::find()
-      .filter(todo_items::Column::DueDate.between(start_of_today, end_of_period))
-      .all(&db)
-      .await
-      .unwrap();
+
+    let todo_items = todo_items::Entity::find().filter(todo_items::Column::DueDate.between(start_of_today, end_of_period)).all(&db).await.unwrap();
     let mut response_todo_items: Vec<ResponseTodoItem> = vec![];
     for todo_item in todo_items {
       response_todo_items.push(ResponseTodoItem {
@@ -609,6 +594,7 @@ pub mod todo_items {
         content: todo_item.content,
         link: todo_item.link,
         color: todo_item.color,
+        priority: todo_item.priority,
         due_date: todo_item.due_date.to_string(),
         created_at: todo_item.created_at.to_string(),
         updated_at: todo_item.updated_at.to_string(),
