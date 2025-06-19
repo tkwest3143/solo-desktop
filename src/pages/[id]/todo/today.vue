@@ -71,10 +71,23 @@
                 ></div>
               </div>
               <p v-if="todo.content" class="text-slate-600 mb-3">{{ todo.content }}</p>
-              <div class="flex items-center space-x-4 text-sm text-slate-500">
-                <span>期限: {{ formatDueDate(todo.due_date) }}</span>
-                <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
-                <span>作成日: {{ formatDate(todo.created_at) }}</span>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4 text-sm text-slate-500">
+                  <span>期限: {{ formatDueDate(todo.due_date) }}</span>
+                  <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                  <span>作成日: {{ formatDate(todo.created_at) }}</span>
+                </div>
+                <div class="flex space-x-2">
+                  <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                    <Icon name="fluent:edit-20-filled" size="1.2em" />
+                  </button>
+                  <button 
+                    @click="deleteTodo(todo.id)"
+                    class="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                  >
+                    <Icon name="fluent:delete-20-filled" size="1.2em" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -184,6 +197,21 @@ export default defineComponent({
         return "bg-orange-50 border-orange-200";
       }
       return "";
+    },
+    async deleteTodo(id: number) {
+      if (!confirm("このタスクを削除しますか？")) {
+        return;
+      }
+      
+      try {
+        await TodoItemRepository.deleteTodoItem(id);
+        // Remove from local array
+        this.todos = this.todos.filter(todo => todo.id !== id);
+        alert("タスクが削除されました");
+      } catch (error) {
+        console.error("Failed to delete todo:", error);
+        alert("タスクの削除に失敗しました");
+      }
     }
   },
 });

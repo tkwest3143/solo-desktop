@@ -74,10 +74,12 @@
                 <p class="text-xs text-slate-400">カテゴリなし</p>
               </div>
               <div v-else>
-                <div 
+                <NuxtLink
                   v-for="category in categories" 
                   :key="category.id"
+                  :to="{ name: 'id-todo-all', params: { id: $route.params.id }, query: { category: category.id } }"
                   class="flex items-center p-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer group"
+                  :class="{ 'bg-blue-50 border-r-4 border-blue-500': parseInt($route.query.category as string || '0') === category.id }"
                 >
                   <div 
                     class="w-3 h-3 rounded-full mr-3"
@@ -87,7 +89,7 @@
                   <span class="ml-auto text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">
                     {{ categoryTaskCounts[category.id] || 0 }}
                   </span>
-                </div>
+                </NuxtLink>
               </div>
             </div>
           </div>

@@ -76,9 +76,22 @@
                     ></div>
                   </div>
                   <p v-if="todo.content" class="text-slate-600 mb-3">{{ todo.content }}</p>
-                  <div class="flex items-center space-x-4 text-sm text-slate-500">
-                    <span class="text-red-600 font-medium">期限: {{ formatDueDate(todo.due_date) }}（{{ getTimeUntilDue(todo.due_date) }}）</span>
-                    <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4 text-sm text-slate-500">
+                      <span class="text-red-600 font-medium">期限: {{ formatDueDate(todo.due_date) }}（{{ getTimeUntilDue(todo.due_date) }}）</span>
+                      <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                        <Icon name="fluent:edit-20-filled" size="1.2em" />
+                      </button>
+                      <button 
+                        @click="deleteTodo(todo.id)"
+                        class="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                      >
+                        <Icon name="fluent:delete-20-filled" size="1.2em" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -113,9 +126,22 @@
                     ></div>
                   </div>
                   <p v-if="todo.content" class="text-slate-600 mb-3">{{ todo.content }}</p>
-                  <div class="flex items-center space-x-4 text-sm text-slate-500">
-                    <span class="text-orange-600 font-medium">期限: {{ formatDueDate(todo.due_date) }}</span>
-                    <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4 text-sm text-slate-500">
+                      <span class="text-orange-600 font-medium">期限: {{ formatDueDate(todo.due_date) }}</span>
+                      <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                        <Icon name="fluent:edit-20-filled" size="1.2em" />
+                      </button>
+                      <button 
+                        @click="deleteTodo(todo.id)"
+                        class="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                      >
+                        <Icon name="fluent:delete-20-filled" size="1.2em" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -150,9 +176,22 @@
                     ></div>
                   </div>
                   <p v-if="todo.content" class="text-slate-600 mb-3">{{ todo.content }}</p>
-                  <div class="flex items-center space-x-4 text-sm text-slate-500">
-                    <span class="text-yellow-600 font-medium">期限: {{ formatDueDate(todo.due_date) }}</span>
-                    <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4 text-sm text-slate-500">
+                      <span class="text-yellow-600 font-medium">期限: {{ formatDueDate(todo.due_date) }}</span>
+                      <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                        <Icon name="fluent:edit-20-filled" size="1.2em" />
+                      </button>
+                      <button 
+                        @click="deleteTodo(todo.id)"
+                        class="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                      >
+                        <Icon name="fluent:delete-20-filled" size="1.2em" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -305,6 +344,21 @@ export default defineComponent({
       } else {
         const days = Math.floor(hoursUntilDue / 24);
         return `残り${days}日`;
+      }
+    },
+    async deleteTodo(id: number) {
+      if (!confirm("このタスクを削除しますか？")) {
+        return;
+      }
+      
+      try {
+        await TodoItemRepository.deleteTodoItem(id);
+        // Remove from local array
+        this.todos = this.todos.filter(todo => todo.id !== id);
+        alert("タスクが削除されました");
+      } catch (error) {
+        console.error("Failed to delete todo:", error);
+        alert("タスクの削除に失敗しました");
       }
     }
   },

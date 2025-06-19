@@ -175,6 +175,18 @@ export default defineComponent({
   },
   async mounted() {
     await this.fetchData();
+    // Set category filter from query parameter
+    if (this.$route.query.category) {
+      this.selectedCategoryId = this.$route.query.category as string;
+    }
+  },
+  watch: {
+    '$route.query.category': {
+      handler(newCategory) {
+        this.selectedCategoryId = newCategory as string || "";
+      },
+      immediate: false,
+    },
   },
   methods: {
     async fetchData() {
