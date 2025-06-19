@@ -191,8 +191,11 @@ import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
 import type { TodoCategory, TodoItemForInsert } from "~/models/todo";
 
+definePageMeta({
+  layout: 'todo'
+});
+
 export default defineComponent({
-  layout: "todo",
   data() {
     return {
       todo: {

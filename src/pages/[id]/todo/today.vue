@@ -103,8 +103,11 @@ import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
 import type { TodoItem, TodoCategory } from "~/models/todo";
 
+definePageMeta({
+  layout: 'todo'
+});
+
 export default defineComponent({
-  layout: "todo",
   data() {
     return {
       currentDate: "",
@@ -199,14 +202,19 @@ export default defineComponent({
       return "";
     },
     async deleteTodo(id: number) {
+      console.log("deleteTodo called with id:", id);
+      
       if (!confirm("このタスクを削除しますか？")) {
+        console.log("User cancelled deletion");
         return;
       }
       
       try {
+        console.log("Attempting to delete todo with id:", id);
         await TodoItemRepository.deleteTodoItem(id);
         // Remove from local array
         this.todos = this.todos.filter(todo => todo.id !== id);
+        console.log("Successfully deleted todo");
         alert("タスクが削除されました");
       } catch (error) {
         console.error("Failed to delete todo:", error);

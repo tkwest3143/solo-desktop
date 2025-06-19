@@ -161,8 +161,11 @@ import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
 import type { TodoItem, TodoCategory } from "~/models/todo";
 
+definePageMeta({
+  layout: 'todo'
+});
+
 export default defineComponent({
-  layout: "todo",
   data() {
     return {
       currentDate: "",

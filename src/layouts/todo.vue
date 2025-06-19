@@ -104,7 +104,7 @@
       </div>
 
       <!-- Main Content Area -->
-      <div class="flex-1 flex flex-col overflow-hidden" style="padding-top: 60px;">
+      <div class="flex-1 flex flex-col overflow-hidden">
         <slot />
       </div>
     </div>
