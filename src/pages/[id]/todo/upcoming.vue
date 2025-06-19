@@ -86,7 +86,7 @@
                         <Icon name="fluent:edit-20-filled" size="1.2em" />
                       </button>
                       <button 
-                        @click="deleteTodo(todo.id)"
+                        @click="showDeleteDialog(todo)"
                         class="p-2 text-slate-400 hover:text-red-500 transition-colors"
                       >
                         <Icon name="fluent:delete-20-filled" size="1.2em" />
@@ -136,7 +136,7 @@
                         <Icon name="fluent:edit-20-filled" size="1.2em" />
                       </button>
                       <button 
-                        @click="deleteTodo(todo.id)"
+                        @click="showDeleteDialog(todo)"
                         class="p-2 text-slate-400 hover:text-red-500 transition-colors"
                       >
                         <Icon name="fluent:delete-20-filled" size="1.2em" />
@@ -186,7 +186,7 @@
                         <Icon name="fluent:edit-20-filled" size="1.2em" />
                       </button>
                       <button 
-                        @click="deleteTodo(todo.id)"
+                        @click="showDeleteDialog(todo)"
                         class="p-2 text-slate-400 hover:text-red-500 transition-colors"
                       >
                         <Icon name="fluent:delete-20-filled" size="1.2em" />
@@ -216,6 +216,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <ConfirmDialog
+      :show="deleteDialog.show"
+      title="タスクの削除"
+      :message="`「${deleteDialog.todo?.title}」を削除しますか？この操作は取り消せません。`"
+      confirm-text="削除"
+      cancel-text="キャンセル"
+      @confirm="confirmDelete"
+      @cancel="cancelDelete"
+    />
   </div>
 </template>
 
@@ -224,18 +235,26 @@ import { defineComponent } from "vue";
 import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
 import type { TodoItem, TodoCategory } from "~/models/todo";
+import ConfirmDialog from "~/components/ConfirmDialog.vue";
 
 definePageMeta({
   layout: 'todo'
 });
 
 export default defineComponent({
+  components: {
+    ConfirmDialog,
+  },
   data() {
     return {
       todos: [] as TodoItem[],
       categories: [] as TodoCategory[],
       selectedCategoryId: "",
       loading: true,
+      deleteDialog: {
+        show: false,
+        todo: null as TodoItem | null,
+      },
     };
   },
   computed: {
@@ -349,21 +368,22 @@ export default defineComponent({
         return `残り${days}日`;
       }
     },
-    async deleteTodo(id: number) {
-      console.log("deleteTodo called with id:", id);
-      
-      if (!confirm("このタスクを削除しますか？")) {
-        console.log("User cancelled deletion");
-        return;
-      }
+    showDeleteDialog(todo: TodoItem) {
+      this.deleteDialog.todo = todo;
+      this.deleteDialog.show = true;
+    },
+    cancelDelete() {
+      this.deleteDialog.show = false;
+      this.deleteDialog.todo = null;
+    },
+    async confirmDelete() {
+      if (!this.deleteDialog.todo) return;
       
       try {
-        console.log("Attempting to delete todo with id:", id);
-        await TodoItemRepository.deleteTodoItem(id);
+        await TodoItemRepository.deleteTodoItem(this.deleteDialog.todo.id);
         // Remove from local array
-        this.todos = this.todos.filter(todo => todo.id !== id);
-        console.log("Successfully deleted todo");
-        alert("タスクが削除されました");
+        this.todos = this.todos.filter(todo => todo.id !== this.deleteDialog.todo?.id);
+        this.cancelDelete();
       } catch (error) {
         console.error("Failed to delete todo:", error);
         alert("タスクの削除に失敗しました");

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-    <div class="flex h-screen">
+    <div class="flex" style="height: calc(100vh - 60px);">
       <!-- Left Sidebar -->
       <div class="w-80 bg-white shadow-xl border-r border-slate-200 flex flex-col">
         <!-- Sidebar Header -->
@@ -12,7 +12,7 @@
         </div>
 
         <!-- Navigation Menu -->
-        <nav class="flex-1 p-4 space-y-2">
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
           <!-- Quick Actions -->
           <div class="mb-6">
             <NuxtLink
