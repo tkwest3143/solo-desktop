@@ -12,6 +12,7 @@ pub struct Model {
   pub content: Option<String>,
   pub link: Option<String>,
   pub color: Option<String>,
+  pub priority: Option<String>,
   pub due_date: DateTime,
   pub created_at: DateTime,
   pub updated_at: DateTime,

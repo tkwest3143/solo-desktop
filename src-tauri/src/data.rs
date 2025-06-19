@@ -72,6 +72,7 @@ pub struct WorkTimeSettingForUpdate {
 pub struct TodoCategoryForInsert {
   pub name: String,
   pub memo: Option<String>,
+  pub color: Option<String>,
   pub user_id: i32,
 }
 #[derive(Serialize, Deserialize, Clone)]
@@ -79,6 +80,7 @@ pub struct TodoCategoryForUpdate {
   pub id: i32,
   pub name: Option<String>,
   pub memo: Option<String>,
+  pub color: Option<String>,
   pub user_id: i32,
 }
 #[derive(Serialize, Deserialize, Clone)]
@@ -87,6 +89,7 @@ pub struct TodoItemForInsert {
   pub content: Option<String>,
   pub link: Option<String>,
   pub color: Option<String>,
+  pub priority: Option<String>,
   pub due_date: String,
   pub category_id: Option<i32>,
   pub user_id: i32,
@@ -98,6 +101,7 @@ pub struct TodoItemForUpdate {
   pub content: Option<String>,
   pub link: Option<String>,
   pub color: Option<String>,
+  pub priority: Option<String>,
   pub due_date: String,
   pub category_id: Option<i32>,
   pub user_id: i32,

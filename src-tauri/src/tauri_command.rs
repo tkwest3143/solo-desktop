@@ -378,6 +378,89 @@ pub mod japanese_holiday {
   }
 }
 
+pub mod todo_categories {
+  use crate::data::{TodoCategoryForInsert, TodoCategoryForUpdate};
+  use crate::entities::todo_categories;
+  use crate::repositories::database::establish_connection;
+  use chrono::Local;
+  use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, Set};
+  use serde::Serialize;
+
+  #[derive(Serialize)]
+  pub struct ResponseTodoCategory {
+    pub id: i32,
+    pub name: String,
+    pub memo: Option<String>,
+    pub color: Option<String>,
+    pub user_id: i32,
+    pub created_at: String,
+    pub updated_at: String,
+  }
+
+  #[tauri::command]
+  pub async fn get_todo_categories_by_user_id(user_id: i32) -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    let todo_categories = todo_categories::Entity::find().filter(todo_categories::Column::UserId.eq(user_id)).all(&db).await.unwrap();
+    let mut response_categories: Vec<ResponseTodoCategory> = vec![];
+    for category in todo_categories {
+      response_categories.push(ResponseTodoCategory {
+        id: category.id,
+        name: category.name,
+        memo: category.memo,
+        color: category.color,
+        user_id: category.user_id,
+        created_at: category.created_at.to_string(),
+        updated_at: category.updated_at.to_string(),
+      });
+    }
+    Ok(serde_json::to_string(&response_categories).unwrap())
+  }
+
+  #[tauri::command]
+  pub async fn create_todo_category(category: &str) -> Result<String, String> {
+    let json_to: TodoCategoryForInsert = serde_json::from_str(category).unwrap();
+    let db = establish_connection().await.unwrap();
+    let data = todo_categories::ActiveModel {
+      name: Set(json_to.name),
+      memo: Set(json_to.memo),
+      color: Set(json_to.color),
+      user_id: Set(json_to.user_id),
+      created_at: Set(Local::now().naive_local()),
+      updated_at: Set(Local::now().naive_local()),
+      ..Default::default()
+    };
+    todo_categories::Entity::insert(data).exec(&db).await.unwrap();
+    Ok("create_todo_category finish".to_string())
+  }
+
+  #[tauri::command]
+  pub async fn update_todo_category(category: &str) -> Result<String, String> {
+    let json_to: TodoCategoryForUpdate = serde_json::from_str(category).unwrap();
+    let db = establish_connection().await.unwrap();
+    let data = todo_categories::Entity::find_by_id(json_to.id).one(&db).await.unwrap();
+    let mut data: todo_categories::ActiveModel = data.unwrap().into();
+    if json_to.name.is_some() {
+      data.name = Set(json_to.name.unwrap());
+    }
+    if json_to.memo.is_some() {
+      data.memo = Set(json_to.memo);
+    }
+    if json_to.color.is_some() {
+      data.color = Set(json_to.color);
+    }
+    data.updated_at = Set(Local::now().naive_local());
+    todo_categories::Entity::update(data).exec(&db).await.unwrap();
+    Ok("update_todo_category finish".to_string())
+  }
+
+  #[tauri::command]
+  pub async fn delete_todo_category(id: i32) -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    todo_categories::Entity::delete_by_id(id).exec(&db).await.unwrap();
+    Ok("delete_todo_category finish".to_string())
+  }
+}
+
 pub mod todo_items {
   use crate::data::{TodoItemForInsert, TodoItemForUpdate};
   use crate::entities::todo_items;
@@ -393,11 +476,112 @@ pub mod todo_items {
     pub content: Option<String>,
     pub link: Option<String>,
     pub color: Option<String>,
+    pub priority: Option<String>,
     pub due_date: String,
     pub created_at: String,
     pub updated_at: String,
     pub category_id: Option<i32>,
   }
+
+  #[tauri::command]
+  pub async fn get_todo_item_by_id(id: i32) -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    let todo_item = todo_items::Entity::find_by_id(id).one(&db).await.unwrap();
+    if todo_item.is_none() {
+      return Err("Todo item not found".to_string());
+    }
+    let todo_item = todo_item.unwrap();
+    let response_todo_item = ResponseTodoItem {
+      id: todo_item.id,
+      title: todo_item.title.unwrap_or_default(),
+      content: todo_item.content,
+      link: todo_item.link,
+      color: todo_item.color,
+      priority: todo_item.priority,
+      due_date: todo_item.due_date.to_string(),
+      created_at: todo_item.created_at.to_string(),
+      updated_at: todo_item.updated_at.to_string(),
+      category_id: todo_item.category_id,
+    };
+    Ok(serde_json::to_string(&response_todo_item).unwrap())
+  }
+
+  #[tauri::command]
+  pub async fn get_all_todo_items(_user_id: i32) -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    let todo_items = todo_items::Entity::find().all(&db).await.unwrap();
+    let mut response_todo_items: Vec<ResponseTodoItem> = vec![];
+    for todo_item in todo_items {
+      response_todo_items.push(ResponseTodoItem {
+        id: todo_item.id,
+        title: todo_item.title.unwrap_or_default(),
+        content: todo_item.content,
+        link: todo_item.link,
+        color: todo_item.color,
+        priority: todo_item.priority,
+        due_date: todo_item.due_date.to_string(),
+        created_at: todo_item.created_at.to_string(),
+        updated_at: todo_item.updated_at.to_string(),
+        category_id: todo_item.category_id,
+      });
+    }
+    Ok(serde_json::to_string(&response_todo_items).unwrap())
+  }
+
+  #[tauri::command]
+  pub async fn get_today_todo_items(_user_id: i32) -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    let today = Local::now().date_naive();
+    let start_of_day = today.and_hms_opt(0, 0, 0).unwrap();
+    let end_of_day = today.and_hms_opt(23, 59, 59).unwrap();
+
+    let todo_items = todo_items::Entity::find().filter(todo_items::Column::DueDate.between(start_of_day, end_of_day)).all(&db).await.unwrap();
+    let mut response_todo_items: Vec<ResponseTodoItem> = vec![];
+    for todo_item in todo_items {
+      response_todo_items.push(ResponseTodoItem {
+        id: todo_item.id,
+        title: todo_item.title.unwrap_or_default(),
+        content: todo_item.content,
+        link: todo_item.link,
+        color: todo_item.color,
+        priority: todo_item.priority,
+        due_date: todo_item.due_date.to_string(),
+        created_at: todo_item.created_at.to_string(),
+        updated_at: todo_item.updated_at.to_string(),
+        category_id: todo_item.category_id,
+      });
+    }
+    Ok(serde_json::to_string(&response_todo_items).unwrap())
+  }
+
+  #[tauri::command]
+  pub async fn get_upcoming_todo_items(_user_id: i32, days: Option<i32>) -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    let today = Local::now().date_naive();
+    let days_ahead = days.unwrap_or(7); // Default to 7 days if not specified
+    let end_date = today + chrono::Duration::days(days_ahead as i64);
+    let start_of_today = today.and_hms_opt(0, 0, 0).unwrap();
+    let end_of_period = end_date.and_hms_opt(23, 59, 59).unwrap();
+
+    let todo_items = todo_items::Entity::find().filter(todo_items::Column::DueDate.between(start_of_today, end_of_period)).all(&db).await.unwrap();
+    let mut response_todo_items: Vec<ResponseTodoItem> = vec![];
+    for todo_item in todo_items {
+      response_todo_items.push(ResponseTodoItem {
+        id: todo_item.id,
+        title: todo_item.title.unwrap_or_default(),
+        content: todo_item.content,
+        link: todo_item.link,
+        color: todo_item.color,
+        priority: todo_item.priority,
+        due_date: todo_item.due_date.to_string(),
+        created_at: todo_item.created_at.to_string(),
+        updated_at: todo_item.updated_at.to_string(),
+        category_id: todo_item.category_id,
+      });
+    }
+    Ok(serde_json::to_string(&response_todo_items).unwrap())
+  }
+
   #[tauri::command]
   pub async fn get_todo_items_by_category_id(category_id: i32) -> Result<String, String> {
     let db = establish_connection().await.unwrap();
@@ -410,6 +594,7 @@ pub mod todo_items {
         content: todo_item.content,
         link: todo_item.link,
         color: todo_item.color,
+        priority: todo_item.priority,
         due_date: todo_item.due_date.to_string(),
         created_at: todo_item.created_at.to_string(),
         updated_at: todo_item.updated_at.to_string(),
@@ -427,6 +612,7 @@ pub mod todo_items {
       content: Set(json_to.content),
       link: Set(json_to.link),
       color: Set(json_to.color),
+      priority: Set(json_to.priority),
       due_date: Set(NaiveDateTime::parse_from_str(&json_to.due_date, "%Y-%m-%d %H:%M:%S").unwrap()),
       category_id: Set(json_to.category_id),
       created_at: Set(Local::now().naive_local()),
@@ -453,6 +639,9 @@ pub mod todo_items {
     }
     if json_to.color.is_some() {
       data.color = Set(json_to.color);
+    }
+    if json_to.priority.is_some() {
+      data.priority = Set(json_to.priority);
     }
     if !json_to.due_date.is_empty() {
       data.due_date = Set(NaiveDateTime::parse_from_str(&json_to.due_date, "%Y-%m-%d %H:%M:%S").unwrap());

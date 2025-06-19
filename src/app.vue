@@ -1,18 +1,18 @@
 <template>
   <div>
-    <NuxtLayout>
-      <div v-if="isLoading" class="h-screen flex items-center justify-center">
-        <Loading loading-text="データ取り込み中" />
+    <div v-if="isLoading" class="h-screen flex items-center justify-center">
+      <Loading loading-text="データ取り込み中" />
+    </div>
+    <div v-else class="h-screen">
+      <div style="position: fixed; top: 0; width: 100%; z-index: 1000">
+        <Header :userData="userData" />
       </div>
-      <div v-else class="h-screen">
-        <div style="position: fixed; top: 0; width: 100%; z-index: 1000">
-          <Header :userData="userData" />
-        </div>
+      <NuxtLayout>
         <div style="padding-top: 60px">
           <NuxtPage />
         </div>
-      </div>
-    </NuxtLayout>
+      </NuxtLayout>
+    </div>
   </div>
 </template>
 
