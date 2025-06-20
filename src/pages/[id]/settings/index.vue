@@ -52,7 +52,7 @@
         >
           <div class="text-center">
             <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-              <Icon name="fluent:briefcase-settings-20-filled" class="text-white" size="2em" />
+              <Icon name="fluent:settings-20-filled" class="text-white" size="2em" />
             </div>
             <h3 class="text-xl font-semibold text-slate-800 mb-2">勤務設定</h3>
             <p class="text-slate-600 mb-4">勤務時間や休憩時間の設定を管理</p>

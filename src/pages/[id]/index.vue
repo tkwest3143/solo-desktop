@@ -66,7 +66,7 @@
         >
           <div class="flex flex-col items-center space-y-3">
             <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <Icon name="fluent:clock-arrow-upload-20-filled" size="1.5em" />
+              <Icon name="fluent:arrow-right-20-filled" size="1.5em" />
             </div>
             <span class="font-semibold">退勤</span>
           </div>
