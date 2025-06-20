@@ -6,6 +6,7 @@ mod m20241216_114851_create_table_todo_items;
 mod m20241216_114851_create_table_users;
 mod m20241216_114851_create_table_work_settings;
 mod m20241216_114851_create_table_work_times;
+mod m20250103_000000_add_user_id_to_todo_items;
 
 pub struct Migrator;
 
@@ -20,6 +21,7 @@ impl MigratorTrait for Migrator {
       Box::new(m20241216_114851_create_table_japanese_holiday::Migration),
       Box::new(m20241216_114851_create_table_todo_items::Migration),
       Box::new(m20241216_114851_create_table_todo_categories::Migration),
+      Box::new(m20250103_000000_add_user_id_to_todo_items::Migration),
     ]
   }
 }

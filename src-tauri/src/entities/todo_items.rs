@@ -15,6 +15,7 @@ pub struct Model {
   pub priority: Option<String>,
   pub due_date: DateTime,
   pub status: Option<String>,
+  pub user_id: i32,
   pub created_at: DateTime,
   pub updated_at: DateTime,
 }

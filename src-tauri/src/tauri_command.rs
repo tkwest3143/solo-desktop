@@ -481,6 +481,7 @@ pub mod todo_items {
     pub created_at: String,
     pub updated_at: String,
     pub category_id: Option<i32>,
+    pub user_id: i32,
     pub status: Option<String>,
   }
 
@@ -503,6 +504,7 @@ pub mod todo_items {
       created_at: todo_item.created_at.to_string(),
       updated_at: todo_item.updated_at.to_string(),
       category_id: todo_item.category_id,
+      user_id: todo_item.user_id,
       status: todo_item.status,
     };
     Ok(serde_json::to_string(&response_todo_item).unwrap())
@@ -525,6 +527,7 @@ pub mod todo_items {
         created_at: todo_item.created_at.to_string(),
         updated_at: todo_item.updated_at.to_string(),
         category_id: todo_item.category_id,
+        user_id: todo_item.user_id,
         status: todo_item.status,
       });
     }
@@ -552,6 +555,7 @@ pub mod todo_items {
         created_at: todo_item.created_at.to_string(),
         updated_at: todo_item.updated_at.to_string(),
         category_id: todo_item.category_id,
+        user_id: todo_item.user_id,
         status: todo_item.status,
       });
     }
@@ -581,6 +585,7 @@ pub mod todo_items {
         created_at: todo_item.created_at.to_string(),
         updated_at: todo_item.updated_at.to_string(),
         category_id: todo_item.category_id,
+        user_id: todo_item.user_id,
         status: todo_item.status,
       });
     }
@@ -604,6 +609,7 @@ pub mod todo_items {
         created_at: todo_item.created_at.to_string(),
         updated_at: todo_item.updated_at.to_string(),
         category_id: todo_item.category_id,
+        user_id: todo_item.user_id,
         status: todo_item.status,
       });
     }
@@ -621,6 +627,7 @@ pub mod todo_items {
       priority: Set(json_to.priority),
       due_date: Set(NaiveDateTime::parse_from_str(&json_to.due_date, "%Y-%m-%d %H:%M:%S").unwrap()),
       category_id: Set(json_to.category_id),
+      user_id: Set(json_to.user_id),
       status: Set(json_to.status.or_else(|| Some("incomplete".to_string()))),
       created_at: Set(Local::now().naive_local()),
       updated_at: Set(Local::now().naive_local()),
@@ -656,6 +663,7 @@ pub mod todo_items {
     if json_to.category_id.is_some() {
       data.category_id = Set(json_to.category_id);
     }
+    data.user_id = Set(json_to.user_id);
     if json_to.status.is_some() {
       data.status = Set(json_to.status);
     }
