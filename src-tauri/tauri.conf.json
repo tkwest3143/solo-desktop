@@ -13,8 +13,10 @@
     "windows": [
       {
         "title": "solo",
-        "width": 1000,
-        "height": 800
+        "width": 960,
+        "height": 700,
+        "resizable": false,
+        "maximizable": false
       }
     ],
     "security": {
