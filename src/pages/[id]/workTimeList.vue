@@ -131,7 +131,7 @@
           <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
               <tr>
-                <th scope="col" class="w-12 px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider"></th>
+                <th scope="col" class="w-16 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">操作</th>
                 <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">日付</th>
                 <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">稼働状況</th>
                 <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">開始時間</th>
@@ -153,14 +153,15 @@
                 }"
                 class="transition-colors duration-200"
               >
-                <td class="px-4 py-3 text-center">
+                <td class="px-2 py-3 text-center">
                   <button
                     :disabled="selectedWorkSettingId === 0"
                     @click="setDefaultWorkTime(workTime)"
-                    class="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-md text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:cursor-not-allowed"
+                    class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-md text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:cursor-not-allowed whitespace-nowrap"
+                    title="デフォルト設定を適用"
                   >
-                    <Icon name="fluent:magic-wand-20-filled" class="mr-1" size="0.8em" />
-                    デフォルト
+                    <Icon name="fluent:magic-wand-20-filled" size="0.8em" />
+                    <span class="hidden sm:inline ml-1">デフォルト</span>
                   </button>
                 </td>
                 <td 
@@ -189,136 +190,136 @@
                     非稼働
                   </span>
                 </td>
-            <td
-              @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <div
-                v-if="
-                  editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                "
-              >
-                {{ workTime.startByText }}
-              </div>
-              <div v-else>
-                <input
-                  type="time"
-                  :value="workTime.startByText"
-                  @change="
-                    changeWorkTime(workTime, {
-                      start: ($event.target as HTMLInputElement).value,
-                    })
-                  "
-                  class="border border-basic-300 rounded"
-                />
-              </div>
-            </td>
-            <td
-              @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <div
-                v-if="
-                  editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                "
-              >
-                {{ workTime.endByText }}
-              </div>
-              <div v-else>
-                <input
-                  type="time"
-                  :value="workTime.endByText"
-                  @change="
-                    changeWorkTime(workTime, {
-                      end: ($event.target as HTMLInputElement).value,
-                    })
-                  "
-                  class="border border-basic-300 rounded"
-                />
-              </div>
-            </td>
-            <td
-              @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <div
-                v-if="
-                  editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                "
-              >
-                {{ workTime.restStartByText }}
-              </div>
-              <div v-else>
-                <input
-                  type="time"
-                  :value="workTime.restStartByText"
-                  @change="
-                    changeWorkTime(workTime, {
-                      restStart: ($event.target as HTMLInputElement).value,
-                    })
-                  "
-                  class="border border-basic-300 rounded"
-                />
-              </div>
-            </td>
-            <td
-              @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <div
-                v-if="
-                  editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                "
-              >
-                {{ workTime.restEndByText }}
-              </div>
-              <div v-else>
-                <input
-                  type="time"
-                  :value="workTime.restEndByText"
-                  @change="
-                    changeWorkTime(workTime, {
-                      restEnd: ($event.target as HTMLInputElement).value,
-                    })
-                  "
-                  class="border border-basic-300 rounded"
-                />
-              </div>
-            </td>
-            <td
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              {{ workTime.restDurationByText ?? "00:00" }}
-            </td>
-            <td
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              {{ workTime.workDurationByText ?? "00:00" }}
-            </td>
-            <td
-              @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <div
-                v-if="
-                  editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                "
-              >
-                {{ workTime.memo }}
-              </div>
-              <div v-else>
-                <input
-                  type="text"
-                  :value="workTime.memo"
-                  @change="
-                    changeWorkTime(workTime, {
-                      memo: ($event.target as HTMLInputElement).value,
-                    })
-                  "
-                  class="border border-basic-300 rounded"
-                />
-              </div>
-            </td>
+                <td
+                  @dblclick="editWorkTime(workTime)"
+                  class="px-4 py-3 text-center text-sm text-slate-900"
+                >
+                  <div
+                    v-if="
+                      editingWorkTime?.prop.target_day !== workTime.prop.target_day
+                    "
+                  >
+                    {{ workTime.startByText }}
+                  </div>
+                  <div v-else>
+                    <input
+                      type="time"
+                      :value="workTime.startByText"
+                      @change="
+                        changeWorkTime(workTime, {
+                          start: ($event.target as HTMLInputElement).value,
+                        })
+                      "
+                      class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </td>
+                <td
+                  @dblclick="editWorkTime(workTime)"
+                  class="px-4 py-3 text-center text-sm text-slate-900"
+                >
+                  <div
+                    v-if="
+                      editingWorkTime?.prop.target_day !== workTime.prop.target_day
+                    "
+                  >
+                    {{ workTime.endByText }}
+                  </div>
+                  <div v-else>
+                    <input
+                      type="time"
+                      :value="workTime.endByText"
+                      @change="
+                        changeWorkTime(workTime, {
+                          end: ($event.target as HTMLInputElement).value,
+                        })
+                      "
+                      class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </td>
+                <td
+                  @dblclick="editWorkTime(workTime)"
+                  class="px-4 py-3 text-center text-sm text-slate-900"
+                >
+                  <div
+                    v-if="
+                      editingWorkTime?.prop.target_day !== workTime.prop.target_day
+                    "
+                  >
+                    {{ workTime.restStartByText }}
+                  </div>
+                  <div v-else>
+                    <input
+                      type="time"
+                      :value="workTime.restStartByText"
+                      @change="
+                        changeWorkTime(workTime, {
+                          restStart: ($event.target as HTMLInputElement).value,
+                        })
+                      "
+                      class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </td>
+                <td
+                  @dblclick="editWorkTime(workTime)"
+                  class="px-4 py-3 text-center text-sm text-slate-900"
+                >
+                  <div
+                    v-if="
+                      editingWorkTime?.prop.target_day !== workTime.prop.target_day
+                    "
+                  >
+                    {{ workTime.restEndByText }}
+                  </div>
+                  <div v-else>
+                    <input
+                      type="time"
+                      :value="workTime.restEndByText"
+                      @change="
+                        changeWorkTime(workTime, {
+                          restEnd: ($event.target as HTMLInputElement).value,
+                        })
+                      "
+                      class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </td>
+                <td
+                  class="px-4 py-3 text-center text-sm text-slate-900"
+                >
+                  {{ workTime.restDurationByText ?? "00:00" }}
+                </td>
+                <td
+                  class="px-4 py-3 text-center text-sm text-slate-900"
+                >
+                  {{ workTime.workDurationByText ?? "00:00" }}
+                </td>
+                <td
+                  @dblclick="editWorkTime(workTime)"
+                  class="px-6 py-3 text-center text-sm text-slate-900"
+                >
+                  <div
+                    v-if="
+                      editingWorkTime?.prop.target_day !== workTime.prop.target_day
+                    "
+                  >
+                    {{ workTime.memo }}
+                  </div>
+                  <div v-else>
+                    <input
+                      type="text"
+                      :value="workTime.memo"
+                      @change="
+                        changeWorkTime(workTime, {
+                          memo: ($event.target as HTMLInputElement).value,
+                        })
+                      "
+                      class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                    />
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
