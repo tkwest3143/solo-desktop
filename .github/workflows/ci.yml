@@ -27,3 +27,11 @@ jobs:
     
     - name: Type check
       run: make type-check
+      
+    - name: Check build artifacts
+      run: |
+        if [ ! -d ".output" ]; then
+          echo "Build failed: .output directory not found"
+          exit 1
+        fi
+        echo "Build successful: .output directory exists"
