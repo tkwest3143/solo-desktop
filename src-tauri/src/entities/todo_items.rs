@@ -14,8 +14,8 @@ pub struct Model {
   pub color: Option<String>,
   pub priority: Option<String>,
   pub due_date: DateTime,
-  pub status: Option<String>,
   pub user_id: i32,
+  pub status: Option<String>,
   pub created_at: DateTime,
   pub updated_at: DateTime,
 }
@@ -30,11 +30,25 @@ pub enum Relation {
     on_delete = "Cascade"
   )]
   TodoCategories,
+  #[sea_orm(
+    belongs_to = "super::users::Entity",
+    from = "Column::UserId",
+    to = "super::users::Column::Id",
+    on_update = "NoAction",
+    on_delete = "NoAction"
+  )]
+  Users,
 }
 
 impl Related<super::todo_categories::Entity> for Entity {
   fn to() -> RelationDef {
     Relation::TodoCategories.def()
+  }
+}
+
+impl Related<super::users::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::Users.def()
   }
 }
 

@@ -1,6 +1,6 @@
 use sea_orm_migration::{prelude::*, schema::*};
 
-use crate::m20241216_114851_create_table_todo_categories::TodoCategories;
+use crate::{m20241216_114851_create_table_todo_categories::TodoCategories, m20241216_114851_create_table_users::Users};
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 #[async_trait::async_trait]
@@ -19,6 +19,7 @@ impl MigrationTrait for Migration {
           .col(string_null(TodoItems::Color))
           .col(string_null(TodoItems::Priority))
           .col(date_time(TodoItems::DueDate).not_null())
+          .col(integer(TodoItems::UserId).not_null())
           .col(string_null(TodoItems::Status).default("incomplete"))
           .col(date_time(TodoItems::CreatedAt).not_null())
           .col(date_time(TodoItems::UpdatedAt).not_null())
@@ -30,6 +31,7 @@ impl MigrationTrait for Migration {
               .on_delete(ForeignKeyAction::Cascade)
               .on_update(ForeignKeyAction::Cascade),
           )
+          .foreign_key(ForeignKey::create().name("FK_users_todo_items_id").from(TodoItems::Table, TodoItems::UserId).to(Users::Table, Users::Id))
           .to_owned(),
       )
       .await

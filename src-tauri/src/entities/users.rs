@@ -21,6 +21,8 @@ pub enum Relation {
   Documents,
   #[sea_orm(has_many = "super::todo_categories::Entity")]
   TodoCategories,
+  #[sea_orm(has_many = "super::todo_items::Entity")]
+  TodoItems,
   #[sea_orm(has_many = "super::work_settings::Entity")]
   WorkSettings,
   #[sea_orm(has_many = "super::work_times::Entity")]
@@ -36,6 +38,12 @@ impl Related<super::documents::Entity> for Entity {
 impl Related<super::todo_categories::Entity> for Entity {
   fn to() -> RelationDef {
     Relation::TodoCategories.def()
+  }
+}
+
+impl Related<super::todo_items::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::TodoItems.def()
   }
 }
 
