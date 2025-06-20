@@ -18,7 +18,7 @@ impl MigrationTrait for Migration {
           .col(date_time(TodoCategories::CreatedAt).not_null())
           .col(date_time(TodoCategories::UpdatedAt).not_null())
           .col(string_null(TodoCategories::Color))
-          .foreign_key(ForeignKey::create().name("FK_users_todo_categories_id").from(Users::Table, TodoCategories::UserId).to(TodoCategories::Table, Users::Id))
+          .foreign_key(ForeignKey::create().name("FK_todo_categories_user_id").from(TodoCategories::Table, TodoCategories::UserId).to(Users::Table, Users::Id))
           .to_owned(),
       )
       .await

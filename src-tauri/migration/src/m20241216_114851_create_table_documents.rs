@@ -17,7 +17,7 @@ impl MigrationTrait for Migration {
           .col(integer(Documents::UserId).not_null())
           .col(date_time(Documents::CreatedAt).not_null())
           .col(date_time(Documents::UpdatedAt).not_null())
-          .foreign_key(ForeignKey::create().name("FK_users_documents_id").from(Users::Table, Documents::UserId).to(Documents::Table, Users::Id))
+          .foreign_key(ForeignKey::create().name("FK_documents_user_id").from(Documents::Table, Documents::UserId).to(Users::Table, Users::Id))
           .to_owned(),
       )
       .await

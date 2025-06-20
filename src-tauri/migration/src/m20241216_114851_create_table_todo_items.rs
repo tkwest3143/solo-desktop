@@ -25,8 +25,8 @@ impl MigrationTrait for Migration {
           .foreign_key(
             ForeignKey::create()
               .name("FK_todo_categories_todo_items_id")
-              .from(TodoCategories::Table, TodoItems::CategoryId)
-              .to(TodoItems::Table, TodoCategories::Id)
+              .from(TodoItems::Table, TodoItems::CategoryId)
+              .to(TodoCategories::Table, TodoCategories::Id)
               .on_delete(ForeignKeyAction::Cascade)
               .on_update(ForeignKeyAction::Cascade),
           )
