@@ -50,45 +50,25 @@
                 <label class="block text-slate-700 text-sm font-medium mb-2" for="startTime">
                   開始時間
                 </label>
-                <input
-                  v-model="form.startTime"
-                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  id="startTime"
-                  type="time"
-                />
+                <TimeInput v-model="form.startTime" />
               </div>
               <div>
                 <label class="block text-slate-700 text-sm font-medium mb-2" for="endTime">
                   終了時間
                 </label>
-                <input
-                  v-model="form.endTime"
-                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  id="endTime"
-                  type="time"
-                />
+                <TimeInput v-model="form.endTime" />
               </div>
               <div>
                 <label class="block text-slate-700 text-sm font-medium mb-2" for="breakStartTime">
                   休憩開始時間
                 </label>
-                <input
-                  v-model="form.breakStartTime"
-                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  id="breakStartTime"
-                  type="time"
-                />
+                <TimeInput v-model="form.breakStartTime" />
               </div>
               <div>
                 <label class="block text-slate-700 text-sm font-medium mb-2" for="breakEndTime">
                   休憩終了時間
                 </label>
-                <input
-                  v-model="form.breakEndTime"
-                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  id="breakEndTime"
-                  type="time"
-                />
+                <TimeInput v-model="form.breakEndTime" />
               </div>
               <div>
                 <label class="block text-slate-700 text-sm font-medium mb-2" for="workUnit">
@@ -182,6 +162,7 @@
 import { defineComponent } from "vue";
 import { useRoute } from "vue-router";
 import Loading from "~/components/Loading.vue";
+import TimeInput from "~/components/TimeInput.vue";
 import { UserData } from "~/models/user";
 import { workSettingData } from "~/models/workSetting";
 import { UserRepository } from "~/repositories/tauri-commands/user";
@@ -190,6 +171,7 @@ import { WorkSettingRepository } from "~/repositories/tauri-commands/workTimeSet
 export default defineComponent({
   components: {
     Loading,
+    TimeInput,
   },
   data() {
     return {

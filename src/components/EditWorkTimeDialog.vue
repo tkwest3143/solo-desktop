@@ -73,20 +73,12 @@
                   </h3>
                   <div class="grid grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-xs font-medium text-slate-600 mb-1">開始時間</label>
-                      <input
-                        type="time"
-                        v-model="localWorkTime.start"
-                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
+                      <label class="block text-xs font-medium text-slate-600 mb-2">開始時間</label>
+                      <TimeInput v-model="localWorkTime.start" />
                     </div>
                     <div>
-                      <label class="block text-xs font-medium text-slate-600 mb-1">終了時間</label>
-                      <input
-                        type="time"
-                        v-model="localWorkTime.end"
-                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
+                      <label class="block text-xs font-medium text-slate-600 mb-2">終了時間</label>
+                      <TimeInput v-model="localWorkTime.end" />
                     </div>
                   </div>
                 </div>
@@ -99,20 +91,12 @@
                   </h3>
                   <div class="grid grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-xs font-medium text-slate-600 mb-1">開始時間</label>
-                      <input
-                        type="time"
-                        v-model="localWorkTime.restStart"
-                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
+                      <label class="block text-xs font-medium text-slate-600 mb-2">開始時間</label>
+                      <TimeInput v-model="localWorkTime.restStart" />
                     </div>
                     <div>
-                      <label class="block text-xs font-medium text-slate-600 mb-1">終了時間</label>
-                      <input
-                        type="time"
-                        v-model="localWorkTime.restEnd"
-                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
+                      <label class="block text-xs font-medium text-slate-600 mb-2">終了時間</label>
+                      <TimeInput v-model="localWorkTime.restEnd" />
                     </div>
                   </div>
                 </div>
@@ -159,6 +143,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import TimeInput from './TimeInput.vue'
 
 interface WorkTimeEdit {
   start: string
@@ -170,6 +155,9 @@ interface WorkTimeEdit {
 
 export default defineComponent({
   name: 'EditWorkTimeDialog',
+  components: {
+    TimeInput
+  },
   props: {
     show: {
       type: Boolean,
