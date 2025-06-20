@@ -141,7 +141,8 @@
                 <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">勤務時間</th>
                 <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">休憩時間</th>
                 <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">業務時間</th>
-                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">備考</th>
+                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">備考</th>
+                <th scope="col" class="w-16 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">操作</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
@@ -193,8 +194,8 @@
                   </div>
                 </td>
                 <td
-                  @dblclick="editWorkTime(workTime)"
-                  class="px-4 py-3 text-center text-sm text-slate-900"
+                  @click="editWorkTime(workTime)"
+                  class="px-4 py-3 text-center text-sm text-slate-900 cursor-pointer hover:bg-blue-50 transition-colors"
                 >
                   <div
                     v-if="
@@ -214,6 +215,7 @@
                             start: ($event.target as HTMLInputElement).value,
                           })
                         "
+                        @click.stop
                         class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <span class="text-slate-400">-</span>
@@ -225,14 +227,15 @@
                             end: ($event.target as HTMLInputElement).value,
                           })
                         "
+                        @click.stop
                         class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
                   </div>
                 </td>
                 <td
-                  @dblclick="editWorkTime(workTime)"
-                  class="px-4 py-3 text-center text-sm text-slate-900"
+                  @click="editWorkTime(workTime)"
+                  class="px-4 py-3 text-center text-sm text-slate-900 cursor-pointer hover:bg-blue-50 transition-colors"
                 >
                   <div
                     v-if="
@@ -253,6 +256,7 @@
                             restStart: ($event.target as HTMLInputElement).value,
                           })
                         "
+                        @click.stop
                         class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <span class="text-slate-400">-</span>
@@ -264,6 +268,7 @@
                             restEnd: ($event.target as HTMLInputElement).value,
                           })
                         "
+                        @click.stop
                         class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -276,15 +281,16 @@
                   {{ workTime.workDurationByText ?? "00:00" }}
                 </td>
                 <td
-                  @dblclick="editWorkTime(workTime)"
-                  class="px-6 py-3 text-center text-sm text-slate-900"
+                  @click="editWorkTime(workTime)"
+                  class="px-4 py-3 text-center text-sm text-slate-900 cursor-pointer hover:bg-blue-50 transition-colors max-w-32"
                 >
                   <div
                     v-if="
                       editingWorkTime?.prop.target_day !== workTime.prop.target_day
                     "
+                    class="truncate"
                   >
-                    {{ workTime.memo }}
+                    {{ workTime.memo || '-' }}
                   </div>
                   <div v-else>
                     <input
@@ -295,9 +301,19 @@
                           memo: ($event.target as HTMLInputElement).value,
                         })
                       "
+                      @click.stop
                       class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
                     />
                   </div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <button
+                    @click="showMemoDialog(workTime)"
+                    class="p-2 bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                    title="備考を表示"
+                  >
+                    <Icon name="fluent:note-20-filled" size="1em" />
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -334,6 +350,14 @@
         </div>
       </div>
     </div>
+
+    <!-- Memo Dialog -->
+    <MemoDialog
+      :show="showMemo"
+      :memo="selectedMemo"
+      :date="selectedMemoDate"
+      @close="closeMemoDialog"
+    />
   </div>
 </template>
 
@@ -342,6 +366,7 @@ import { format } from "date-fns";
 import { defineComponent } from "vue";
 import CommonSelect from "~/components/CommonSelect.vue";
 import Loading from "~/components/Loading.vue";
+import MemoDialog from "~/components/MemoDialog.vue";
 import ExportFileDialog from "~/components/worktime/ExportFileDialog.vue";
 import { JapaneseHolidayData } from "~/models/japaneseHoliday";
 import { MonthForWork } from "~/models/monthForWork";
@@ -359,6 +384,7 @@ export default defineComponent({
     Loading,
     CommonSelect,
     ExportFileDialog,
+    MemoDialog,
   },
   data() {
     return {
@@ -371,6 +397,9 @@ export default defineComponent({
       workSettings: [] as workSettingData[],
       selectedWorkSettingId: 0,
       japaneseHolidays: [] as JapaneseHolidayData[],
+      showMemo: false,
+      selectedMemo: '',
+      selectedMemoDate: '',
     };
   },
   async mounted() {
@@ -599,6 +628,16 @@ export default defineComponent({
           }
         }
       });
+    },
+    showMemoDialog(workTime: workTimeData) {
+      this.selectedMemo = workTime.memo || '';
+      this.selectedMemoDate = workTime.getDayTextWithWeek(this.japaneseHolidays);
+      this.showMemo = true;
+    },
+    closeMemoDialog() {
+      this.showMemo = false;
+      this.selectedMemo = '';
+      this.selectedMemoDate = '';
     },
   },
 });
