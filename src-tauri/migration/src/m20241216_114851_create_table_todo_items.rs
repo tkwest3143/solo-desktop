@@ -19,6 +19,7 @@ impl MigrationTrait for Migration {
           .col(string_null(TodoItems::Color))
           .col(string_null(TodoItems::Priority))
           .col(date_time(TodoItems::DueDate).not_null())
+          .col(string_null(TodoItems::Status).default("incomplete"))
           .col(date_time(TodoItems::CreatedAt).not_null())
           .col(date_time(TodoItems::UpdatedAt).not_null())
           .foreign_key(
