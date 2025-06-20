@@ -14,21 +14,27 @@ pub struct Model {
   pub color: Option<String>,
   pub priority: Option<String>,
   pub due_date: DateTime,
+  pub status: Option<String>,
   pub created_at: DateTime,
   pub updated_at: DateTime,
-  pub status: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
   #[sea_orm(
-    belongs_to = "Entity",
+    belongs_to = "super::todo_categories::Entity",
     from = "Column::CategoryId",
-    to = "Column::Id",
+    to = "super::todo_categories::Column::Id",
     on_update = "Cascade",
     on_delete = "Cascade"
   )]
-  SelfRef,
+  TodoCategories,
+}
+
+impl Related<super::todo_categories::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::TodoCategories.def()
+  }
 }
 
 impl ActiveModelBehavior for ActiveModel {}

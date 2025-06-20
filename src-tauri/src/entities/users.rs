@@ -16,6 +16,39 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+  #[sea_orm(has_many = "super::documents::Entity")]
+  Documents,
+  #[sea_orm(has_many = "super::todo_categories::Entity")]
+  TodoCategories,
+  #[sea_orm(has_many = "super::work_settings::Entity")]
+  WorkSettings,
+  #[sea_orm(has_many = "super::work_times::Entity")]
+  WorkTimes,
+}
+
+impl Related<super::documents::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::Documents.def()
+  }
+}
+
+impl Related<super::todo_categories::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::TodoCategories.def()
+  }
+}
+
+impl Related<super::work_settings::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::WorkSettings.def()
+  }
+}
+
+impl Related<super::work_times::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::WorkTimes.def()
+  }
+}
 
 impl ActiveModelBehavior for ActiveModel {}
