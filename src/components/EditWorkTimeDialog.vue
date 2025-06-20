@@ -193,7 +193,7 @@ export default defineComponent({
   watch: {
     show(newVal) {
       if (newVal) {
-        this.localWorkTime = { ...this.workTime }
+        this.localWorkTime = { ...this.workTime } as WorkTimeEdit
       }
     },
     workTime: {
