@@ -22,7 +22,7 @@ impl MigrationTrait for Migration {
           .col(integer(WorkSettings::UserId).not_null())
           .col(date_time(WorkSettings::CreatedAt).not_null())
           .col(date_time(WorkSettings::UpdatedAt).not_null())
-          .foreign_key(ForeignKey::create().name("FK_users_work_settings_id").from(Users::Table, WorkSettings::UserId).to(WorkSettings::Table, Users::Id))
+          .foreign_key(ForeignKey::create().name("FK_work_settings_user_id").from(WorkSettings::Table, WorkSettings::UserId).to(Users::Table, Users::Id))
           .to_owned(),
       )
       .await

@@ -21,7 +21,7 @@ impl MigrationTrait for Migration {
           .col(integer(WorkTimes::UserId))
           .col(date_time(WorkTimes::CreatedAt).not_null())
           .col(date_time(WorkTimes::UpdatedAt).not_null())
-          .foreign_key(ForeignKey::create().name("FK_users_work_times_id").from(Users::Table, WorkTimes::UserId).to(WorkTimes::Table, Users::Id))
+          .foreign_key(ForeignKey::create().name("FK_work_times_user_id").from(WorkTimes::Table, WorkTimes::UserId).to(Users::Table, Users::Id))
           .to_owned(),
       )
       .await
