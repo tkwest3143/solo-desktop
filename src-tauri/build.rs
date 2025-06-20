@@ -1,7 +1,10 @@
 use std::fs;
 use std::path::PathBuf;
+
 fn main() {
+  #[cfg(feature = "tauri-build")]
   tauri_build::build();
+  
   copy_data_file("solo.db".to_string());
 }
 

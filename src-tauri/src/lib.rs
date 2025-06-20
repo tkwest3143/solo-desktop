@@ -2,7 +2,12 @@ pub mod data;
 pub mod entities;
 pub mod helper;
 pub mod repositories;
-mod tauri_command;
+pub mod tauri_command;
+
+#[cfg(test)]
+mod test_utils;
+
+#[cfg(feature = "tauri")]
 use tauri_command::{
   japanese_holiday::{get_all_japanese_holidays, import_japanese_holiday},
   todo_categories::{create_todo_category, delete_todo_category, get_todo_categories_by_user_id, update_todo_category},
@@ -11,6 +16,8 @@ use tauri_command::{
   work_time_settings::{create_work_time_setting, get_work_setting_by_user_id, update_work_time_setting},
   work_times::{create_work_time, get_work_time_by_month, update_work_time},
 };
+
+#[cfg(feature = "tauri")]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()

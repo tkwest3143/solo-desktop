@@ -1,9 +1,10 @@
 pub mod user {
   use crate::data::{UserForInsert, UserForUpdate};
   use crate::entities::users;
+  #[cfg(feature = "tauri")]
   use crate::repositories::database::establish_connection;
   use chrono::{Local, NaiveDateTime};
-  use sea_orm::{EntityTrait, Set};
+  use sea_orm::{EntityTrait, Set, DbConn};
   use serde::Serialize;
   #[derive(Serialize)]
   pub struct ResponseUser {
@@ -16,10 +17,9 @@ pub mod user {
     pub updated_at: String,
   }
 
-  #[tauri::command]
-  pub async fn get_all_users() -> Result<String, String> {
-    let db = establish_connection().await.unwrap();
-    let users = users::Entity::find().all(&db).await.unwrap();
+  // Helper function for testing
+  pub async fn get_all_users_with_db(db: &DbConn) -> Result<String, String> {
+    let users = users::Entity::find().all(db).await.unwrap();
     let mut response_users: Vec<ResponseUser> = vec![];
     for user in users {
       let user = user;
@@ -35,10 +35,17 @@ pub mod user {
     }
     Ok(serde_json::to_string(&response_users).unwrap())
   }
+
+  #[cfg(feature = "tauri")]
   #[tauri::command]
-  pub async fn get_user_by_id(id: i32) -> Result<String, String> {
+  pub async fn get_all_users() -> Result<String, String> {
     let db = establish_connection().await.unwrap();
-    let user = users::Entity::find_by_id(id).one(&db).await.unwrap();
+    get_all_users_with_db(&db).await
+  }
+
+  // Helper function for testing
+  pub async fn get_user_by_id_with_db(id: i32, db: &DbConn) -> Result<String, String> {
+    let user = users::Entity::find_by_id(id).one(db).await.unwrap();
     if user.is_none() {
       return Err("user not found".to_string());
     }
@@ -57,10 +64,17 @@ pub mod user {
       .unwrap(),
     )
   }
+
+  #[cfg(feature = "tauri")]
   #[tauri::command]
-  pub async fn create_user(user: &str) -> Result<String, String> {
-    let json_to_user: UserForInsert = serde_json::from_str(user).unwrap();
+  pub async fn get_user_by_id(id: i32) -> Result<String, String> {
     let db = establish_connection().await.unwrap();
+    get_user_by_id_with_db(id, &db).await
+  }
+
+  // Helper function for testing  
+  pub async fn create_user_with_db(user: &str, db: &DbConn) -> Result<String, String> {
+    let json_to_user: UserForInsert = serde_json::from_str(user).unwrap();
     let user = users::ActiveModel {
       name: Set(json_to_user.name.to_owned()),
       email: Set(Some(json_to_user.email)),
@@ -68,15 +82,21 @@ pub mod user {
       updated_at: Set(Local::now().naive_local()),
       ..Default::default()
     };
-    users::Entity::insert(user).exec(&db).await.unwrap();
+    users::Entity::insert(user).exec(db).await.unwrap();
     Ok("create_user finish".to_string())
   }
 
+  #[cfg(feature = "tauri")]
   #[tauri::command]
-  pub async fn update_user(user: &str) -> Result<String, String> {
-    let json_to_user: UserForUpdate = serde_json::from_str(user).unwrap();
+  pub async fn create_user(user: &str) -> Result<String, String> {
     let db = establish_connection().await.unwrap();
-    let user = users::Entity::find_by_id(json_to_user.id).one(&db).await.unwrap();
+    create_user_with_db(user, &db).await
+  }
+
+  // Helper function for testing
+  pub async fn update_user_with_db(user: &str, db: &DbConn) -> Result<String, String> {
+    let json_to_user: UserForUpdate = serde_json::from_str(user).unwrap();
+    let user = users::Entity::find_by_id(json_to_user.id).one(db).await.unwrap();
     let mut user: users::ActiveModel = user.unwrap().into();
     if json_to_user.name.is_some() {
       user.name = Set(json_to_user.name.unwrap());
@@ -90,8 +110,15 @@ pub mod user {
       ));
     }
     user.updated_at = Set(Local::now().naive_local());
-    users::Entity::update(user).exec(&db).await.unwrap();
+    users::Entity::update(user).exec(db).await.unwrap();
     Ok("update_user finish".to_string())
+  }
+
+  #[cfg(feature = "tauri")]
+  #[tauri::command]
+  pub async fn update_user(user: &str) -> Result<String, String> {
+    let db = establish_connection().await.unwrap();
+    update_user_with_db(user, &db).await
   }
 }
 
