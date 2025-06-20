@@ -131,13 +131,14 @@
           <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
               <tr>
-                <th scope="col" class="w-16 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">操作</th>
+                <th scope="col" class="w-12 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <Icon name="fluent:magic-wand-20-filled" size="1em" title="デフォルト設定" />
+                </th>
                 <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">日付</th>
-                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">稼働状況</th>
-                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">開始時間</th>
-                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">終了時間</th>
-                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">休憩開始</th>
-                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">休憩終了</th>
+                <th scope="col" class="w-16 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <Icon name="fluent:checkmark-circle-20-filled" size="1em" title="稼働状況" />
+                </th>
+                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">勤務時間</th>
                 <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">休憩時間</th>
                 <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">業務時間</th>
                 <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">備考</th>
@@ -157,11 +158,10 @@
                   <button
                     :disabled="selectedWorkSettingId === 0"
                     @click="setDefaultWorkTime(workTime)"
-                    class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-md text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:cursor-not-allowed whitespace-nowrap"
+                    class="p-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md disabled:cursor-not-allowed"
                     title="デフォルト設定を適用"
                   >
-                    <Icon name="fluent:magic-wand-20-filled" size="0.8em" />
-                    <span class="hidden sm:inline ml-1">デフォルト</span>
+                    <Icon name="fluent:magic-wand-20-filled" size="1em" />
                   </button>
                 </td>
                 <td 
@@ -174,43 +174,21 @@
                 >
                   {{ workTime.getDayTextWithWeek(japaneseHolidays) }}
                 </td>
-                <td class="px-4 py-3 text-center">
-                  <span 
-                    v-if="workTime.workDurationByMinute !== 0"
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                  >
-                    <Icon name="fluent:checkmark-circle-20-filled" class="mr-1" size="0.9em" />
-                    稼働
-                  </span>
-                  <span 
-                    v-else
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600"
-                  >
-                    <Icon name="fluent:subtract-circle-20-filled" class="mr-1" size="0.9em" />
-                    非稼働
-                  </span>
-                </td>
-                <td
-                  @dblclick="editWorkTime(workTime)"
-                  class="px-4 py-3 text-center text-sm text-slate-900"
-                >
-                  <div
-                    v-if="
-                      editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                    "
-                  >
-                    {{ workTime.startByText }}
-                  </div>
-                  <div v-else>
-                    <input
-                      type="time"
-                      :value="workTime.startByText"
-                      @change="
-                        changeWorkTime(workTime, {
-                          start: ($event.target as HTMLInputElement).value,
-                        })
-                      "
-                      class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                <td class="px-2 py-3 text-center">
+                  <div class="flex justify-center">
+                    <Icon 
+                      v-if="workTime.workDurationByMinute !== 0"
+                      name="fluent:checkmark-circle-20-filled" 
+                      class="text-green-600" 
+                      size="1.5em"
+                      title="稼働"
+                    />
+                    <Icon 
+                      v-else
+                      name="fluent:subtract-circle-20-filled" 
+                      class="text-slate-400" 
+                      size="1.5em"
+                      title="非稼働"
                     />
                   </div>
                 </td>
@@ -222,20 +200,34 @@
                     v-if="
                       editingWorkTime?.prop.target_day !== workTime.prop.target_day
                     "
+                    class="space-y-1"
                   >
-                    {{ workTime.endByText }}
+                    <div class="text-xs text-slate-500">{{ workTime.startByText }} - {{ workTime.endByText }}</div>
                   </div>
-                  <div v-else>
-                    <input
-                      type="time"
-                      :value="workTime.endByText"
-                      @change="
-                        changeWorkTime(workTime, {
-                          end: ($event.target as HTMLInputElement).value,
-                        })
-                      "
-                      class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                  <div v-else class="space-y-2">
+                    <div class="flex items-center space-x-2">
+                      <input
+                        type="time"
+                        :value="workTime.startByText"
+                        @change="
+                          changeWorkTime(workTime, {
+                            start: ($event.target as HTMLInputElement).value,
+                          })
+                        "
+                        class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <span class="text-slate-400">-</span>
+                      <input
+                        type="time"
+                        :value="workTime.endByText"
+                        @change="
+                          changeWorkTime(workTime, {
+                            end: ($event.target as HTMLInputElement).value,
+                          })
+                        "
+                        class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
                   </div>
                 </td>
                 <td
@@ -246,53 +238,40 @@
                     v-if="
                       editingWorkTime?.prop.target_day !== workTime.prop.target_day
                     "
+                    class="space-y-1"
                   >
-                    {{ workTime.restStartByText }}
+                    <div class="text-xs text-slate-500">{{ workTime.restStartByText }} - {{ workTime.restEndByText }}</div>
+                    <div class="text-sm font-medium">{{ workTime.restDurationByText ?? "00:00" }}</div>
                   </div>
-                  <div v-else>
-                    <input
-                      type="time"
-                      :value="workTime.restStartByText"
-                      @change="
-                        changeWorkTime(workTime, {
-                          restStart: ($event.target as HTMLInputElement).value,
-                        })
-                      "
-                      class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </td>
-                <td
-                  @dblclick="editWorkTime(workTime)"
-                  class="px-4 py-3 text-center text-sm text-slate-900"
-                >
-                  <div
-                    v-if="
-                      editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                    "
-                  >
-                    {{ workTime.restEndByText }}
-                  </div>
-                  <div v-else>
-                    <input
-                      type="time"
-                      :value="workTime.restEndByText"
-                      @change="
-                        changeWorkTime(workTime, {
-                          restEnd: ($event.target as HTMLInputElement).value,
-                        })
-                      "
-                      class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                  <div v-else class="space-y-2">
+                    <div class="flex items-center space-x-2">
+                      <input
+                        type="time"
+                        :value="workTime.restStartByText"
+                        @change="
+                          changeWorkTime(workTime, {
+                            restStart: ($event.target as HTMLInputElement).value,
+                          })
+                        "
+                        class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <span class="text-slate-400">-</span>
+                      <input
+                        type="time"
+                        :value="workTime.restEndByText"
+                        @change="
+                          changeWorkTime(workTime, {
+                            restEnd: ($event.target as HTMLInputElement).value,
+                          })
+                        "
+                        class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div class="text-sm font-medium text-slate-600">{{ workTime.restDurationByText ?? "00:00" }}</div>
                   </div>
                 </td>
                 <td
-                  class="px-4 py-3 text-center text-sm text-slate-900"
-                >
-                  {{ workTime.restDurationByText ?? "00:00" }}
-                </td>
-                <td
-                  class="px-4 py-3 text-center text-sm text-slate-900"
+                  class="px-4 py-3 text-center text-sm font-medium text-slate-900"
                 >
                   {{ workTime.workDurationByText ?? "00:00" }}
                 </td>
