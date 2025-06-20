@@ -1,0 +1,5 @@
+# Test build artifacts
+target/
+
+# Cargo.lock for standalone test crate (optional)
+Cargo.lock
