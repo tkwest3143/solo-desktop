@@ -149,11 +149,7 @@
               <tr
                 v-for="(workTime, index) in selectedMonth.monthWorkTimes"
                 :key="index"
-                :class="{
-                  'bg-blue-50': editingWorkTime?.prop.target_day === workTime.prop.target_day,
-                  'hover:bg-slate-50': true
-                }"
-                class="transition-colors duration-200"
+                class="hover:bg-slate-50 transition-colors duration-200"
               >
                 <td class="px-2 py-3 text-center">
                   <button
@@ -194,85 +190,18 @@
                   </div>
                 </td>
                 <td
-                  @click="editWorkTime(workTime)"
+                  @click="openEditDialog(workTime)"
                   class="px-4 py-3 text-center text-sm text-slate-900 cursor-pointer hover:bg-blue-50 transition-colors"
                 >
-                  <div
-                    v-if="
-                      editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                    "
-                    class="space-y-1"
-                  >
-                    <div class="text-xs text-slate-500">{{ workTime.startByText }} - {{ workTime.endByText }}</div>
-                  </div>
-                  <div v-else class="space-y-2">
-                    <div class="flex items-center space-x-2">
-                      <input
-                        type="time"
-                        :value="workTime.startByText"
-                        @change="
-                          changeWorkTime(workTime, {
-                            start: ($event.target as HTMLInputElement).value,
-                          })
-                        "
-                        @click.stop
-                        class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                      <span class="text-slate-400">-</span>
-                      <input
-                        type="time"
-                        :value="workTime.endByText"
-                        @change="
-                          changeWorkTime(workTime, {
-                            end: ($event.target as HTMLInputElement).value,
-                          })
-                        "
-                        @click.stop
-                        class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
+                  <div class="text-xs text-slate-500">{{ workTime.startByText }} - {{ workTime.endByText }}</div>
                 </td>
                 <td
-                  @click="editWorkTime(workTime)"
+                  @click="openEditDialog(workTime)"
                   class="px-4 py-3 text-center text-sm text-slate-900 cursor-pointer hover:bg-blue-50 transition-colors"
                 >
-                  <div
-                    v-if="
-                      editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                    "
-                    class="space-y-1"
-                  >
+                  <div class="space-y-1">
                     <div class="text-xs text-slate-500">{{ workTime.restStartByText }} - {{ workTime.restEndByText }}</div>
                     <div class="text-sm font-medium">{{ workTime.restDurationByText ?? "00:00" }}</div>
-                  </div>
-                  <div v-else class="space-y-2">
-                    <div class="flex items-center space-x-2">
-                      <input
-                        type="time"
-                        :value="workTime.restStartByText"
-                        @change="
-                          changeWorkTime(workTime, {
-                            restStart: ($event.target as HTMLInputElement).value,
-                          })
-                        "
-                        @click.stop
-                        class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                      <span class="text-slate-400">-</span>
-                      <input
-                        type="time"
-                        :value="workTime.restEndByText"
-                        @change="
-                          changeWorkTime(workTime, {
-                            restEnd: ($event.target as HTMLInputElement).value,
-                          })
-                        "
-                        @click.stop
-                        class="border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    <div class="text-sm font-medium text-slate-600">{{ workTime.restDurationByText ?? "00:00" }}</div>
                   </div>
                 </td>
                 <td
@@ -281,29 +210,11 @@
                   {{ workTime.workDurationByText ?? "00:00" }}
                 </td>
                 <td
-                  @click="editWorkTime(workTime)"
+                  @click="openEditDialog(workTime)"
                   class="px-4 py-3 text-center text-sm text-slate-900 cursor-pointer hover:bg-blue-50 transition-colors max-w-32"
                 >
-                  <div
-                    v-if="
-                      editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                    "
-                    class="truncate"
-                  >
+                  <div class="truncate">
                     {{ workTime.memo || '-' }}
-                  </div>
-                  <div v-else>
-                    <input
-                      type="text"
-                      :value="workTime.memo"
-                      @change="
-                        changeWorkTime(workTime, {
-                          memo: ($event.target as HTMLInputElement).value,
-                        })
-                      "
-                      @click.stop
-                      class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
-                    />
                   </div>
                 </td>
                 <td class="px-2 py-3 text-center">
@@ -358,6 +269,15 @@
       :date="selectedMemoDate"
       @close="closeMemoDialog"
     />
+
+    <!-- Edit Work Time Dialog -->
+    <EditWorkTimeDialog
+      :show="showEditDialog"
+      :work-time="editDialogWorkTime"
+      :date="editDialogDate"
+      @close="closeEditDialog"
+      @save="saveWorkTimeFromDialog"
+    />
   </div>
 </template>
 
@@ -367,6 +287,7 @@ import { defineComponent } from "vue";
 import CommonSelect from "~/components/CommonSelect.vue";
 import Loading from "~/components/Loading.vue";
 import MemoDialog from "~/components/MemoDialog.vue";
+import EditWorkTimeDialog from "~/components/EditWorkTimeDialog.vue";
 import ExportFileDialog from "~/components/worktime/ExportFileDialog.vue";
 import { JapaneseHolidayData } from "~/models/japaneseHoliday";
 import { MonthForWork } from "~/models/monthForWork";
@@ -385,6 +306,7 @@ export default defineComponent({
     CommonSelect,
     ExportFileDialog,
     MemoDialog,
+    EditWorkTimeDialog,
   },
   data() {
     return {
@@ -400,6 +322,16 @@ export default defineComponent({
       showMemo: false,
       selectedMemo: '',
       selectedMemoDate: '',
+      showEditDialog: false,
+      editDialogWorkTime: {
+        start: '',
+        end: '',
+        restStart: '',
+        restEnd: '',
+        memo: ''
+      },
+      editDialogDate: '',
+      currentEditingWorkTime: null as workTimeData | null,
     };
   },
   async mounted() {
@@ -475,9 +407,6 @@ export default defineComponent({
       this.selectedMonth = this.selectedMonth.thisMonth;
       await this.fetchWorkTimeByMonth();
     },
-    editWorkTime(workTime: workTimeData) {
-      this.editingWorkTime = workTime;
-    },
     changeWorkTime(
       workTime: workTimeData,
       updateProp: {
@@ -546,7 +475,6 @@ export default defineComponent({
       } else {
         this.changedWorkTimes.push(workTime);
       }
-      this.editingWorkTime = null;
     },
     async saveChanges() {
       this.isLoading = true;
@@ -638,6 +566,34 @@ export default defineComponent({
       this.showMemo = false;
       this.selectedMemo = '';
       this.selectedMemoDate = '';
+    },
+    openEditDialog(workTime: workTimeData) {
+      this.currentEditingWorkTime = workTime;
+      this.editDialogWorkTime = {
+        start: workTime.startByText,
+        end: workTime.endByText,
+        restStart: workTime.restStartByText,
+        restEnd: workTime.restEndByText,
+        memo: workTime.memo || ''
+      };
+      this.editDialogDate = workTime.getDayTextWithWeek(this.japaneseHolidays);
+      this.showEditDialog = true;
+    },
+    closeEditDialog() {
+      this.showEditDialog = false;
+      this.currentEditingWorkTime = null;
+    },
+    saveWorkTimeFromDialog(editedData: any) {
+      if (this.currentEditingWorkTime) {
+        this.changeWorkTime(this.currentEditingWorkTime, {
+          start: editedData.start,
+          end: editedData.end,
+          restStart: editedData.restStart,
+          restEnd: editedData.restEnd,
+          memo: editedData.memo
+        });
+      }
+      this.closeEditDialog();
     },
   },
 });
