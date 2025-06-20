@@ -1,365 +1,281 @@
 <template>
   <Loading v-if="isLoading" />
-  <div v-else>
-    <div class="overflow-x-auto m-2 mb-20">
-      <div class="flex justify-between items-center mb-4">
-        <div class="flex space-x-2">
-          <button
-            @click="previousMonth"
-            class="px-4 py-2 rounded hover:bg-basic-200 flex items-center"
-          >
-            <Icon name="material-symbols:arrow-back-ios" size="1em" />
-          </button>
-          <button
-            @click="nextMonth"
-            class="px-4 py-2 rounded hover:bg-basic-200 flex items-center"
-          >
-            <Icon name="material-symbols:arrow-forward-ios" size="1em" />
-          </button>
-          <h2 class="text-xl font-semibold flex items-center">
-            {{ selectedMonth.yearText }}年{{
-              selectedMonth.monthText
-            }}月の勤務時間
-          </h2>
-          <button
-            @click="thisMonth"
-            class="px-4 py-1 rounded hover:bg-basic-200 flex items-center border border-basic-200 rounded-full"
-          >
-            今月
-          </button>
+  <div v-else class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm border-b border-slate-200">
+      <div class="container mx-auto px-6 py-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <button
+              @click="previousMonth"
+              class="p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200"
+            >
+              <Icon name="fluent:arrow-left-20-filled" size="1.2em" class="text-slate-600" />
+            </button>
+            <button
+              @click="nextMonth"
+              class="p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200"
+            >
+              <Icon name="fluent:arrow-right-20-filled" size="1.2em" class="text-slate-600" />
+            </button>
+            <h1 class="text-2xl font-bold text-slate-800">
+              {{ selectedMonth.yearText }}年{{ selectedMonth.monthText }}月の勤務時間
+            </h1>
+            <button
+              @click="thisMonth"
+              class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 text-sm font-medium"
+            >
+              今月
+            </button>
+          </div>
         </div>
       </div>
-      <div class="mb-4">
-        <div class="flex items-center space-x-2">
-          <CommonSelect
-            class="w-1/3"
-            id="workSetting"
-            label="勤務設定"
-            v-model="selectedWorkSettingId"
-            :options="
-              workSettings.map((setting) => ({
-                value: setting.prop.id,
-                text: setting.prop.title,
-              }))
-            "
-          />
-          <button
-            v-if="selectedWorkSettingId"
-            class="px-4 py-2 bg-primary-400 text-basic-0 rounded hover:bg-primary-500"
-          >
-            設定を編集する
-          </button>
-          <NuxtLink
-            v-else
-            class="px-4 py-2 bg-primary-400 text-basic-0 rounded hover:bg-primary-500"
-            :to="{
-              name: 'id-settings-workSetting-add',
-              params: { id: user?.prop.id },
-            }"
-          >
-            設定を登録する
-          </NuxtLink>
-        </div>
+    </div>
 
-        <div class="mb-4 divide-x divide-solid space-x-1">
-          <label class="text-basic-700 text-sm font-bold">
-            開始時間：{{ getSelectedWorkSetting()?.startByText ?? " - " }}
-          </label>
-          <label class="text-basic-700 text-sm font-bold">
-            終了時間：{{ getSelectedWorkSetting()?.endByText ?? " - " }}
-          </label>
-          <label class="text-basic-700 text-sm font-bold">
-            休憩開始時間：{{
-              getSelectedWorkSetting()?.restStartByText ?? " - "
-            }}
-          </label>
-          <label class="text-basic-700 text-sm font-bold">
-            休憩終了時間：{{ getSelectedWorkSetting()?.restEndByText ?? " - " }}
-          </label>
-          <label class="text-basic-700 text-sm font-bold">
-            勤務時間単位：{{
-              getSelectedWorkSetting()?.prop.working_unit ?? " - "
-            }}分
-          </label>
-        </div>
-      </div>
-      <div class="flex justify-end mb-2 space-x-2">
-        <button
-          :disabled="selectedWorkSettingId === 0"
-          @click="setAllDefaultWorkTime"
-          class="disabled:opacity-25 px-2 py-2 text-white bg-primary-400 enabled:hover:bg-primary-500 text-xs rounded-lg"
-        >
-          未入力を全てデフォルトで登録
-        </button>
-        <ExportFileDialog
-          :selectableColumns="[
-            ...selectedMonth.monthWorkTimes[0].exportFileColumn.keys(),
-          ]"
-          @download="downloadWorkTime"
-        />
-        <div class="flex items-center space-x-2">
-          <span class="text-md font-semibold text-basic-700">
-            今月の勤務時間:
-          </span>
-          <span class="text-md font-semibold text-basic-800">
-            {{ totalWorkTime() }}
-          </span>
-        </div>
-      </div>
-      <table class="min-w-full border-collapse mb-4">
-        <thead class="bg-basic-100">
-          <tr>
-            <th
-              scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
-            ></th>
-            <th
-              scope="col"
-              class="w-2/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
+    <div class="container mx-auto px-6 py-6 space-y-6">
+      <!-- Work Settings Card -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+          <Icon name="fluent:briefcase-settings-20-filled" class="mr-2 text-blue-600" size="1.3em" />
+          勤務設定
+        </h2>
+        
+        <div class="flex items-center space-x-4 mb-4">
+          <div class="flex-1">
+            <CommonSelect
+              id="workSetting"
+              label="勤務設定を選択"
+              v-model="selectedWorkSettingId"
+              :options="
+                workSettings.map((setting) => ({
+                  value: setting.prop.id,
+                  text: setting.prop.title,
+                }))
+              "
+            />
+          </div>
+          <div class="flex-shrink-0">
+            <button
+              v-if="selectedWorkSettingId"
+              class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
             >
-              日付
-            </th>
-            <th
-              scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
-            >
-              稼働状況
-            </th>
-            <th
-              scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
-            >
-              開始時間
-            </th>
-            <th
-              scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
-            >
-              終了時間
-            </th>
-            <th
-              scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
-            >
-              休憩開始
-            </th>
-            <th
-              scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
-            >
-              休憩終了
-            </th>
-            <th
-              scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
-            >
-              休憩時間
-            </th>
-            <th
-              scope="col"
-              class="w-1/12 py-3 text-center text-xs font-medium text-basic-500 border border-table-border"
-            >
-              業務時間
-            </th>
-            <th
-              scope="col"
-              class="w-1/2 py-3 text-center text-xs font-medium text-basic-500 border border-table-border w-auto"
-            >
-              備考
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(workTime, index) in selectedMonth.monthWorkTimes"
-            :key="index"
-            :class="{
-              'bg-primary-100':
-                editingWorkTime?.prop.target_day === workTime.prop.target_day,
-            }"
-          >
-            <td
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <button
-                :disabled="selectedWorkSettingId === 0"
-                @click="setDefaultWorkTime(workTime)"
-                class="disabled:opacity-25 px-2 py-1 text-white bg-primary-400 enabled:hover:bg-primary-500 text-xs rounded-lg"
-              >
-                デフォルト
-              </button>
-            </td>
-            <td
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-              :class="{
-                'text-red-500':
-                  workTime.isHoliday(japaneseHolidays) || workTime.isSunday(),
-                'text-blue-500': workTime.isSaturday(),
-                'text-basic-900':
-                  !workTime.isHoliday(japaneseHolidays) &&
-                  !workTime.isSaturday() &&
-                  !workTime.isSunday(),
+              設定を編集する
+            </button>
+            <NuxtLink
+              v-else
+              class="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+              :to="{
+                name: 'id-settings-workSetting-add',
+                params: { id: user?.prop.id },
               }"
             >
-              {{ workTime.getDayTextWithWeek(japaneseHolidays) }}
-            </td>
-            <td
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
+              設定を登録する
+            </NuxtLink>
+          </div>
+        </div>
+
+        <!-- Work Settings Details -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-4 bg-slate-50 rounded-lg">
+          <div class="text-center">
+            <div class="text-xs text-slate-500 mb-1">開始時間</div>
+            <div class="font-semibold text-slate-800">{{ getSelectedWorkSetting()?.startByText ?? "-" }}</div>
+          </div>
+          <div class="text-center">
+            <div class="text-xs text-slate-500 mb-1">終了時間</div>
+            <div class="font-semibold text-slate-800">{{ getSelectedWorkSetting()?.endByText ?? "-" }}</div>
+          </div>
+          <div class="text-center">
+            <div class="text-xs text-slate-500 mb-1">休憩開始</div>
+            <div class="font-semibold text-slate-800">{{ getSelectedWorkSetting()?.restStartByText ?? "-" }}</div>
+          </div>
+          <div class="text-center">
+            <div class="text-xs text-slate-500 mb-1">休憩終了</div>
+            <div class="font-semibold text-slate-800">{{ getSelectedWorkSetting()?.restEndByText ?? "-" }}</div>
+          </div>
+          <div class="text-center">
+            <div class="text-xs text-slate-500 mb-1">時間単位</div>
+            <div class="font-semibold text-slate-800">{{ getSelectedWorkSetting()?.prop.working_unit ?? "-" }}分</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Bar -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <button
+              :disabled="selectedWorkSettingId === 0"
+              @click="setAllDefaultWorkTime"
+              class="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg disabled:cursor-not-allowed text-sm font-medium"
             >
-              <div v-if="workTime.workDurationByMinute !== 0">稼働</div>
-              <div v-else>非稼働</div>
-            </td>
-            <td
-              @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <div
-                v-if="
-                  editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                "
+              <Icon name="fluent:magic-wand-20-filled" class="mr-2" size="1em" />
+              未入力を自動登録
+            </button>
+            <ExportFileDialog
+              :selectableColumns="[
+                ...selectedMonth.monthWorkTimes[0].exportFileColumn.keys(),
+              ]"
+              @download="downloadWorkTime"
+            />
+          </div>
+          <div class="flex items-center space-x-2 bg-gradient-to-r from-green-50 to-green-100 px-4 py-2 rounded-lg">
+            <Icon name="fluent:clock-20-filled" class="text-green-600" size="1.2em" />
+            <span class="text-sm font-medium text-green-700">今月の勤務時間:</span>
+            <span class="text-lg font-bold text-green-800">{{ totalWorkTime() }}</span>
+          </div>
+        </div>
+      </div>
+      <!-- Work Time Table -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+              <tr>
+                <th scope="col" class="w-12 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
+                </th>
+                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">日付</th>
+                <th scope="col" class="w-20 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  稼働/非稼働
+                </th>
+                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">勤務時間</th>
+                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">休憩時間</th>
+                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">業務時間</th>
+                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">備考</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-slate-200">
+              <tr
+                v-for="(workTime, index) in selectedMonth.monthWorkTimes"
+                :key="index"
+                class="hover:bg-slate-50 transition-colors duration-200"
               >
-                {{ workTime.startByText }}
-              </div>
-              <div v-else>
-                <input
-                  type="time"
-                  :value="workTime.startByText"
-                  @change="
-                    changeWorkTime(workTime, {
-                      start: ($event.target as HTMLInputElement).value,
-                    })
-                  "
-                  class="border border-basic-300 rounded"
-                />
-              </div>
-            </td>
-            <td
-              @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <div
-                v-if="
-                  editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                "
-              >
-                {{ workTime.endByText }}
-              </div>
-              <div v-else>
-                <input
-                  type="time"
-                  :value="workTime.endByText"
-                  @change="
-                    changeWorkTime(workTime, {
-                      end: ($event.target as HTMLInputElement).value,
-                    })
-                  "
-                  class="border border-basic-300 rounded"
-                />
-              </div>
-            </td>
-            <td
-              @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <div
-                v-if="
-                  editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                "
-              >
-                {{ workTime.restStartByText }}
-              </div>
-              <div v-else>
-                <input
-                  type="time"
-                  :value="workTime.restStartByText"
-                  @change="
-                    changeWorkTime(workTime, {
-                      restStart: ($event.target as HTMLInputElement).value,
-                    })
-                  "
-                  class="border border-basic-300 rounded"
-                />
-              </div>
-            </td>
-            <td
-              @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <div
-                v-if="
-                  editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                "
-              >
-                {{ workTime.restEndByText }}
-              </div>
-              <div v-else>
-                <input
-                  type="time"
-                  :value="workTime.restEndByText"
-                  @change="
-                    changeWorkTime(workTime, {
-                      restEnd: ($event.target as HTMLInputElement).value,
-                    })
-                  "
-                  class="border border-basic-300 rounded"
-                />
-              </div>
-            </td>
-            <td
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              {{ workTime.restDurationByText ?? "00:00" }}
-            </td>
-            <td
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              {{ workTime.workDurationByText ?? "00:00" }}
-            </td>
-            <td
-              @dblclick="editWorkTime(workTime)"
-              class="py-2 text-center text-sm text-basic-900 border border-table-border"
-            >
-              <div
-                v-if="
-                  editingWorkTime?.prop.target_day !== workTime.prop.target_day
-                "
-              >
-                {{ workTime.memo }}
-              </div>
-              <div v-else>
-                <input
-                  type="text"
-                  :value="workTime.memo"
-                  @change="
-                    changeWorkTime(workTime, {
-                      memo: ($event.target as HTMLInputElement).value,
-                    })
-                  "
-                  class="border border-basic-300 rounded"
-                />
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                <td class="px-2 py-3 text-center">
+                  <button
+                    :disabled="selectedWorkSettingId === 0"
+                    @click="setDefaultWorkTime(workTime)"
+                    class="p-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md disabled:cursor-not-allowed"
+                    title="デフォルト設定を適用"
+                  >
+                    <Icon name="fluent:magic-wand-20-filled" size="1em" />
+                  </button>
+                </td>
+                <td 
+                  class="px-6 py-3 text-center text-sm font-medium"
+                  :class="{
+                    'text-red-600': workTime.isHoliday(japaneseHolidays) || workTime.isSunday(),
+                    'text-blue-600': workTime.isSaturday(),
+                    'text-slate-900': !workTime.isHoliday(japaneseHolidays) && !workTime.isSaturday() && !workTime.isSunday(),
+                  }"
+                >
+                  {{ workTime.getDayTextWithWeek(japaneseHolidays) }}
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="flex justify-center">
+                    <Icon 
+                      v-if="workTime.workDurationByMinute !== 0"
+                      name="fluent:checkmark-circle-20-filled" 
+                      class="text-green-600" 
+                      size="1.5em"
+                      title="稼働"
+                    />
+                    <Icon 
+                      v-else
+                      name="fluent:subtract-circle-20-filled" 
+                      class="text-slate-400" 
+                      size="1.5em"
+                      title="非稼働"
+                    />
+                  </div>
+                </td>
+                <td
+                  @click="openEditDialog(workTime)"
+                  class="px-4 py-3 text-center text-sm text-slate-900 cursor-pointer hover:bg-blue-50 transition-colors"
+                >
+                  <div class="text-xs text-slate-500">{{ workTime.startByText }} - {{ workTime.endByText }}</div>
+                </td>
+                <td
+                  @click="openEditDialog(workTime)"
+                  class="px-4 py-3 text-center text-sm text-slate-900 cursor-pointer hover:bg-blue-50 transition-colors"
+                >
+                  <div class="space-y-1">
+                    <div class="text-xs text-slate-500">{{ workTime.restStartByText }} - {{ workTime.restEndByText }}</div>
+                    <div class="text-sm font-medium">{{ workTime.restDurationByText ?? "00:00" }}</div>
+                  </div>
+                </td>
+                <td
+                  class="px-4 py-3 text-center text-sm font-medium text-slate-900"
+                >
+                  {{ workTime.workDurationByText ?? "00:00" }}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-slate-900 max-w-32">
+                  <div class="flex items-center justify-center space-x-2">
+                    <div 
+                      @click="openEditDialog(workTime)"
+                      class="truncate cursor-pointer hover:bg-blue-50 transition-colors px-2 py-1 rounded flex-1"
+                    >
+                      {{ workTime.memo || '-' }}
+                    </div>
+                    <button
+                      @click="showMemoDialog(workTime)"
+                      class="p-1 bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
+                      title="備考を表示"
+                    >
+                      <Icon name="fluent:note-20-filled" size="0.9em" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+
+    <!-- Save/Cancel Footer -->
     <div
       v-if="changedWorkTimes.length > 0"
-      class="fixed bottom-0 left-0 w-full shadow-lg p-4 flex justify-end items-center bg-black bg-opacity-50"
+      class="fixed bottom-0 left-0 w-full bg-white shadow-2xl border-t border-slate-200 p-4 z-50"
     >
-      <button
-        @click="saveChanges"
-        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition mr-4"
-      >
-        保存
-      </button>
-      <button
-        @click="resetChanges"
-        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-      >
-        編集をリセット
-      </button>
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+          <Icon name="fluent:edit-20-filled" class="text-blue-600" size="1.2em" />
+          <span class="text-slate-700 font-medium">{{ changedWorkTimes.length }}件の変更があります</span>
+        </div>
+        <div class="flex space-x-3">
+          <button
+            @click="resetChanges"
+            class="px-4 py-2 bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg font-medium"
+          >
+            <Icon name="fluent:arrow-reset-20-filled" class="mr-2" size="1em" />
+            リセット
+          </button>
+          <button
+            @click="saveChanges"
+            class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg font-medium"
+          >
+            <Icon name="fluent:save-20-filled" class="mr-2" size="1em" />
+            保存
+          </button>
+        </div>
+      </div>
     </div>
+
+    <!-- Memo Dialog -->
+    <MemoDialog
+      :show="showMemo"
+      :memo="selectedMemo"
+      :date="selectedMemoDate"
+      @close="closeMemoDialog"
+    />
+
+    <!-- Edit Work Time Dialog -->
+    <EditWorkTimeDialog
+      :show="showEditDialog"
+      :work-time="editDialogWorkTime"
+      :date="editDialogDate"
+      @close="closeEditDialog"
+      @save="saveWorkTimeFromDialog"
+    />
   </div>
 </template>
 
@@ -368,6 +284,8 @@ import { format } from "date-fns";
 import { defineComponent } from "vue";
 import CommonSelect from "~/components/CommonSelect.vue";
 import Loading from "~/components/Loading.vue";
+import MemoDialog from "~/components/MemoDialog.vue";
+import EditWorkTimeDialog from "~/components/EditWorkTimeDialog.vue";
 import ExportFileDialog from "~/components/worktime/ExportFileDialog.vue";
 import { JapaneseHolidayData } from "~/models/japaneseHoliday";
 import { MonthForWork } from "~/models/monthForWork";
@@ -385,6 +303,8 @@ export default defineComponent({
     Loading,
     CommonSelect,
     ExportFileDialog,
+    MemoDialog,
+    EditWorkTimeDialog,
   },
   data() {
     return {
@@ -397,6 +317,19 @@ export default defineComponent({
       workSettings: [] as workSettingData[],
       selectedWorkSettingId: 0,
       japaneseHolidays: [] as JapaneseHolidayData[],
+      showMemo: false,
+      selectedMemo: '',
+      selectedMemoDate: '',
+      showEditDialog: false,
+      editDialogWorkTime: {
+        start: '',
+        end: '',
+        restStart: '',
+        restEnd: '',
+        memo: ''
+      },
+      editDialogDate: '',
+      currentEditingWorkTime: null as workTimeData | null,
     };
   },
   async mounted() {
@@ -472,9 +405,6 @@ export default defineComponent({
       this.selectedMonth = this.selectedMonth.thisMonth;
       await this.fetchWorkTimeByMonth();
     },
-    editWorkTime(workTime: workTimeData) {
-      this.editingWorkTime = workTime;
-    },
     changeWorkTime(
       workTime: workTimeData,
       updateProp: {
@@ -543,7 +473,6 @@ export default defineComponent({
       } else {
         this.changedWorkTimes.push(workTime);
       }
-      this.editingWorkTime = null;
     },
     async saveChanges() {
       this.isLoading = true;
@@ -625,6 +554,44 @@ export default defineComponent({
           }
         }
       });
+    },
+    showMemoDialog(workTime: workTimeData) {
+      this.selectedMemo = workTime.memo || '';
+      this.selectedMemoDate = workTime.getDayTextWithWeek(this.japaneseHolidays);
+      this.showMemo = true;
+    },
+    closeMemoDialog() {
+      this.showMemo = false;
+      this.selectedMemo = '';
+      this.selectedMemoDate = '';
+    },
+    openEditDialog(workTime: workTimeData) {
+      this.currentEditingWorkTime = workTime;
+      this.editDialogWorkTime = {
+        start: workTime.startByText,
+        end: workTime.endByText,
+        restStart: workTime.restStartByText,
+        restEnd: workTime.restEndByText,
+        memo: workTime.memo || ''
+      };
+      this.editDialogDate = workTime.getDayTextWithWeek(this.japaneseHolidays);
+      this.showEditDialog = true;
+    },
+    closeEditDialog() {
+      this.showEditDialog = false;
+      this.currentEditingWorkTime = null;
+    },
+    saveWorkTimeFromDialog(editedData: any) {
+      if (this.currentEditingWorkTime) {
+        this.changeWorkTime(this.currentEditingWorkTime, {
+          start: editedData.start,
+          end: editedData.end,
+          restStart: editedData.restStart,
+          restEnd: editedData.restEnd,
+          memo: editedData.memo
+        });
+      }
+      this.closeEditDialog();
     },
   },
 });

@@ -1,151 +1,150 @@
 <template>
   <Loading v-if="isLoading" />
-  <div v-else>
-    <div class="text-center text-4xl mt-5">{{ user?.prop.name }} さん</div>
-    <ResizeWindowButton
-      class="flex items-center justify-center px-6 w-full h-full"
-    />
-    <div class="w-full mt-4 grid justify-items-center">
-      <div class="flex">
-        <div v-if="!isWorking() && !isResting()">
-          <Icon name="fluent:sleep-20-filled" style="color: gray" size="2em" />
-        </div>
-        <div v-else-if="isWorking()">
-          <Icon
-            name="fluent:people-team-20-filled"
-            style="color: aqua"
-            size="2em"
-          />
-        </div>
-        <div v-else-if="isResting()">
-          <Icon
-            name="fluent:drink-coffee-20-filled"
-            style="color: aqua"
-            size="2em"
-          />
-        </div>
-        <div class="text-2xl">
-          {{ isWorking() ? "勤務中" : isResting() ? "休憩中" : "未出勤" }}
+  <div v-else class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm border-b border-slate-200">
+      <div class="container mx-auto px-6 py-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-slate-800 mb-2">
+              おかえりなさい、{{ user?.prop.name }}さん
+            </h1>
+            <p class="text-slate-600">今日も1日お疲れ様です</p>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl font-bold text-slate-800">{{ currentTime }}</div>
+            <div class="text-sm text-slate-600">{{ currentDate }} {{ currentDay }}</div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="user-detail-container divide-x divide-solid">
-      <div class="left-panel flex justify-center items-center">
-        <div class="text-center">
-          <div class="text-4xl">{{ currentDate }} {{ currentDay }}</div>
-          <div class="text-7xl">{{ currentTime }}</div>
+
+    <div class="container mx-auto px-6 py-8">
+      <!-- Status Card -->
+      <div class="mb-8">
+        <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+          <div class="flex items-center justify-center mb-4">
+            <div class="flex items-center space-x-3">
+              <div v-if="!isWorking() && !isResting()" class="flex items-center space-x-2">
+                <Icon name="fluent:sleep-20-filled" class="text-slate-400" size="2.5em" />
+                <span class="text-2xl font-semibold text-slate-600">未出勤</span>
+              </div>
+              <div v-else-if="isWorking()" class="flex items-center space-x-2">
+                <Icon name="fluent:people-team-20-filled" class="text-blue-500" size="2.5em" />
+                <span class="text-2xl font-semibold text-blue-600">勤務中</span>
+              </div>
+              <div v-else-if="isResting()" class="flex items-center space-x-2">
+                <Icon name="fluent:drink-coffee-20-filled" class="text-orange-500" size="2.5em" />
+                <span class="text-2xl font-semibold text-orange-600">休憩中</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="right-panel">
-        <div class="button-group ml-4">
-          <button
-            class="bg-sky-300 enabled:hover:bg-sky-500 disabled:opacity-25"
-            @click="startWork"
-            :disabled="isWorking() || isResting()"
-          >
-            <div class="mr-2 w-1/3">
-              <img src="~/assets/icons/attendance.png" width="48" />
+
+      <!-- Action Buttons -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Start Work Button -->
+        <button
+          @click="startWork"
+          :disabled="isWorking() || isResting()"
+          class="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:cursor-not-allowed"
+        >
+          <div class="flex flex-col items-center space-y-3">
+            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+              <Icon name="fluent:clock-arrow-download-20-filled" size="1.5em" />
             </div>
-            <div class="w-2/3 text-xl">出勤</div>
-          </button>
-          <button
-            class="bg-rose-300 enabled:hover:bg-rose-500 disabled:opacity-25"
-            @click="endWork"
-            :disabled="!isWorking()"
-          >
-            <div class="mr-2 w-1/3">
-              <img src="~/assets/icons/go-home.png" width="48" />
+            <span class="font-semibold">出勤</span>
+          </div>
+        </button>
+
+        <!-- End Work Button -->
+        <button
+          @click="endWork"
+          :disabled="!isWorking()"
+          class="bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:cursor-not-allowed"
+        >
+          <div class="flex flex-col items-center space-y-3">
+            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+              <Icon name="fluent:arrow-right-20-filled" size="1.5em" />
             </div>
-            <div class="w-2/3 text-xl">退勤</div>
-          </button>
-          <button
-            class="bg-lime-300 enabled:hover:bg-lime-500 disabled:opacity-25"
-            @click="startRest"
-            :disabled="isResting() || isNone()"
-          >
-            <div class="mr-2 w-1/3">
-              <img src="~/assets/icons/break-time.png" width="48" />
+            <span class="font-semibold">退勤</span>
+          </div>
+        </button>
+
+        <!-- Start Rest Button -->
+        <button
+          @click="startRest"
+          :disabled="isResting() || isNone()"
+          class="bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:cursor-not-allowed"
+        >
+          <div class="flex flex-col items-center space-y-3">
+            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+              <Icon name="fluent:drink-coffee-20-filled" size="1.5em" />
             </div>
-            <div class="w-2/3 text-xl">休憩開始</div>
-          </button>
-          <button
-            class="bg-amber-300 enabled:hover:bg-amber-500 disabled:opacity-25"
-            @click="endRest"
-            :disabled="!isResting()"
-          >
-            <div class="mr-2 w-1/3">
-              <img
-                src="~/assets/icons/back-office.png"
-                class="mr-2"
-                width="48"
-              />
+            <span class="font-semibold">休憩開始</span>
+          </div>
+        </button>
+
+        <!-- End Rest Button -->
+        <button
+          @click="endRest"
+          :disabled="!isResting()"
+          class="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:cursor-not-allowed"
+        >
+          <div class="flex flex-col items-center space-y-3">
+            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+              <Icon name="fluent:briefcase-20-filled" size="1.5em" />
             </div>
-            <div class="w-2/3 text-xl">休憩終了</div>
-          </button>
+            <span class="font-semibold">休憩終了</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Quick Navigation -->
+      <div class="mt-8">
+        <h2 class="text-xl font-semibold text-slate-800 mb-4">クイックアクセス</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <NuxtLink
+            :to="{ name: 'id-workTimeList', params: { id: user?.prop.id } }"
+            class="bg-white border-2 border-slate-200 hover:border-blue-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
+          >
+            <Icon name="fluent:clock-20-filled" size="2em" class="text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
+            <h3 class="font-semibold text-slate-800">勤怠一覧</h3>
+            <p class="text-sm text-slate-600">勤務記録を確認</p>
+          </NuxtLink>
+
+          <NuxtLink
+            :to="{ name: 'id-report', params: { id: user?.prop.id } }"
+            class="bg-white border-2 border-slate-200 hover:border-green-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
+          >
+            <Icon name="fluent:document-data-20-filled" size="2em" class="text-green-500 mb-2 group-hover:scale-110 transition-transform" />
+            <h3 class="font-semibold text-slate-800">レポート</h3>
+            <p class="text-sm text-slate-600">勤務データ分析</p>
+          </NuxtLink>
+
+          <NuxtLink
+            :to="{ name: 'id-todo', params: { id: user?.prop.id } }"
+            class="bg-white border-2 border-slate-200 hover:border-purple-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
+          >
+            <Icon name="fluent:task-list-square-20-filled" size="2em" class="text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
+            <h3 class="font-semibold text-slate-800">Todo管理</h3>
+            <p class="text-sm text-slate-600">タスクを管理</p>
+          </NuxtLink>
+
+          <NuxtLink
+            :to="{ name: 'id-settings', params: { id: user?.prop.id } }"
+            class="bg-white border-2 border-slate-200 hover:border-slate-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
+          >
+            <Icon name="fluent:settings-20-filled" size="2em" class="text-slate-500 mb-2 group-hover:scale-110 transition-transform" />
+            <h3 class="font-semibold text-slate-800">設定</h3>
+            <p class="text-sm text-slate-600">アプリ設定</p>
+          </NuxtLink>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.user-detail-container {
-  display: flex;
-  justify-content: space-between;
-  max-width: 800px;
-  margin: 50px auto;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.left-panel {
-  flex: 1;
-  text-align: left;
-}
-
-.right-panel {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-h1 {
-  margin-bottom: 20px;
-  color: #343a40;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-p {
-  color: #495057;
-  font-size: 16px;
-}
-
-.button-group {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-button {
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-}
-
-button .nuxt-icon {
-  margin-right: 5px;
-}
-</style>
 
 <script lang="ts">
 import { formatDate } from "date-fns";
