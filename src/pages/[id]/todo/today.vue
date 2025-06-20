@@ -62,17 +62,19 @@
         >
           <div class="flex items-start space-x-4">
             <div class="mt-1">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 :checked="todo.status === 'completed'"
                 @click.stop="toggleTodoStatus(todo)"
-                class="w-5 h-5 text-blue-500 rounded border-2 border-slate-300 focus:ring-blue-500" 
+                class="w-5 h-5 text-blue-500 rounded border-2 border-slate-300 focus:ring-blue-500"
               />
             </div>
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-slate-800">{{ todo.title }}</h3>
-                <span 
+                <h3 class="text-lg font-semibold text-slate-800">
+                  {{ todo.title }}
+                </h3>
+                <span
                   class="text-xs px-2 py-1 rounded-full font-medium"
                   :class="getPriorityBadgeClass(todo.priority)"
                 >
@@ -84,11 +86,15 @@
                   :style="{ backgroundColor: todo.color }"
                 ></div>
               </div>
-              <p v-if="todo.content" class="text-slate-600 mb-3">{{ todo.content }}</p>
+              <p v-if="todo.content" class="text-slate-600 mb-3">
+                {{ todo.content }}
+              </p>
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4 text-sm text-slate-500">
                   <span>期限: {{ formatDueDate(todo.due_date) }}</span>
-                  <span v-if="getCategoryName(todo.category_id)">カテゴリ: {{ getCategoryName(todo.category_id) }}</span>
+                  <span v-if="getCategoryName(todo.category_id)"
+                    >カテゴリ: {{ getCategoryName(todo.category_id) }}</span
+                  >
                   <span>作成日: {{ formatDate(todo.created_at) }}</span>
                 </div>
                 <div class="flex space-x-2">
@@ -96,13 +102,13 @@
                     :to="{
                       name: 'id-todo-edit',
                       params: { id: $route.params.id },
-                      query: { id: todo.id }
+                      query: { id: todo.id },
                     }"
                     class="p-2 text-slate-400 hover:text-blue-500 transition-colors"
                   >
                     <Icon name="fluent:edit-20-filled" size="1.2em" />
                   </NuxtLink>
-                  <button 
+                  <button
                     @click.stop="showDeleteDialog(todo)"
                     class="p-2 text-slate-400 hover:text-red-500 transition-colors"
                   >
@@ -142,15 +148,15 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
-import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
-import type { TodoItem, TodoCategory } from "~/models/todo";
 import ConfirmDialog from "~/components/ConfirmDialog.vue";
-import TaskDetailDialog from "~/components/TaskDetailDialog.vue";
 import CustomSelect from "~/components/CustomSelect.vue";
+import TaskDetailDialog from "~/components/TaskDetailDialog.vue";
+import type { TodoCategory, TodoItem } from "~/models/todo";
+import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
+import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 
 definePageMeta({
-  layout: 'todo'
+  layout: "todo",
 });
 
 export default defineComponent({
@@ -183,41 +189,43 @@ export default defineComponent({
       return [
         { value: "", label: "すべて" },
         { value: "incomplete", label: "未完了" },
-        { value: "completed", label: "完了済み" }
+        { value: "completed", label: "完了済み" },
       ];
     },
     categoryOptions() {
-      const options = [{ value: "", label: "すべてのカテゴリ" }];
-      
-      this.categories.forEach(category => {
+      const options: { value: string; label: string; color?: string }[] = [
+        { value: "", label: "すべてのカテゴリ", color: "" },
+      ];
+
+      this.categories.forEach((category) => {
         options.push({
           value: category.id?.toString() || "",
           label: category.name,
-          color: category.color
+          color: category.color,
         });
       });
-      
+
       return options;
     },
     filteredTodos(): TodoItem[] {
       let filtered = this.todos;
-      
+
       // Filter by category
       if (this.selectedCategoryId) {
-        filtered = filtered.filter(todo => 
-          todo.category_id === parseInt(this.selectedCategoryId)
+        filtered = filtered.filter(
+          (todo) => todo.category_id === parseInt(this.selectedCategoryId)
         );
       }
-      
+
       // Filter by status
       if (this.selectedStatusFilter === "completed") {
-        filtered = filtered.filter(todo => todo.status === "completed");
+        filtered = filtered.filter((todo) => todo.status === "completed");
       } else if (this.selectedStatusFilter === "incomplete") {
-        filtered = filtered.filter(todo => todo.status !== "completed");
+        filtered = filtered.filter((todo) => todo.status !== "completed");
       }
-      
+
       return filtered;
-    }
+    },
   },
   async mounted() {
     this.updateDateTime();
@@ -237,13 +245,13 @@ export default defineComponent({
       try {
         this.loading = true;
         const userId = parseInt(this.$route.params.id as string);
-        
+
         // Fetch today's todos and categories in parallel
         const [todosResponse, categoriesResponse] = await Promise.all([
           TodoItemRepository.getTodayTodoItems(userId),
-          TodoCategoryRepository.getTodoCategoriesByUserId(userId)
+          TodoCategoryRepository.getTodoCategoriesByUserId(userId),
         ]);
-        
+
         this.todos = todosResponse;
         this.categories = categoriesResponse;
       } catch (error) {
@@ -256,16 +264,19 @@ export default defineComponent({
       const date = new Date(dateString);
       const today = new Date();
       const isToday = date.toDateString() === today.toDateString();
-      
+
       if (isToday) {
-        return `今日 ${date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}`;
+        return `今日 ${date.toLocaleTimeString("ja-JP", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`;
       }
-      
+
       return date.toLocaleDateString("ja-JP", {
         month: "numeric",
         day: "numeric",
         hour: "2-digit",
-        minute: "2-digit"
+        minute: "2-digit",
       });
     },
     formatDate(dateString: string): string {
@@ -273,19 +284,20 @@ export default defineComponent({
       return date.toLocaleDateString("ja-JP", {
         year: "numeric",
         month: "numeric",
-        day: "numeric"
+        day: "numeric",
       });
     },
     getCategoryName(categoryId?: number): string {
       if (!categoryId) return "";
-      const category = this.categories.find(c => c.id === categoryId);
+      const category = this.categories.find((c) => c.id === categoryId);
       return category?.name || "";
     },
     getTodoPriorityClass(todo: TodoItem): string {
       const dueDate = new Date(todo.due_date);
       const now = new Date();
-      const hoursUntilDue = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-      
+      const hoursUntilDue =
+        (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+
       if (hoursUntilDue < 2) {
         return "bg-red-50 border-red-300";
       } else if (hoursUntilDue < 6) {
@@ -303,11 +315,13 @@ export default defineComponent({
     },
     async confirmDelete() {
       if (!this.deleteDialog.todo) return;
-      
+
       try {
         await TodoItemRepository.deleteTodoItem(this.deleteDialog.todo.id);
         // Remove from local array
-        this.todos = this.todos.filter(todo => todo.id !== this.deleteDialog.todo?.id);
+        this.todos = this.todos.filter(
+          (todo) => todo.id !== this.deleteDialog.todo?.id
+        );
         this.cancelDelete();
       } catch (error) {
         console.error("Failed to delete todo:", error);
@@ -315,7 +329,8 @@ export default defineComponent({
       }
     },
     showTaskDetail(todo: TodoItem) {
-      const category = this.categories.find(cat => cat.id === todo.category_id) || null;
+      const category =
+        this.categories.find((cat) => cat.id === todo.category_id) || null;
       this.taskDetailDialog.todo = todo;
       this.taskDetailDialog.category = category;
       this.taskDetailDialog.show = true;
@@ -327,14 +342,15 @@ export default defineComponent({
     },
     editTask(todo: TodoItem) {
       this.$router.push({
-        name: 'id-todo-edit',
+        name: "id-todo-edit",
         params: { id: this.$route.params.id },
-        query: { id: todo.id }
+        query: { id: todo.id },
       });
     },
     async toggleTodoStatus(todo: TodoItem) {
       try {
-        const newStatus = todo.status === "completed" ? "incomplete" : "completed";
+        const newStatus =
+          todo.status === "completed" ? "incomplete" : "completed";
         const updateData: any = {
           id: todo.id,
           title: todo.title,
@@ -347,11 +363,11 @@ export default defineComponent({
           user_id: todo.user_id,
           status: newStatus,
         };
-        
+
         await TodoItemRepository.updateTodoItem(updateData);
-        
+
         // Update the local state
-        const index = this.todos.findIndex(t => t.id === todo.id);
+        const index = this.todos.findIndex((t) => t.id === todo.id);
         if (index !== -1) {
           this.todos[index].status = newStatus;
         }
@@ -362,18 +378,24 @@ export default defineComponent({
     },
     getPriorityLabel(priority?: string): string {
       switch (priority) {
-        case 'high': return '高優先度'
-        case 'low': return '低優先度'
-        default: return '通常'
+        case "high":
+          return "高優先度";
+        case "low":
+          return "低優先度";
+        default:
+          return "通常";
       }
     },
     getPriorityBadgeClass(priority?: string): string {
       switch (priority) {
-        case 'high': return 'bg-red-100 text-red-800'
-        case 'low': return 'bg-gray-100 text-gray-800'
-        default: return 'bg-blue-100 text-blue-800'
+        case "high":
+          return "bg-red-100 text-red-800";
+        case "low":
+          return "bg-gray-100 text-gray-800";
+        default:
+          return "bg-blue-100 text-blue-800";
       }
-    }
+    },
   },
 });
 </script>
