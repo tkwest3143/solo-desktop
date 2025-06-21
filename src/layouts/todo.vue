@@ -1,19 +1,22 @@
 <template>
   <div
-    class="flex bg-gradient-to-br from-slate-50 to-blue-50"
+    class="flex bg-gradient-to-br transition-colors"
+    :class="`${getBgClass('secondary')} dark:from-slate-800 dark:to-slate-900`"
     style="height: calc(100vh - 60px)"
   >
     <!-- Left Sidebar -->
     <div
-      class="w-80 bg-white shadow-xl border-r border-slate-200 flex flex-col fixed left-0"
+      class="w-80 shadow-xl border-r flex flex-col fixed left-0"
+      :class="`${getBgClass('primary')} ${getBorderClass('default')} dark:bg-slate-800 dark:border-slate-600`"
       style="top: 60px; height: calc(100vh - 60px); z-index: 900"
     >
       <!-- Sidebar Header -->
-      <div class="p-6 border-b border-slate-200">
-        <h1 class="text-2xl font-bold text-slate-800 flex items-center">
+      <div class="p-6 border-b" :class="getBorderClass('default')">
+        <h1 class="text-2xl font-bold flex items-center" :class="getTextClass('primary')">
           <Icon
             name="fluent:task-list-square-20-filled"
-            class="mr-3 text-blue-600"
+            class="mr-3"
+            :class="getStateClasses('info', 'text')"
             size="2em"
           />
           Todo管理
@@ -26,7 +29,8 @@
         <div class="mb-6">
           <NuxtLink
             :to="{ name: 'id-todo-add', params: { id: $route.params.id } }"
-            class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg px-4 py-3 flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            class="w-full rounded-lg px-4 py-3 flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            :class="`${getStateClasses('info', 'bg').replace('bg-blue-50', 'bg-blue-500').replace('dark:bg-blue-900', 'dark:bg-blue-600')} ${getTextClass('inverse')} ${getStateClasses('info', 'hover').replace('hover:bg-blue-100', 'hover:bg-blue-600').replace('dark:hover:bg-blue-800', 'dark:hover:bg-blue-700')}`"
           >
             <Icon name="fluent:add-20-filled" class="mr-2" size="1.2em" />
             新しいTodoを作成
@@ -38,72 +42,75 @@
           <!-- Todo Top Page -->
           <NuxtLink
             :to="{ name: 'id-todo', params: { id: $route.params.id } }"
-            class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
-            :class="{
-              'bg-blue-50 border-r-4 border-blue-500':
-                $route.name === 'id-todo',
-            }"
+            class="flex items-center p-3 rounded-lg transition-colors group"
+            :class="[
+              $route.name === 'id-todo' ? `${getStateClasses('info', 'bg')} border-r-4 ${getBorderClass('active')}` : getBgClass('hover'),
+              getBgClass('hover').replace('bg-', 'hover:bg-').replace('dark:bg-', 'dark:hover:bg-')
+            ]"
           >
             <Icon
               name="fluent:home-20-filled"
-              class="mr-3 text-purple-500 group-hover:text-purple-600"
+              class="mr-3 group-hover:text-purple-600"
+              :class="getThemeColor('#a855f7')"
+              :style="{ color: getThemeColor('#a855f7') }"
               size="1.5em"
             />
-            <span class="font-medium text-slate-700 group-hover:text-slate-900"
+            <span class="font-medium group-hover:text-slate-900" :class="getTextClass('primary')"
               >Todo トップ</span
             >
           </NuxtLink>
 
           <NuxtLink
             :to="{ name: 'id-todo-today', params: { id: $route.params.id } }"
-            class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
-            :class="{
-              'bg-blue-50 border-r-4 border-blue-500':
-                $route.name === 'id-todo-today',
-            }"
+            class="flex items-center p-3 rounded-lg transition-colors group"
+            :class="[
+              $route.name === 'id-todo-today' ? `${getStateClasses('info', 'bg')} border-r-4 ${getBorderClass('active')}` : '',
+              getBgClass('hover').replace('bg-', 'hover:bg-').replace('dark:bg-', 'dark:hover:bg-')
+            ]"
           >
             <Icon
               name="fluent:calendar-today-20-filled"
-              class="mr-3 text-blue-500 group-hover:text-blue-600"
+              class="mr-3 text-blue-500 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300"
               size="1.5em"
             />
-            <span class="font-medium text-slate-700 group-hover:text-slate-900"
+            <span class="font-medium group-hover:text-slate-900" :class="getTextClass('primary')"
               >今日のTodo</span
             >
           </NuxtLink>
 
           <NuxtLink
             :to="{ name: 'id-todo-upcoming', params: { id: $route.params.id } }"
-            class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
-            :class="{
-              'bg-blue-50 border-r-4 border-blue-500':
-                $route.name === 'id-todo-upcoming',
-            }"
+            class="flex items-center p-3 rounded-lg transition-colors group"
+            :class="[
+              $route.name === 'id-todo-upcoming' ? `${getStateClasses('info', 'bg')} border-r-4 ${getBorderClass('active')}` : '',
+              getBgClass('hover').replace('bg-', 'hover:bg-').replace('dark:bg-', 'dark:hover:bg-')
+            ]"
           >
             <Icon
               name="fluent:calendar-clock-20-filled"
-              class="mr-3 text-orange-500 group-hover:text-orange-600"
+              class="mr-3 text-orange-500 group-hover:text-orange-600 dark:text-orange-400 dark:group-hover:text-orange-300"
               size="1.5em"
             />
-            <span class="font-medium text-slate-700 group-hover:text-slate-900"
+            <span class="font-medium group-hover:text-slate-900" :class="getTextClass('primary')"
               >期日が近いTodo</span
             >
           </NuxtLink>
 
           <NuxtLink
             :to="{ name: 'id-todo-all', params: { id: $route.params.id } }"
-            class="flex items-center p-3 rounded-lg hover:bg-slate-100 transition-colors group"
-            :class="{
-              'bg-blue-50 border-r-4 border-blue-500':
-                $route.name === 'id-todo-all',
-            }"
+            class="flex items-center p-3 rounded-lg transition-colors group"
+            :class="[
+              $route.name === 'id-todo-all' ? `${getStateClasses('info', 'bg')} border-r-4 ${getBorderClass('active')}` : '',
+              getBgClass('hover').replace('bg-', 'hover:bg-').replace('dark:bg-', 'dark:hover:bg-')
+            ]"
           >
             <Icon
               name="fluent:list-20-filled"
-              class="mr-3 text-slate-500 group-hover:text-slate-600"
+              class="mr-3 group-hover:text-slate-600" 
+              :class="getTextClass('tertiary')"
               size="1.5em"
             />
-            <span class="font-medium text-slate-700 group-hover:text-slate-900"
+            <span class="font-medium group-hover:text-slate-900" :class="getTextClass('primary')"
               >すべてのTodo</span
             >
           </NuxtLink>
@@ -292,6 +299,17 @@ import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 
 export default defineComponent({
   name: "TodoLayout",
+  setup() {
+    const { getBgClass, getTextClass, getBorderClass, getStateClasses, getThemeColor } = useTheme();
+    
+    return {
+      getBgClass,
+      getTextClass,
+      getBorderClass,
+      getStateClasses,
+      getThemeColor
+    };
+  },
   data() {
     return {
       categories: [] as TodoCategory[],

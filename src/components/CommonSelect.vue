@@ -1,12 +1,13 @@
 <template>
   <div class="mb-4">
-    <label :for="id" class="block text-sm font-medium text-gray-700">
+    <label :for="id" class="block text-sm font-medium" :class="getTextClass('primary')">
       {{ label }}
     </label>
     <Listbox :modelValue="selectedValue" @update:modelValue="updateValue">
       <div class="relative mt-1">
         <ListboxButton
-          class="border relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm border-gray-300"
+          class="border relative w-full cursor-default rounded-lg py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm"
+          :class="`${getBgClass('primary')} ${getBorderClass('default')} ${getTextClass('primary')}`"
           style="min-height: 2rem"
         >
           <span class="block truncate">{{ selectedOption.text }}</span>
@@ -15,7 +16,8 @@
           >
             <Icon
               name="material-symbols:keyboard-arrow-down"
-              class="h-5 w-5 text-gray-400"
+              class="h-5 w-5"
+              :class="getTextClass('tertiary')"
               aria-hidden="true"
             />
           </span>
@@ -26,13 +28,15 @@
           leave-to-class="opacity-0"
         >
           <ListboxOptions
-            class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50"
+            class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50"
+            :class="`${getBgClass('primary')} ${getTextClass('primary')}`"
           >
             <ListboxOption
               v-for="option in options"
               :key="option.value"
               :value="option.value"
-              class="cursor-default select-none relative py-2 pl-10 pr-4 hover:bg-gray-100 bg-white"
+              class="cursor-default select-none relative py-2 pl-10 pr-4"
+              :class="`${getBgClass('primary')} ${getBgClass('hover').replace('bg-', 'hover:bg-').replace('dark:bg-', 'dark:hover:bg-')}`"
             >
               <span
                 :class="{
@@ -45,7 +49,8 @@
               </span>
               <span
                 v-if="selectedValue === option.value"
-                class="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600"
+                class="absolute inset-y-0 left-0 flex items-center pl-3"
+                :class="getStateClasses('info', 'text')"
               >
                 <Icon
                   name="material-symbols:check"
@@ -100,6 +105,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const selectedValue = ref(props.modelValue);
+    const { getBgClass, getTextClass, getBorderClass, getStateClasses } = useTheme();
 
     const selectedOption = computed(() => {
       return (
@@ -112,6 +118,16 @@ export default defineComponent({
     const updateValue = (value: any) => {
       selectedValue.value = value;
       emit("update:modelValue", value);
+    };
+
+    return {
+      selectedValue,
+      selectedOption,
+      updateValue,
+      getBgClass,
+      getTextClass,
+      getBorderClass,
+      getStateClasses,
     };
 
     return {

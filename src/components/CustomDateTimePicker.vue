@@ -3,17 +3,20 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <!-- Date Picker -->
       <div>
-        <label :for="dateId" class="block text-sm font-semibold text-slate-700 mb-2">
+        <label :for="dateId" class="block text-sm font-semibold mb-2" :class="getTextClass('primary')">
           {{ dateLabel }}
-          <span v-if="required" class="text-red-500">*</span>
+          <span v-if="required" :class="getStateClasses('error', 'text')">*</span>
         </label>
         <div class="relative">
           <div 
-            class="flex items-center w-full px-4 py-3 border border-slate-300 rounded-lg focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-colors cursor-pointer hover:border-slate-400 bg-white"
-            :class="{ 'border-red-300 focus-within:border-red-500 focus-within:ring-red-500': error }"
+            class="flex items-center w-full px-4 py-3 border rounded-lg focus-within:outline-none focus-within:ring-2 focus-within:border-transparent transition-colors cursor-pointer hover:border-slate-400"
+            :class="[
+              getBgClass('primary'),
+              error ? `${getStateClasses('error', 'border')} focus-within:${getStateClasses('error', 'border')} focus-within:ring-red-500` : `${getBorderClass('default')} focus-within:${getBorderClass('focus')} focus-within:ring-blue-500`
+            ]"
             @click="focusDateInput"
           >
-            <Icon name="fluent:calendar-20-filled" class="text-slate-400 mr-3" />
+            <Icon name="fluent:calendar-20-filled" class="mr-3" :class="getTextClass('tertiary')" />
             <input
               :id="dateId"
               ref="dateInput"
@@ -22,7 +25,8 @@
               :min="minDate"
               :max="maxDate"
               :required="required"
-              class="flex-1 bg-transparent border-none outline-none text-slate-900 placeholder-slate-500"
+              class="flex-1 bg-transparent border-none outline-none placeholder-slate-500"
+              :class="getTextClass('primary')"
               @change="updateDateTime"
             />
           </div>
@@ -32,7 +36,8 @@
                 v-if="!isToday && !isTomorrow"
                 @click.stop="setToday"
                 type="button"
-                class="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors pointer-events-auto"
+                class="px-2 py-1 text-xs rounded-md transition-colors pointer-events-auto"
+                :class="`${getStateClasses('info', 'bg')} ${getStateClasses('info', 'text')} ${getStateClasses('info', 'hover')}`"
               >
                 今日
               </button>
@@ -40,36 +45,41 @@
                 v-if="!isTomorrow"
                 @click.stop="setTomorrow"
                 type="button"
-                class="px-2 py-1 text-xs bg-green-50 text-green-600 rounded-md hover:bg-green-100 transition-colors pointer-events-auto"
+                class="px-2 py-1 text-xs rounded-md transition-colors pointer-events-auto"
+                :class="`${getStateClasses('success', 'bg')} ${getStateClasses('success', 'text')} ${getStateClasses('success', 'hover')}`"
               >
                 明日
               </button>
             </div>
           </div>
         </div>
-        <div class="mt-1 text-xs text-slate-500">
+        <div class="mt-1 text-xs" :class="getTextClass('tertiary')">
           {{ dateDisplayText }}
         </div>
       </div>
 
       <!-- Time Picker -->
       <div>
-        <label :for="timeId" class="block text-sm font-semibold text-slate-700 mb-2">
+        <label :for="timeId" class="block text-sm font-semibold mb-2" :class="getTextClass('primary')">
           {{ timeLabel }}
         </label>
         <div class="relative">
           <div 
-            class="flex items-center w-full px-4 py-3 border border-slate-300 rounded-lg focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-colors cursor-pointer hover:border-slate-400 bg-white"
-            :class="{ 'border-red-300 focus-within:border-red-500 focus-within:ring-red-500': error }"
+            class="flex items-center w-full px-4 py-3 border rounded-lg focus-within:outline-none focus-within:ring-2 focus-within:border-transparent transition-colors cursor-pointer hover:border-slate-400"
+            :class="[
+              getBgClass('primary'),
+              error ? `${getStateClasses('error', 'border')} focus-within:${getStateClasses('error', 'border')} focus-within:ring-red-500` : `${getBorderClass('default')} focus-within:${getBorderClass('focus')} focus-within:ring-blue-500`
+            ]"
             @click="focusTimeInput"
           >
-            <Icon name="fluent:clock-20-filled" class="text-slate-400 mr-3" />
+            <Icon name="fluent:clock-20-filled" class="mr-3" :class="getTextClass('tertiary')" />
             <input
               :id="timeId"
               ref="timeInput"
               v-model="internalTime"
               type="time"
-              class="flex-1 bg-transparent border-none outline-none text-slate-900 placeholder-slate-500"
+              class="flex-1 bg-transparent border-none outline-none placeholder-slate-500"
+              :class="getTextClass('primary')"
               @change="updateDateTime"
             />
           </div>
@@ -78,28 +88,31 @@
               <button
                 @click.stop="setTime('09:00')"
                 type="button"
-                class="px-2 py-1 text-xs bg-yellow-50 text-yellow-700 rounded-md hover:bg-yellow-100 transition-colors pointer-events-auto"
+                class="px-2 py-1 text-xs rounded-md transition-colors pointer-events-auto"
+                :class="`${getStateClasses('warning', 'bg')} ${getStateClasses('warning', 'text')} ${getStateClasses('warning', 'hover')}`"
               >
                 9:00
               </button>
               <button
                 @click.stop="setTime('18:00')"
                 type="button"
-                class="px-2 py-1 text-xs bg-orange-50 text-orange-700 rounded-md hover:bg-orange-100 transition-colors pointer-events-auto"
+                class="px-2 py-1 text-xs rounded-md transition-colors pointer-events-auto"
+                :class="`${getStateClasses('warning', 'bg')} ${getStateClasses('warning', 'text')} ${getStateClasses('warning', 'hover')}`"
               >
                 18:00
               </button>
               <button
                 @click.stop="setTime('23:59')"
                 type="button"
-                class="px-2 py-1 text-xs bg-purple-50 text-purple-700 rounded-md hover:bg-purple-100 transition-colors pointer-events-auto"
+                class="px-2 py-1 text-xs rounded-md transition-colors pointer-events-auto"
+                :class="getThemeAwareColorClasses('purple')"
               >
                 終日
               </button>
             </div>
           </div>
         </div>
-        <div class="mt-1 text-xs text-slate-500">
+        <div class="mt-1 text-xs" :class="getTextClass('tertiary')">
           {{ timeDisplayText }}
         </div>
       </div>
@@ -112,8 +125,15 @@
         :key="preset.label"
         @click="applyPreset(preset)"
         type="button"
-        class="px-3 py-1 text-sm bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200 text-slate-700 rounded-full hover:from-slate-100 hover:to-slate-200 hover:border-slate-300 transition-all duration-200 shadow-sm hover:shadow"
-        :class="{ 'ring-2 ring-blue-500 ring-opacity-50': isCurrentPreset(preset) }"
+        class="px-3 py-1 text-sm border rounded-full transition-all duration-200 shadow-sm hover:shadow"
+        :class="[
+          getBgClass('secondary'),
+          getTextClass('primary'),
+          getBorderClass('default'),
+          isCurrentPreset(preset) ? 'ring-2 ring-blue-500 ring-opacity-50' : '',
+          'hover:' + getBgClass('hover'),
+          'dark:bg-slate-700 dark:border-slate-600 dark:hover:bg-slate-600'
+        ]"
       >
         <Icon :name="preset.icon" class="mr-1" size="0.875em" />
         {{ preset.label }}
@@ -169,6 +189,25 @@ export default defineComponent({
     }
   },
   emits: ['update:date', 'update:time', 'change'],
+  setup() {
+    const { getBgClass, getTextClass, getBorderClass, getStateClasses } = useTheme();
+    
+    const getThemeAwareColorClasses = (colorName: string) => {
+      // For purple state similar to the colorOptions
+      if (colorName === 'purple') {
+        return 'bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-900 dark:text-purple-300 dark:hover:bg-purple-800';
+      }
+      return '';
+    };
+    
+    return {
+      getBgClass,
+      getTextClass,
+      getBorderClass,
+      getStateClasses,
+      getThemeAwareColorClasses
+    };
+  },
   data() {
     return {
       internalDate: this.date,
