@@ -165,6 +165,14 @@ export default defineComponent({
     TaskDetailDialog,
     CustomSelect,
   },
+  setup() {
+    const { getPriorityBadgeClass, getPriorityLabel } = useTheme();
+    
+    return {
+      getPriorityBadgeClass,
+      getPriorityLabel
+    };
+  },
   data() {
     return {
       currentDate: "",
@@ -374,26 +382,6 @@ export default defineComponent({
       } catch (error) {
         console.error("Failed to toggle todo status:", error);
         alert("ステータスの更新に失敗しました");
-      }
-    },
-    getPriorityLabel(priority?: string): string {
-      switch (priority) {
-        case "high":
-          return "高優先度";
-        case "low":
-          return "低優先度";
-        default:
-          return "通常";
-      }
-    },
-    getPriorityBadgeClass(priority?: string): string {
-      switch (priority) {
-        case "high":
-          return "bg-red-100 text-red-800";
-        case "low":
-          return "bg-gray-100 text-gray-800";
-        default:
-          return "bg-blue-100 text-blue-800";
       }
     },
   },

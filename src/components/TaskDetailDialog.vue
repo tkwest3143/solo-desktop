@@ -64,7 +64,7 @@
                   <div class="flex items-center space-x-2">
                     <span 
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="getPriorityClass(todo.priority)"
+                      :class="getPriorityBadgeClass(todo.priority)"
                     >
                       {{ getPriorityLabel(todo.priority) }}
                     </span>
@@ -204,6 +204,14 @@ export default defineComponent({
     }
   },
   emits: ['close', 'edit', 'delete'],
+  setup() {
+    const { getPriorityBadgeClass, getPriorityLabel } = useTheme();
+    
+    return {
+      getPriorityBadgeClass,
+      getPriorityLabel
+    };
+  },
   methods: {
     close() {
       this.$emit('close')
@@ -262,20 +270,6 @@ export default defineComponent({
         return ''
       }
     },
-    getPriorityLabel(priority?: string): string {
-      switch (priority) {
-        case 'high': return '高優先度'
-        case 'low': return '低優先度'
-        default: return '通常'
-      }
-    },
-    getPriorityClass(priority?: string): string {
-      switch (priority) {
-        case 'high': return 'bg-red-100 text-red-800'
-        case 'low': return 'bg-gray-100 text-gray-800'
-        default: return 'bg-blue-100 text-blue-800'
-      }
-    }
   }
 })
 </script>

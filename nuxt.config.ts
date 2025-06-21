@@ -25,5 +25,11 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: "2024-12-27",
-  modules: ["@nuxt/icon", "@nuxtjs/tailwindcss", "@nuxt/test-utils/module"],
+  modules: ["@nuxt/icon", "@nuxtjs/tailwindcss", "@nuxtjs/color-mode", "@nuxt/test-utils/module"],
+  
+  colorMode: {
+    preference: 'light', // default theme
+    fallback: 'light', // fallback theme
+    classSuffix: '',
+  },
 });

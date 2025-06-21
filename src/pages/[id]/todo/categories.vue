@@ -163,6 +163,14 @@ definePageMeta({
 });
 
 export default defineComponent({
+  setup() {
+    const { getColorOptions, defaultColor } = useTheme();
+    
+    return {
+      colorOptions: getColorOptions(),
+      defaultColor
+    };
+  },
   data() {
     return {
       categories: [] as TodoCategory[],
@@ -172,18 +180,8 @@ export default defineComponent({
       categoryForm: {
         name: "",
         description: "",
-        color: "#8b5cf6",
+        color: this.defaultColor,
       },
-      colorOptions: [
-        { name: "パープル", value: "#8b5cf6", bg: "#8b5cf6" },
-        { name: "ブルー", value: "#3b82f6", bg: "#3b82f6" },
-        { name: "レッド", value: "#ef4444", bg: "#ef4444" },
-        { name: "グリーン", value: "#10b981", bg: "#10b981" },
-        { name: "オレンジ", value: "#f59e0b", bg: "#f59e0b" },
-        { name: "ピンク", value: "#ec4899", bg: "#ec4899" },
-        { name: "インディゴ", value: "#6366f1", bg: "#6366f1" },
-        { name: "イエロー", value: "#eab308", bg: "#eab308" },
-      ],
     };
   },
   async mounted() {
