@@ -57,7 +57,7 @@
           v-for="todo in filteredTodos"
           :key="todo.id"
           class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg hover:border-slate-300 cursor-pointer"
-          :class="getTodoPriorityClass(todo)"
+          :class="[getTodoPriorityClass(todo), todo.status === 'completed' ? 'bg-gray-50 border-gray-300 opacity-75' : '']"
           @click="showTaskDetail(todo)"
         >
           <div class="flex items-start space-x-4">
@@ -71,7 +71,7 @@
             </div>
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-slate-800">
+                <h3 class="text-lg font-semibold text-slate-800" :class="todo.status === 'completed' ? 'line-through text-gray-500' : ''">
                   {{ todo.title }}
                 </h3>
                 <span
