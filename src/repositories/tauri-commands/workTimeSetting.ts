@@ -43,6 +43,7 @@ export class WorkSettingRepository {
     workingUnit?: number;
     memo?: string;
     isDefault?: boolean;
+    userId: number;
   }) {
     const start = record.start ? getDateTextForDB(record.start) : undefined;
     const end = record.end ? getDateTextForDB(record.end) : undefined;
@@ -62,7 +63,8 @@ export class WorkSettingRepository {
         rest_end: restEnd,
         working_unit: record.workingUnit,
         memo: record.memo,
-        is_default: record.isDefault,
+        is_default: record.isDefault ?? false,
+        user_id: record.userId,
       }),
     });
   }
@@ -76,9 +78,11 @@ export class WorkSettingRepository {
 
   static async getById(id: number, userId: number) {
     const workSettings = await this.getByUserId(userId);
-    const workSetting = workSettings.find(ws => ws.id === id);
+    const workSetting = workSettings.find((ws) => ws.id === id);
     if (!workSetting) {
-      throw new Error(`Work setting with ID ${id} not found for user ${userId}`);
+      throw new Error(
+        `Work setting with ID ${id} not found for user ${userId}`
+      );
     }
     return workSetting;
   }
