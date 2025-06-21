@@ -65,7 +65,7 @@
               v-for="todo in todayTasks"
               :key="todo.id"
               class="bg-red-50 border-2 border-red-300 rounded-xl p-6 transition-all hover:shadow-lg cursor-pointer"
-              :class="todo.status === 'completed' ? 'bg-gray-50 border-gray-300 opacity-75' : ''"
+              :class="todo.status === 'completed' ? 'bg-green-50 border-green-300' : ''"
               @click="showTaskDetail(todo)"
             >
               <div class="flex items-start space-x-4">
@@ -79,16 +79,25 @@
                 </div>
                 <div class="flex-1">
                   <div class="flex items-center space-x-3 mb-2">
-                    <h3 class="text-lg font-semibold text-slate-800" :class="todo.status === 'completed' ? 'line-through text-gray-500' : ''">
+                    <h3 class="text-lg font-semibold text-slate-800" :class="todo.status === 'completed' ? 'line-through text-green-700' : ''">
                       {{ todo.title }}
                     </h3>
                     <span
+                      v-if="todo.status === 'completed'"
+                      class="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium flex items-center"
+                    >
+                      <Icon name="fluent:checkmark-20-filled" class="mr-1" size="0.9em" />
+                      完了
+                    </span>
+                    <span
+                      v-else
                       class="text-xs px-2 py-1 rounded-full font-medium"
                       :class="getPriorityBadgeClass(todo.priority)"
                     >
                       {{ getPriorityLabel(todo.priority) }}
                     </span>
                     <span
+                      v-if="todo.status !== 'completed'"
                       class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full font-medium"
                       >今日期限</span
                     >
@@ -160,7 +169,7 @@
               v-for="todo in tomorrowTasks"
               :key="todo.id"
               class="bg-orange-50 border-2 border-orange-200 rounded-xl p-6 transition-all hover:shadow-lg cursor-pointer"
-              :class="todo.status === 'completed' ? 'bg-gray-50 border-gray-300 opacity-75' : ''"
+              :class="todo.status === 'completed' ? 'bg-green-50 border-green-300' : ''"
               @click="showTaskDetail(todo)"
             >
               <div class="flex items-start space-x-4">
@@ -174,16 +183,25 @@
                 </div>
                 <div class="flex-1">
                   <div class="flex items-center space-x-3 mb-2">
-                    <h3 class="text-lg font-semibold text-slate-800" :class="todo.status === 'completed' ? 'line-through text-gray-500' : ''">
+                    <h3 class="text-lg font-semibold text-slate-800" :class="todo.status === 'completed' ? 'line-through text-green-700' : ''">
                       {{ todo.title }}
                     </h3>
                     <span
+                      v-if="todo.status === 'completed'"
+                      class="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium flex items-center"
+                    >
+                      <Icon name="fluent:checkmark-20-filled" class="mr-1" size="0.9em" />
+                      完了
+                    </span>
+                    <span
+                      v-else
                       class="text-xs px-2 py-1 rounded-full font-medium"
                       :class="getPriorityBadgeClass(todo.priority)"
                     >
                       {{ getPriorityLabel(todo.priority) }}
                     </span>
                     <span
+                      v-if="todo.status !== 'completed'"
                       class="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded-full font-medium"
                       >明日期限</span
                     >
@@ -253,7 +271,7 @@
               v-for="todo in thisWeekTasks"
               :key="todo.id"
               class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 transition-all hover:shadow-lg cursor-pointer"
-              :class="todo.status === 'completed' ? 'bg-gray-50 border-gray-300 opacity-75' : ''"
+              :class="todo.status === 'completed' ? 'bg-green-50 border-green-300' : ''"
               @click="showTaskDetail(todo)"
             >
               <div class="flex items-start space-x-4">
@@ -267,16 +285,25 @@
                 </div>
                 <div class="flex-1">
                   <div class="flex items-center space-x-3 mb-2">
-                    <h3 class="text-lg font-semibold text-slate-800" :class="todo.status === 'completed' ? 'line-through text-gray-500' : ''">
+                    <h3 class="text-lg font-semibold text-slate-800" :class="todo.status === 'completed' ? 'line-through text-green-700' : ''">
                       {{ todo.title }}
                     </h3>
                     <span
+                      v-if="todo.status === 'completed'"
+                      class="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium flex items-center"
+                    >
+                      <Icon name="fluent:checkmark-20-filled" class="mr-1" size="0.9em" />
+                      完了
+                    </span>
+                    <span
+                      v-else
                       class="text-xs px-2 py-1 rounded-full font-medium"
                       :class="getPriorityBadgeClass(todo.priority)"
                     >
                       {{ getPriorityLabel(todo.priority) }}
                     </span>
                     <span
+                      v-if="todo.status !== 'completed'"
                       class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium"
                       >今週期限</span
                     >

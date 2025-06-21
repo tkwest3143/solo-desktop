@@ -78,7 +78,7 @@
           v-for="todo in filteredTodos"
           :key="todo.id"
           class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg hover:border-slate-300 cursor-pointer"
-          :class="todo.status === 'completed' ? 'bg-gray-50 border-gray-300 opacity-75' : ''"
+          :class="todo.status === 'completed' ? 'bg-green-50 border-green-300' : ''"
           @click="showTaskDetail(todo)"
         >
           <div class="flex items-start space-x-4">
@@ -92,8 +92,16 @@
             </div>
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-slate-800" :class="todo.status === 'completed' ? 'line-through text-gray-500' : ''">{{ todo.title }}</h3>
-                <span 
+                <h3 class="text-lg font-semibold text-slate-800" :class="todo.status === 'completed' ? 'line-through text-green-700' : ''">{{ todo.title }}</h3>
+                <span
+                  v-if="todo.status === 'completed'"
+                  class="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium flex items-center"
+                >
+                  <Icon name="fluent:checkmark-20-filled" class="mr-1" size="0.9em" />
+                  完了
+                </span>
+                <span
+                  v-else
                   class="text-xs px-2 py-1 rounded-full font-medium"
                   :class="getPriorityBadgeClass(todo.priority)"
                 >
