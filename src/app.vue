@@ -8,7 +8,13 @@
         <Header :userData="userData" />
       </div>
       <NuxtLayout>
-        <div style="padding-top: 60px">
+        <div
+          style="
+            padding-top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+          "
+        >
           <NuxtPage />
         </div>
       </NuxtLayout>

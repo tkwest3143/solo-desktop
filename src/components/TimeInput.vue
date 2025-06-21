@@ -1,6 +1,8 @@
 <template>
   <div class="time-input-container">
-    <div class="flex items-center space-x-2 bg-white border border-slate-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all duration-200">
+    <div
+      class="flex items-center space-x-2 bg-white border border-slate-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all duration-200"
+    >
       <!-- Hour input -->
       <div class="flex items-center">
         <button
@@ -9,7 +11,11 @@
           class="p-1 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors"
           :disabled="disabled"
         >
-          <Icon name="fluent:chevron-up-20-filled" size="0.9em" class="rotate-180" />
+          <Icon
+            name="fluent:chevron-up-20-filled"
+            size="0.9em"
+            class="rotate-180"
+          />
         </button>
         <input
           ref="hourInput"
@@ -44,7 +50,11 @@
           class="p-1 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors"
           :disabled="disabled"
         >
-          <Icon name="fluent:chevron-up-20-filled" size="0.9em" class="rotate-180" />
+          <Icon
+            name="fluent:chevron-up-20-filled"
+            size="0.9em"
+            class="rotate-180"
+          />
         </button>
         <input
           ref="minuteInput"
@@ -76,6 +86,7 @@
           @click="toggleQuickPicker"
           class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors"
           :disabled="disabled"
+          v-click-outside="closeQuickPicker"
           title="クイック選択"
         >
           <Icon name="fluent:clock-20-filled" size="1em" />
@@ -92,15 +103,17 @@
         >
           <div
             v-if="showQuickPicker"
-            v-click-outside="closeQuickPicker"
             class="absolute top-full right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 w-48 max-h-64 overflow-y-auto"
           >
             <div class="p-2">
-              <div class="text-xs font-medium text-slate-500 mb-2 px-2">よく使用する時間</div>
+              <div class="text-xs font-medium text-slate-500 mb-2 px-2">
+                よく使用する時間
+              </div>
               <div class="grid grid-cols-2 gap-1">
                 <button
                   v-for="time in quickTimes"
                   :key="time"
+                  type="button"
                   @click="selectQuickTime(time)"
                   class="px-2 py-1 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 rounded transition-colors text-center"
                 >
@@ -116,211 +129,232 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'TimeInput',
+  name: "TimeInput",
   props: {
     modelValue: {
       type: String,
-      default: ''
+      default: "",
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     placeholder: {
       type: String,
-      default: '00:00'
-    }
+      default: "00:00",
+    },
   },
-  emits: ['update:modelValue'],
+  emits: ["update:modelValue"],
   data() {
     return {
-      localHour: '',
-      localMinute: '',
+      localHour: "",
+      localMinute: "",
       showQuickPicker: false,
       quickTimes: [
-        '08:00', '08:30', '09:00', '09:30',
-        '10:00', '10:30', '11:00', '11:30',
-        '12:00', '12:30', '13:00', '13:30',
-        '14:00', '14:30', '15:00', '15:30',
-        '16:00', '16:30', '17:00', '17:30',
-        '18:00', '18:30', '19:00', '19:30',
-        '20:00', '20:30', '21:00', '21:30'
-      ]
-    }
+        "08:00",
+        "08:30",
+        "09:00",
+        "09:30",
+        "10:00",
+        "10:30",
+        "11:00",
+        "11:30",
+        "12:00",
+        "12:30",
+        "13:00",
+        "13:30",
+        "14:00",
+        "14:30",
+        "15:00",
+        "15:30",
+        "16:00",
+        "16:30",
+        "17:00",
+        "17:30",
+        "18:00",
+        "18:30",
+        "19:00",
+        "19:30",
+        "20:00",
+        "20:30",
+        "21:00",
+        "21:30",
+      ],
+    };
   },
   watch: {
     modelValue: {
       immediate: true,
       handler(newValue: string) {
-        this.parseTime(newValue)
-      }
-    }
+        this.parseTime(newValue);
+      },
+    },
   },
   methods: {
     parseTime(timeString: string) {
       if (!timeString) {
-        this.localHour = ''
-        this.localMinute = ''
-        return
+        this.localHour = "";
+        this.localMinute = "";
+        return;
       }
-      
-      const [hour, minute] = timeString.split(':')
-      this.localHour = hour || ''
-      this.localMinute = minute || ''
+
+      const [hour, minute] = timeString.split(":");
+      this.localHour = hour || "";
+      this.localMinute = minute || "";
     },
-    
+
     formatTime(): string {
-      const hour = this.localHour.padStart(2, '0')
-      const minute = this.localMinute.padStart(2, '0')
-      return `${hour}:${minute}`
+      const hour = this.localHour.padStart(2, "0");
+      const minute = this.localMinute.padStart(2, "0");
+      return `${hour}:${minute}`;
     },
-    
+
     emitValue() {
       if (this.localHour && this.localMinute) {
-        const formattedTime = this.formatTime()
-        this.$emit('update:modelValue', formattedTime)
+        const formattedTime = this.formatTime();
+        this.$emit("update:modelValue", formattedTime);
       } else if (!this.localHour && !this.localMinute) {
-        this.$emit('update:modelValue', '')
+        this.$emit("update:modelValue", "");
       }
     },
-    
+
     adjustHour(delta: number) {
-      const currentHour = parseInt(this.localHour) || 0
-      const newHour = Math.max(0, Math.min(23, currentHour + delta))
-      this.localHour = newHour.toString()
-      this.validateAndFormatHour()
+      const currentHour = parseInt(this.localHour) || 0;
+      const newHour = Math.max(0, Math.min(23, currentHour + delta));
+      this.localHour = newHour.toString();
+      this.validateAndFormatHour();
     },
-    
+
     adjustMinute(delta: number) {
-      const currentMinute = parseInt(this.localMinute) || 0
-      let newMinute = currentMinute + delta
-      let hourAdjustment = 0
-      
+      const currentMinute = parseInt(this.localMinute) || 0;
+      let newMinute = currentMinute + delta;
+      let hourAdjustment = 0;
+
       if (newMinute >= 60) {
-        hourAdjustment = Math.floor(newMinute / 60)
-        newMinute = newMinute % 60
+        hourAdjustment = Math.floor(newMinute / 60);
+        newMinute = newMinute % 60;
       } else if (newMinute < 0) {
-        hourAdjustment = Math.ceil(newMinute / 60) - 1
-        newMinute = newMinute + (Math.abs(hourAdjustment) * 60)
+        hourAdjustment = Math.ceil(newMinute / 60) - 1;
+        newMinute = newMinute + Math.abs(hourAdjustment) * 60;
       }
-      
-      this.localMinute = newMinute.toString()
-      
+
+      this.localMinute = newMinute.toString();
+
       if (hourAdjustment !== 0) {
-        this.adjustHour(hourAdjustment)
+        this.adjustHour(hourAdjustment);
       }
-      
-      this.validateAndFormatMinute()
+
+      this.validateAndFormatMinute();
     },
-    
+
     validateAndFormatHour() {
-      let hour = parseInt(this.localHour)
+      let hour = parseInt(this.localHour);
       if (isNaN(hour)) {
-        this.localHour = ''
+        this.localHour = "";
       } else {
-        hour = Math.max(0, Math.min(23, hour))
-        this.localHour = hour.toString().padStart(2, '0')
+        hour = Math.max(0, Math.min(23, hour));
+        this.localHour = hour.toString().padStart(2, "0");
       }
-      this.emitValue()
+      this.emitValue();
     },
-    
+
     validateAndFormatMinute() {
-      let minute = parseInt(this.localMinute)
+      let minute = parseInt(this.localMinute);
       if (isNaN(minute)) {
-        this.localMinute = ''
+        this.localMinute = "";
       } else {
-        minute = Math.max(0, Math.min(59, minute))
-        this.localMinute = minute.toString().padStart(2, '0')
+        minute = Math.max(0, Math.min(59, minute));
+        this.localMinute = minute.toString().padStart(2, "0");
       }
-      this.emitValue()
+      this.emitValue();
     },
-    
+
     onHourInput(event: Event) {
-      const input = event.target as HTMLInputElement
-      let value = input.value.replace(/[^0-9]/g, '')
-      if (value.length > 2) value = value.slice(0, 2)
-      if (parseInt(value) > 23) value = '23'
-      this.localHour = value
-      input.value = value
+      const input = event.target as HTMLInputElement;
+      let value = input.value.replace(/[^0-9]/g, "");
+      if (value.length > 2) value = value.slice(0, 2);
+      if (parseInt(value) > 23) value = "23";
+      this.localHour = value;
+      input.value = value;
     },
-    
+
     onMinuteInput(event: Event) {
-      const input = event.target as HTMLInputElement
-      let value = input.value.replace(/[^0-9]/g, '')
-      if (value.length > 2) value = value.slice(0, 2)
-      if (parseInt(value) > 59) value = '59'
-      this.localMinute = value
-      input.value = value
+      const input = event.target as HTMLInputElement;
+      let value = input.value.replace(/[^0-9]/g, "");
+      if (value.length > 2) value = value.slice(0, 2);
+      if (parseInt(value) > 59) value = "59";
+      this.localMinute = value;
+      input.value = value;
     },
-    
+
     onHourKeydown(event: KeyboardEvent) {
-      this.handleKeydown(event, 'hour')
+      this.handleKeydown(event, "hour");
     },
-    
+
     onMinuteKeydown(event: KeyboardEvent) {
-      this.handleKeydown(event, 'minute')
+      this.handleKeydown(event, "minute");
     },
-    
-    handleKeydown(event: KeyboardEvent, type: 'hour' | 'minute') {
-      if (event.key === 'ArrowUp') {
-        event.preventDefault()
-        if (type === 'hour') {
-          this.adjustHour(1)
+
+    handleKeydown(event: KeyboardEvent, type: "hour" | "minute") {
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        if (type === "hour") {
+          this.adjustHour(1);
         } else {
-          this.adjustMinute(15)
+          this.adjustMinute(15);
         }
-      } else if (event.key === 'ArrowDown') {
-        event.preventDefault()
-        if (type === 'hour') {
-          this.adjustHour(-1)
+      } else if (event.key === "ArrowDown") {
+        event.preventDefault();
+        if (type === "hour") {
+          this.adjustHour(-1);
         } else {
-          this.adjustMinute(-15)
+          this.adjustMinute(-15);
         }
-      } else if (event.key === 'Tab') {
-        if (type === 'hour' && !event.shiftKey) {
-          event.preventDefault()
-          ;(this.$refs.minuteInput as HTMLInputElement)?.focus()
+      } else if (event.key === "Tab") {
+        if (type === "hour" && !event.shiftKey) {
+          event.preventDefault();
+          (this.$refs.minuteInput as HTMLInputElement)?.focus();
         }
       }
     },
-    
+
     toggleQuickPicker() {
-      this.showQuickPicker = !this.showQuickPicker
+      this.showQuickPicker = !this.showQuickPicker;
     },
-    
+
     closeQuickPicker() {
-      this.showQuickPicker = false
+      this.showQuickPicker = false;
     },
-    
+
     selectQuickTime(time: string) {
-      const [hour, minute] = time.split(':')
-      this.localHour = hour
-      this.localMinute = minute
-      this.emitValue()
-      this.closeQuickPicker()
-    }
+      this.closeQuickPicker();
+      const [hour, minute] = time.split(":");
+      this.localHour = hour;
+      this.localMinute = minute;
+      this.emitValue();
+    },
   },
-  
+
   directives: {
-    'click-outside': {
+    "click-outside": {
       beforeMount(el: HTMLElement, binding: any) {
         (el as any)._clickOutside = (event: Event) => {
           if (!(el === event.target || el.contains(event.target as Node))) {
-            binding.value()
+            binding.value();
           }
-        }
-        document.addEventListener('click', (el as any)._clickOutside)
+        };
+        document.addEventListener("click", (el as any)._clickOutside);
       },
       unmounted(el: HTMLElement) {
-        document.removeEventListener('click', (el as any)._clickOutside)
-        delete (el as any)._clickOutside
-      }
-    }
-  }
-})
+        document.removeEventListener("click", (el as any)._clickOutside);
+        delete (el as any)._clickOutside;
+      },
+    },
+  },
+});
 </script>
 
 <style scoped>

@@ -13,6 +13,7 @@ describe("workSettingData", () => {
     rest_end: new Date("2023-10-01T13:00:00"),
     working_unit: 60,
     memo: "Test memo",
+    is_default: false,
     created_at: new Date(),
     updated_at: new Date(),
   };
@@ -100,6 +101,7 @@ describe("workSettingData", () => {
       end: new Date("2023-10-01T17:00:00"),
       rest_start: new Date("2023-10-01T00:00:00"),
       rest_end: new Date("2023-10-01T00:00:00"),
+      is_default: false,
     };
     const workSettingInstance = new workSettingData(workSettingNoRest);
     expect(workSettingInstance.workDurationByMinute).toBe(480);
@@ -112,6 +114,7 @@ describe("workSettingData", () => {
       end: new Date("2023-10-01T17:00:00"),
       rest_start: new Date("2023-10-01T00:00:00"),
       rest_end: new Date("2023-10-01T00:00:00"),
+      is_default: false,
     };
     const workSettingInstance = new workSettingData(workSettingNoRest);
     expect(workSettingInstance.workDurationByText).toBe("08:00");
@@ -121,6 +124,7 @@ describe("workSettingData", () => {
     const workSettingUndefinedStart: workSetting = {
       ...workSetting,
       start: undefined as unknown as Date,
+      is_default: false,
     };
     const workSettingInstance = new workSettingData(workSettingUndefinedStart);
     expect(workSettingInstance.startByText).toBe("00:00");
@@ -130,6 +134,7 @@ describe("workSettingData", () => {
     const workSettingUndefinedEnd: workSetting = {
       ...workSetting,
       end: undefined as unknown as Date,
+      is_default: false,
     };
     const workSettingInstance = new workSettingData(workSettingUndefinedEnd);
     expect(workSettingInstance.endByText).toBe("00:00");
@@ -139,6 +144,7 @@ describe("workSettingData", () => {
     const workSettingUndefinedRestStart: workSetting = {
       ...workSetting,
       rest_start: undefined as unknown as Date,
+      is_default: false,
     };
     const workSettingInstance = new workSettingData(
       workSettingUndefinedRestStart
@@ -150,6 +156,7 @@ describe("workSettingData", () => {
     const workSettingUndefinedRestEnd: workSetting = {
       ...workSetting,
       rest_end: undefined as unknown as Date,
+      is_default: false,
     };
     const workSettingInstance = new workSettingData(
       workSettingUndefinedRestEnd
@@ -162,6 +169,7 @@ describe("workSettingData", () => {
       ...workSetting,
       rest_start: undefined as unknown as Date,
       rest_end: undefined as unknown as Date,
+      is_default: false,
     };
     const workSettingInstance = new workSettingData(workSettingUndefinedRest);
     expect(workSettingInstance.restDurationByText).toBe("00:00");
@@ -172,6 +180,7 @@ describe("workSettingData", () => {
       ...workSetting,
       start: undefined as unknown as Date,
       end: undefined as unknown as Date,
+      is_default: false,
     };
     const workSettingInstance = new workSettingData(
       workSettingUndefinedStartEnd
