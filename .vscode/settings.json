@@ -1,5 +1,8 @@
 {
-  "rust-analyzer.linkedProjects": ["src-tauri/Cargo.toml"],
+  "rust-analyzer.linkedProjects": [
+    "src-tauri/Cargo.toml",
+    "src-tauri/migration/Cargo.toml"
+  ],
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": [
     "source.addMissingImports",

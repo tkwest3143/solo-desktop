@@ -57,7 +57,7 @@
           v-for="todo in filteredTodos"
           :key="todo.id"
           class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg hover:border-slate-300 cursor-pointer"
-          :class="getTodoPriorityClass(todo)"
+          :class="[getTodoPriorityClass(todo), todo.status === 'completed' ? 'bg-green-50 border-green-300' : '']"
           @click="showTaskDetail(todo)"
         >
           <div class="flex items-start space-x-4">
@@ -71,10 +71,18 @@
             </div>
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-slate-800">
+                <h3 class="text-lg font-semibold text-slate-800" :class="todo.status === 'completed' ? 'line-through text-green-700' : ''">
                   {{ todo.title }}
                 </h3>
                 <span
+                  v-if="todo.status === 'completed'"
+                  class="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium flex items-center"
+                >
+                  <Icon name="fluent:checkmark-20-filled" class="mr-1" size="0.9em" />
+                  完了
+                </span>
+                <span
+                  v-else
                   class="text-xs px-2 py-1 rounded-full font-medium"
                   :class="getPriorityBadgeClass(todo.priority)"
                 >
@@ -98,6 +106,14 @@
                   <span>作成日: {{ formatDate(todo.created_at) }}</span>
                 </div>
                 <div class="flex space-x-2">
+                  <button
+                    v-if="todo.status !== 'completed'"
+                    @click.stop="completeTodo(todo)"
+                    class="p-2 text-slate-400 hover:text-green-500 transition-colors"
+                    title="完了にする"
+                  >
+                    <Icon name="fluent:checkmark-circle-20-filled" size="1.2em" />
+                  </button>
                   <NuxtLink
                     :to="{
                       name: 'id-todo-edit',
@@ -374,6 +390,33 @@ export default defineComponent({
       } catch (error) {
         console.error("Failed to toggle todo status:", error);
         alert("ステータスの更新に失敗しました");
+      }
+    },
+    async completeTodo(todo: TodoItem) {
+      try {
+        const updateData: any = {
+          id: todo.id,
+          title: todo.title,
+          content: todo.content,
+          link: todo.link,
+          color: todo.color,
+          priority: todo.priority,
+          due_date: todo.due_date,
+          category_id: todo.category_id,
+          user_id: todo.user_id,
+          status: "completed",
+        };
+
+        await TodoItemRepository.updateTodoItem(updateData);
+
+        // Update the local state
+        const index = this.todos.findIndex((t) => t.id === todo.id);
+        if (index !== -1) {
+          this.todos[index].status = "completed";
+        }
+      } catch (error) {
+        console.error("Failed to complete todo:", error);
+        alert("タスクの完了に失敗しました");
       }
     },
     getPriorityLabel(priority?: string): string {
