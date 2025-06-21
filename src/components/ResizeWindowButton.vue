@@ -25,6 +25,7 @@ export default defineComponent({
     return {
       windowMode: "normal" as "normal" | "compact",
       currentRoute: [] as RouteRecord[],
+      resizeObserver: null as ResizeObserver | null,
     };
   },
   mounted() {
@@ -36,8 +37,39 @@ export default defineComponent({
         (window as any).windowState.mode = mode;
       }
     };
+
+    // Listen for window resize events to detect manual resizing
+    this.setupWindowListener();
+  },
+  beforeUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   },
   methods: {
+    setupWindowListener() {
+      // Use ResizeObserver to detect window size changes
+      this.resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          
+          // If window is manually resized to large dimensions and we're in compact mode
+          if (this.windowMode === "compact" && (width > 500 || height > 600)) {
+            this.windowMode = "normal";
+            (window as any).windowState.mode = "normal";
+            
+            // Update route to remove compact query
+            const route = this.$route;
+            if (route.query.compact === "true") {
+              const { compact, ...otherQuery } = route.query;
+              this.$router.push({ ...route, query: otherQuery });
+            }
+          }
+        }
+      });
+      
+      this.resizeObserver.observe(document.body);
+    },
     async resizeWindow() {
       const currentWindow = getCurrentWindow();
       

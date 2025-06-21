@@ -56,7 +56,7 @@
             >
               <Icon name="fluent:settings-20-filled" size="1.2em" />
             </NuxtLink>
-            <div class="p-2 rounded-lg text-slate-700" title="{{ userData.prop.name }}さん">
+            <div class="p-2 rounded-lg text-slate-700" :title="`${userData.prop.name}さん`">
               <Icon name="fluent:person-20-filled" size="1.2em" />
             </div>
           </div>
