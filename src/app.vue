@@ -4,20 +4,35 @@
       <Loading loading-text="データ取り込み中" />
     </div>
     <div v-else class="h-screen">
-      <div style="position: fixed; top: 0; width: 100%; z-index: 1000">
-        <Header :userData="userData" />
-      </div>
-      <NuxtLayout>
-        <div style="padding-top: 60px">
-          <NuxtPage />
+      <!-- Compact Mode Layout -->
+      <div v-if="isCompactMode" class="h-screen">
+        <div style="position: fixed; top: 0; width: 100%; z-index: 1000">
+          <Header :userData="userData" />
         </div>
-      </NuxtLayout>
+        <NuxtLayout name="compact">
+          <div style="padding-top: 40px">
+            <NuxtPage />
+          </div>
+        </NuxtLayout>
+      </div>
+      
+      <!-- Normal Mode Layout -->
+      <div v-else class="h-screen">
+        <div style="position: fixed; top: 0; width: 100%; z-index: 1000">
+          <Header :userData="userData" />
+        </div>
+        <NuxtLayout>
+          <div style="padding-top: 60px">
+            <NuxtPage />
+          </div>
+        </NuxtLayout>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from "vue";
+import { defineComponent, onMounted, ref, watch, computed } from "vue";
 import { useRoute } from "vue-router";
 import Header from "./components/Header.vue";
 import { UserData } from "./models/user";
@@ -32,6 +47,11 @@ export default defineComponent({
     const route = useRoute(); // ルート情報を取得
     const isLoading = ref(true); // ローディング状態
     const userData = ref<UserData | undefined>(undefined); // ユーザーデータ
+
+    // コンパクトモードの判定
+    const isCompactMode = computed(() => {
+      return route.query.compact === "true";
+    });
 
     // ユーザーデータを取得する関数
     const fetchUserData = async () => {
@@ -71,6 +91,7 @@ export default defineComponent({
     return {
       isLoading,
       userData,
+      isCompactMode,
     };
   },
 });
