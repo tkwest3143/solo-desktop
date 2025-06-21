@@ -1,15 +1,15 @@
 <template>
-  <div class="h-full bg-white">
+  <div class="h-full bg-white dark:bg-slate-900 transition-colors">
     <!-- Page Header -->
-    <div class="p-8 border-b border-slate-200">
+    <div class="p-8 border-b border-slate-200 dark:border-slate-700">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-slate-800 mb-2">カテゴリ管理</h1>
-          <p class="text-slate-600">タスクのカテゴリを管理・編集</p>
+          <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">カテゴリ管理</h1>
+          <p class="text-slate-600 dark:text-slate-400">タスクのカテゴリを管理・編集</p>
         </div>
         <button
           @click="openCreateModal"
-          class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg"
+          class="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg"
         >
           <Icon name="fluent:add-20-filled" class="mr-2" />
           新しいカテゴリ
@@ -24,7 +24,7 @@
         <div
           v-for="category in categories"
           :key="category.id"
-          class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg"
+          class="bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl p-6 transition-all hover:shadow-lg dark:hover:shadow-xl"
         >
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center space-x-3">

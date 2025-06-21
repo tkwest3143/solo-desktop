@@ -1,15 +1,15 @@
 <template>
-  <div class="h-full bg-white overflow-y-auto">
+  <div class="h-full bg-white dark:bg-slate-900 overflow-y-auto transition-colors">
     <!-- Page Header -->
-    <div class="p-8 border-b border-slate-200">
+    <div class="p-8 border-b border-slate-200 dark:border-slate-700">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-slate-800 mb-2">今日のTodo</h1>
-          <p class="text-slate-600">{{ currentDate }}のタスク一覧</p>
+          <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">今日のTodo</h1>
+          <p class="text-slate-600 dark:text-slate-400">{{ currentDate }}のタスク一覧</p>
         </div>
         <NuxtLink
           :to="{ name: 'id-todo-add', params: { id: $route.params.id } }"
-          class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg"
+          class="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg"
         >
           <Icon name="fluent:add-20-filled" class="mr-2" />
           新規作成
@@ -44,19 +44,19 @@
 
       <!-- Task Items -->
       <div v-if="loading" class="flex justify-center py-8">
-        <div class="text-slate-500">読み込み中...</div>
+        <div class="text-slate-500 dark:text-slate-400">読み込み中...</div>
       </div>
 
       <div v-else-if="filteredTodos.length === 0" class="text-center py-8">
-        <div class="text-slate-500 text-lg">今日のタスクはありません</div>
-        <p class="text-slate-400 mt-2">新しいタスクを追加してみましょう</p>
+        <div class="text-slate-500 dark:text-slate-400 text-lg">今日のタスクはありません</div>
+        <p class="text-slate-400 dark:text-slate-500 mt-2">新しいタスクを追加してみましょう</p>
       </div>
 
       <div v-else class="space-y-4">
         <div
           v-for="todo in filteredTodos"
           :key="todo.id"
-          class="bg-white border-2 border-slate-200 rounded-xl p-6 transition-all hover:shadow-lg hover:border-slate-300 cursor-pointer"
+          class="bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl p-6 transition-all hover:shadow-lg dark:hover:shadow-xl hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer"
           :class="getTodoPriorityClass(todo)"
           @click="showTaskDetail(todo)"
         >
@@ -66,12 +66,12 @@
                 type="checkbox"
                 :checked="todo.status === 'completed'"
                 @click.stop="toggleTodoStatus(todo)"
-                class="w-5 h-5 text-blue-500 rounded border-2 border-slate-300 focus:ring-blue-500"
+                class="w-5 h-5 text-blue-500 rounded border-2 border-slate-300 dark:border-slate-600 focus:ring-blue-500 bg-white dark:bg-slate-700"
               />
             </div>
             <div class="flex-1">
               <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-slate-800">
+                <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">
                   {{ todo.title }}
                 </h3>
                 <span
@@ -86,11 +86,11 @@
                   :style="{ backgroundColor: todo.color }"
                 ></div>
               </div>
-              <p v-if="todo.content" class="text-slate-600 mb-3">
+              <p v-if="todo.content" class="text-slate-600 dark:text-slate-300 mb-3">
                 {{ todo.content }}
               </p>
               <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4 text-sm text-slate-500">
+                <div class="flex items-center space-x-4 text-sm text-slate-500 dark:text-slate-400">
                   <span>期限: {{ formatDueDate(todo.due_date) }}</span>
                   <span v-if="getCategoryName(todo.category_id)"
                     >カテゴリ: {{ getCategoryName(todo.category_id) }}</span
