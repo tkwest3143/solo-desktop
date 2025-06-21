@@ -104,6 +104,7 @@ export type workSetting = {
   rest_end: Date;
   working_unit: number;
   memo?: string;
+  is_default: boolean;
   created_at: Date;
   updated_at: Date;
 };

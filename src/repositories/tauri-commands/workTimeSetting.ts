@@ -61,7 +61,7 @@ export class WorkSettingRepository {
         rest_start: restStart,
         rest_end: restEnd,
         working_unit: record.workingUnit,
-        memo: record,
+        memo: record.memo,
         is_default: record.isDefault,
       }),
     });
@@ -72,5 +72,10 @@ export class WorkSettingRepository {
     });
     const data = JSON.parse(res as string) as workSetting[];
     return data;
+  }
+
+  static async getById(id: number, userId: number) {
+    const workSettings = await this.getByUserId(userId);
+    return workSettings.find(ws => ws.id === id);
   }
 }
