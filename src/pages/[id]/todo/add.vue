@@ -1,15 +1,15 @@
 <template>
-  <div class="h-full bg-white">
+  <div class="h-full bg-white dark:bg-slate-900 transition-colors">
     <!-- Page Header -->
-    <div class="p-8 border-b border-slate-200">
+    <div class="p-8 border-b border-slate-200 dark:border-slate-700">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-slate-800 mb-2">新しいTodoを作成</h1>
-          <p class="text-slate-600">効率的なタスク管理のために詳細を入力してください</p>
+          <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">新しいTodoを作成</h1>
+          <p class="text-slate-600 dark:text-slate-400">効率的なタスク管理のために詳細を入力してください</p>
         </div>
         <NuxtLink
           :to="{ name: 'id-todo', params: { id: $route.params.id } }"
-          class="text-slate-600 hover:text-slate-800 px-4 py-2 rounded-lg transition-colors"
+          class="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 px-4 py-2 rounded-lg transition-colors"
         >
           <Icon name="fluent:arrow-left-20-filled" class="mr-2" />
           戻る
@@ -23,7 +23,7 @@
         <form @submit.prevent="saveTodo" class="space-y-6">
           <!-- Title -->
           <div>
-            <label for="title" class="block text-sm font-semibold text-slate-700 mb-2">
+            <label for="title" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
               タスクタイトル *
             </label>
             <input
@@ -31,14 +31,14 @@
               v-model="todo.title"
               type="text"
               placeholder="例: プロジェクトの進捗報告書作成"
-              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors placeholder:text-slate-500 dark:placeholder:text-slate-400"
               required
             />
           </div>
 
           <!-- Description -->
           <div>
-            <label for="content" class="block text-sm font-semibold text-slate-700 mb-2">
+            <label for="content" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
               詳細説明
             </label>
             <textarea
@@ -46,7 +46,7 @@
               v-model="todo.content"
               rows="4"
               placeholder="タスクの詳細な説明を入力してください..."
-              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-vertical"
+              class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors resize-vertical placeholder:text-slate-500 dark:placeholder:text-slate-400"
             ></textarea>
           </div>
 
@@ -85,7 +85,7 @@
 
           <!-- Color Selection -->
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">
+            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
               ラベル色
             </label>
             <div class="flex space-x-3">
@@ -95,7 +95,7 @@
                 @click="todo.color = color.value"
                 :class="[
                   'w-8 h-8 rounded-full cursor-pointer border-4 transition-all',
-                  todo.color === color.value ? 'border-slate-400 scale-110' : 'border-transparent hover:scale-105'
+                  todo.color === color.value ? 'border-slate-400 dark:border-slate-500 scale-110' : 'border-transparent hover:scale-105'
                 ]"
                 :style="{ backgroundColor: color.bg }"
                 :title="color.name"
@@ -105,7 +105,7 @@
 
           <!-- Link -->
           <div>
-            <label for="link" class="block text-sm font-semibold text-slate-700 mb-2">
+            <label for="link" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
               関連リンク
             </label>
             <input
@@ -113,7 +113,7 @@
               v-model="todo.link"
               type="url"
               placeholder="https://example.com"
-              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors placeholder:text-slate-500 dark:placeholder:text-slate-400"
             />
           </div>
 
@@ -176,6 +176,14 @@ export default defineComponent({
     CustomSelect,
     CustomDateTimePicker,
   },
+  setup() {
+    const { getColorOptions, defaultColor } = useTheme();
+    
+    return {
+      colorOptions: getColorOptions(),
+      defaultColor
+    };
+  },
   data() {
     return {
       todo: {
@@ -185,20 +193,10 @@ export default defineComponent({
         due_time: "",
         category_id: "",
         priority: "normal",
-        color: "#3b82f6",
+        color: this.defaultColor,
         link: "",
       },
       categories: [] as TodoCategory[],
-      colorOptions: [
-        { name: "ブルー", value: "#3b82f6", bg: "#3b82f6" },
-        { name: "レッド", value: "#ef4444", bg: "#ef4444" },
-        { name: "グリーン", value: "#10b981", bg: "#10b981" },
-        { name: "オレンジ", value: "#f59e0b", bg: "#f59e0b" },
-        { name: "パープル", value: "#8b5cf6", bg: "#8b5cf6" },
-        { name: "ピンク", value: "#ec4899", bg: "#ec4899" },
-        { name: "インディゴ", value: "#6366f1", bg: "#6366f1" },
-        { name: "グレー", value: "#6b7280", bg: "#6b7280" },
-      ],
       loading: false,
     };
   },

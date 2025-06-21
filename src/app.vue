@@ -1,9 +1,12 @@
 <template>
-  <div>
-    <div v-if="isLoading" class="h-screen flex items-center justify-center">
+  <div :class="$colorMode.value">
+    <div 
+      v-if="isLoading" 
+      class="h-screen flex items-center justify-center bg-white dark:bg-slate-900 transition-colors"
+    >
       <Loading loading-text="データ取り込み中" />
     </div>
-    <div v-else class="h-screen">
+    <div v-else class="h-screen bg-white dark:bg-slate-900 transition-colors">
       <div style="position: fixed; top: 0; width: 100%; z-index: 1000">
         <Header :userData="userData" />
       </div>
