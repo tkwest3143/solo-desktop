@@ -76,6 +76,10 @@ export class WorkSettingRepository {
 
   static async getById(id: number, userId: number) {
     const workSettings = await this.getByUserId(userId);
-    return workSettings.find(ws => ws.id === id);
+    const workSetting = workSettings.find(ws => ws.id === id);
+    if (!workSetting) {
+      throw new Error(`Work setting with ID ${id} not found for user ${userId}`);
+    }
+    return workSetting;
   }
 }

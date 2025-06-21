@@ -227,13 +227,15 @@ export default defineComponent({
       
       this.user = new UserData(await UserRepository.getById(parseInt(userId)));
       
-      const workSettingRecord = await WorkSettingRepository.getById(parseInt(workSettingId), parseInt(userId));
-      if (workSettingRecord) {
+      try {
+        const workSettingRecord = await WorkSettingRepository.getById(parseInt(workSettingId), parseInt(userId));
         this.workSetting = new workSettingData(workSettingRecord);
         this.populateForm();
-      } else {
+      } catch (error) {
+        console.error('Work setting not found:', error);
         // Work setting not found, redirect back
         this.$router.back();
+        return;
       }
       
       this.isLoading = false;
@@ -293,8 +295,11 @@ export default defineComponent({
         this.originalForm = { ...this.form };
         this.hasChanges = false;
         
-        // Navigate back to list
-        this.$router.back();
+        // Navigate back to work setting list
+        this.$router.push({
+          name: 'id-settings-workSetting',
+          params: { id: this.user.prop.id }
+        });
       } catch (error) {
         console.error('Failed to update work setting:', error);
       } finally {
