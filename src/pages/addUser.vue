@@ -56,22 +56,42 @@
           </button>
         </div>
       </form>
+      <CustomDialog
+        :show="dialog.show"
+        :title="dialog.title"
+        :message="dialog.message"
+        :type="dialog.type"
+        :okText="dialog.okText"
+        @ok="onDialogOk"
+        @cancel="onDialogCancel"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import CommonInput from "~/components/CommonInput.vue";
+import CustomDialog from "~/components/todo/CustomDialog.vue";
 import { UserRepository } from "~/repositories/tauri-commands/user";
 
 export default {
   components: {
     CommonInput,
+    CustomDialog,
   },
   data() {
     return {
       name: "",
       email: "",
+      dialog: {
+        show: false,
+        title: "",
+        message: "",
+        type: "confirm",
+        okText: "追加する",
+        resolve: null as null | ((result: boolean) => void),
+        userId: null as null | number,
+      },
     };
   },
   methods: {
@@ -82,7 +102,38 @@ export default {
       });
       this.name = "";
       this.email = "";
-      this.$router.push("/");
+      // ユーザー追加後に勤務設定追加を促す
+      this.dialog = {
+        show: true,
+        title: "ユーザー追加完了",
+        message: "続けて勤務設定を追加しますか？",
+        type: "confirm",
+        okText: "勤務設定を追加",
+        resolve: async (result: boolean) => {
+          if (result) {
+            // 追加直後のユーザーを取得（最も新しいユーザーを利用）
+            const users = await UserRepository.getAll();
+            const lastUser = users[users.length - 1];
+            if (lastUser && lastUser.id) {
+              this.$router.push({
+                name: "id-settings-workSetting-add",
+                params: { id: lastUser.id },
+              });
+              return;
+            }
+          }
+          this.$router.push("/");
+        },
+        userId: null,
+      };
+    },
+    onDialogOk() {
+      if (this.dialog.resolve) this.dialog.resolve(true);
+      this.dialog.show = false;
+    },
+    onDialogCancel() {
+      if (this.dialog.resolve) this.dialog.resolve(false);
+      this.dialog.show = false;
     },
     cancel() {
       this.$router.push("/");

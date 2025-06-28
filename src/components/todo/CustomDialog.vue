@@ -21,7 +21,7 @@
         <button
           @click="$emit('ok')"
           :class="
-            type === 'alert'
+            type !== 'alert'
               ? 'bg-blue-500 hover:bg-blue-600 text-white'
               : 'bg-red-500 hover:bg-red-600 text-white'
           "
