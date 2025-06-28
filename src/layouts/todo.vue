@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="flex bg-gradient-to-br from-slate-50 to-blue-50"
-    style="height: calc(100vh - 60px)"
-  >
+  <div class="flex bg-gradient-to-br from-slate-50 to-blue-50">
     <!-- Left Sidebar -->
     <div
       class="w-80 bg-white shadow-xl border-r border-slate-200 flex flex-col fixed left-0"
