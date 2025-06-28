@@ -3,7 +3,7 @@
     <!-- Left Sidebar -->
     <div
       class="w-80 bg-white shadow-xl border-r border-slate-200 flex flex-col fixed left-0"
-      style="top: 60px; height: calc(100vh - 60px); z-index: 900"
+      style="top: 60px; height: calc(100vh - 60px)"
     >
       <!-- Sidebar Header -->
       <div class="p-6 border-b border-slate-200">

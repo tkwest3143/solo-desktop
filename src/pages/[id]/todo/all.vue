@@ -209,6 +209,15 @@
       @edit="editTask"
       @delete="deleteTodo"
     />
+    <CustomDialog
+      :show="dialog.show"
+      :title="dialog.title"
+      :message="dialog.message"
+      :type="dialog.type"
+      :okText="dialog.okText"
+      @ok="onDialogOk"
+      @cancel="onDialogCancel"
+    />
   </div>
 </template>
 
@@ -216,6 +225,7 @@
 import { defineComponent } from "vue";
 import CustomSelect from "~/components/CustomSelect.vue";
 import TaskDetailDialog from "~/components/TaskDetailDialog.vue";
+import CustomDialog from "~/components/todo/CustomDialog.vue";
 import { createIcsFileFromTodoItems } from "~/functions/todo";
 import type { TodoCategory, TodoItem } from "~/models/todo";
 import { TodoCategoryRepository } from "~/repositories/tauri-commands/todoCategory";
@@ -229,6 +239,7 @@ export default defineComponent({
   components: {
     TaskDetailDialog,
     CustomSelect,
+    CustomDialog,
   },
   data() {
     return {
@@ -244,6 +255,15 @@ export default defineComponent({
         todo: null as TodoItem | null,
         category: null as TodoCategory | null,
       },
+      dialog: {
+        show: false,
+        title: "",
+        message: "",
+        type: "alert", // 'alert' or 'confirm'
+        okText: "OK",
+        resolve: null as null | ((result: boolean) => void),
+      },
+      dialogAction: null as null | (() => void),
     };
   },
   computed: {
@@ -381,25 +401,56 @@ export default defineComponent({
       const category = this.categories.find((c) => c.id === categoryId);
       return category?.name || "";
     },
+    showAlert(message: string, title = "お知らせ", okText = "OK") {
+      return new Promise<void>((resolve) => {
+        this.dialog = {
+          show: true,
+          title,
+          message,
+          type: "alert",
+          okText,
+          resolve: () => resolve(),
+        };
+      });
+    },
+    showConfirm(message: string, title = "確認", okText = "OK") {
+      return new Promise<boolean>((resolve) => {
+        this.dialog = {
+          show: true,
+          title,
+          message,
+          type: "confirm",
+          okText,
+          resolve,
+        };
+      });
+    },
+    onDialogOk() {
+      if (this.dialog.resolve) this.dialog.resolve(true);
+      this.dialog.show = false;
+    },
+    onDialogCancel() {
+      if (this.dialog.resolve) this.dialog.resolve(false);
+      this.dialog.show = false;
+    },
     async deleteTodo(idOrTodo: number | TodoItem) {
       const id = typeof idOrTodo === "number" ? idOrTodo : idOrTodo.id;
-
-      if (!confirm("このタスクを削除しますか？")) {
-        return;
-      }
-
+      const confirmed = await this.showConfirm(
+        "このタスクを削除しますか？",
+        "削除の確認",
+        "削除"
+      );
+      if (!confirmed) return;
       try {
         await TodoItemRepository.deleteTodoItem(id);
-        // Remove from local array
         this.todos = this.todos.filter((todo) => todo.id !== id);
-        alert("タスクが削除されました");
-        // Close detail dialog if it was open for this todo
+        await this.showAlert("タスクが削除されました");
         if (this.taskDetailDialog.todo?.id === id) {
           this.closeTaskDetail();
         }
       } catch (error) {
         console.error("Failed to delete todo:", error);
-        alert("タスクの削除に失敗しました");
+        await this.showAlert("タスクの削除に失敗しました");
       }
     },
     showTaskDetail(todo: TodoItem) {
@@ -447,7 +498,7 @@ export default defineComponent({
         }
       } catch (error) {
         console.error("Failed to toggle todo status:", error);
-        alert("ステータスの更新に失敗しました");
+        await this.showAlert("ステータスの更新に失敗しました");
       }
     },
     async completeTodo(todo: TodoItem) {
@@ -474,7 +525,7 @@ export default defineComponent({
         }
       } catch (error) {
         console.error("Failed to complete todo:", error);
-        alert("タスクの完了に失敗しました");
+        await this.showAlert("タスクの完了に失敗しました");
       }
     },
     getPriorityLabel(priority?: string): string {
@@ -504,9 +555,11 @@ export default defineComponent({
         const fileName = `todos_${new Date().toISOString().slice(0, 10)}.ics`;
 
         createIcsFileFromTodoItems(this.filteredTodos, fileName);
-        alert("ICSファイルをダウンロードディレクトリに保存しました");
+        await this.showAlert(
+          "ICSファイルをダウンロードディレクトリに保存しました"
+        );
       } catch (e) {
-        alert("ICSファイルのエクスポートに失敗しました");
+        await this.showAlert("ICSファイルのエクスポートに失敗しました");
         console.error(e);
       }
     },
