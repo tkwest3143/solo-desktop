@@ -13,8 +13,8 @@
       @click="handleBackdropClick"
     >
       <!-- Backdrop -->
-      <div 
-        class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" 
+      <div
+        class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
         aria-hidden="true"
       ></div>
 
@@ -34,10 +34,12 @@
             @click.stop
           >
             <!-- Header -->
-            <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+            <div
+              class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white"
+            >
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                  <div 
+                  <div
                     v-if="todo.color"
                     class="w-4 h-4 rounded-full border-2 border-white shadow-sm"
                     :style="{ backgroundColor: todo.color }"
@@ -60,9 +62,11 @@
               <!-- Title -->
               <div class="mb-6">
                 <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-2xl font-bold text-slate-800">{{ todo.title }}</h3>
+                  <h3 class="text-2xl font-bold text-slate-800">
+                    {{ todo.title }}
+                  </h3>
                   <div class="flex items-center space-x-2">
-                    <span 
+                    <span
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                       :class="getPriorityClass(todo.priority)"
                     >
@@ -74,11 +78,18 @@
 
               <!-- Description -->
               <div v-if="todo.content" class="mb-6">
-                <h4 class="text-sm font-semibold text-slate-700 mb-2 flex items-center">
-                  <Icon name="fluent:text-description-20-filled" class="mr-2 text-slate-500" />
+                <h4
+                  class="text-sm font-semibold text-slate-700 mb-2 flex items-center"
+                >
+                  <Icon
+                    name="fluent:text-description-20-filled"
+                    class="mr-2 text-slate-500"
+                  />
                   詳細説明
                 </h4>
-                <div class="bg-slate-50 rounded-lg p-4 text-slate-700 whitespace-pre-wrap">
+                <div
+                  class="bg-slate-50 rounded-lg p-4 text-slate-700 whitespace-pre-wrap"
+                >
                   {{ todo.content }}
                 </div>
               </div>
@@ -86,57 +97,89 @@
               <!-- Metadata Grid -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <!-- Due Date -->
-                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
-                  <h4 class="text-sm font-semibold text-blue-800 mb-2 flex items-center">
+                <div
+                  class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4"
+                >
+                  <h4
+                    class="text-sm font-semibold text-blue-800 mb-2 flex items-center"
+                  >
                     <Icon name="fluent:calendar-20-filled" class="mr-2" />
                     期限
                   </h4>
                   <div class="text-blue-900">
-                    <div class="text-lg font-medium">{{ formatDueDate(todo.due_date) }}</div>
-                    <div class="text-sm opacity-75">{{ getRelativeDate(todo.due_date) }}</div>
+                    <div class="text-lg font-medium">
+                      {{ formatDueDate(todo.due_date) }}
+                    </div>
+                    <div class="text-sm opacity-75">
+                      {{ getRelativeDate(todo.due_date) }}
+                    </div>
                   </div>
                 </div>
 
                 <!-- Category -->
-                <div v-if="category" class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
-                  <h4 class="text-sm font-semibold text-green-800 mb-2 flex items-center">
+                <div
+                  v-if="category"
+                  class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4"
+                >
+                  <h4
+                    class="text-sm font-semibold text-green-800 mb-2 flex items-center"
+                  >
                     <Icon name="fluent:folder-20-filled" class="mr-2" />
                     カテゴリ
                   </h4>
                   <div class="flex items-center space-x-2">
-                    <div 
+                    <div
                       v-if="category.color"
                       class="w-3 h-3 rounded-full border border-green-300"
                       :style="{ backgroundColor: category.color }"
                     ></div>
-                    <span class="text-green-900 font-medium">{{ category.name }}</span>
+                    <span class="text-green-900 font-medium">{{
+                      category.name
+                    }}</span>
                   </div>
                 </div>
               </div>
 
               <!-- Timestamps -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
-                  <h4 class="text-sm font-semibold text-purple-800 mb-2 flex items-center">
+                <div
+                  class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4"
+                >
+                  <h4
+                    class="text-sm font-semibold text-purple-800 mb-2 flex items-center"
+                  >
                     <Icon name="fluent:calendar-add-20-filled" class="mr-2" />
                     作成日時
                   </h4>
-                  <div class="text-purple-900 text-sm">{{ formatDateTime(todo.created_at) }}</div>
+                  <div class="text-purple-900 text-sm">
+                    {{ formatDateTime(todo.created_at) }}
+                  </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4">
-                  <h4 class="text-sm font-semibold text-orange-800 mb-2 flex items-center">
+                <div
+                  class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4"
+                >
+                  <h4
+                    class="text-sm font-semibold text-orange-800 mb-2 flex items-center"
+                  >
                     <Icon name="fluent:calendar-edit-20-filled" class="mr-2" />
                     更新日時
                   </h4>
-                  <div class="text-orange-900 text-sm">{{ formatDateTime(todo.updated_at) }}</div>
+                  <div class="text-orange-900 text-sm">
+                    {{ formatDateTime(todo.updated_at) }}
+                  </div>
                 </div>
               </div>
 
               <!-- Link -->
               <div v-if="todo.link" class="mb-6">
-                <h4 class="text-sm font-semibold text-slate-700 mb-2 flex items-center">
-                  <Icon name="fluent:link-20-filled" class="mr-2 text-slate-500" />
+                <h4
+                  class="text-sm font-semibold text-slate-700 mb-2 flex items-center"
+                >
+                  <Icon
+                    name="fluent:link-20-filled"
+                    class="mr-2 text-slate-500"
+                  />
                   関連リンク
                 </h4>
                 <a
@@ -152,7 +195,9 @@
             </div>
 
             <!-- Actions -->
-            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+            <div
+              class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center"
+            >
               <div class="flex space-x-3">
                 <button
                   @click="editTodo"
@@ -167,6 +212,13 @@
                 >
                   <Icon name="fluent:delete-20-filled" class="mr-2" />
                   削除
+                </button>
+                <button
+                  @click="openGoogleCalendar"
+                  class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors shadow-sm"
+                >
+                  <Icon name="fluent:calendar-20-filled" class="mr-2" />
+                  Googleカレンダーに連携
                 </button>
               </div>
               <button
@@ -184,100 +236,112 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue'
-import type { TodoItem, TodoCategory } from '~/models/todo'
+import { openUrl } from "@tauri-apps/plugin-opener";
+import { defineComponent, type PropType } from "vue";
+import type { TodoCategory, TodoItem } from "~/models/todo";
+import { TodoItemRepository } from "~/repositories/tauri-commands/todoItem";
 
 export default defineComponent({
-  name: 'TaskDetailDialog',
+  name: "TaskDetailDialog",
   props: {
     show: {
       type: Boolean,
-      default: false
+      default: false,
     },
     todo: {
       type: Object as PropType<TodoItem>,
-      required: true
+      required: true,
     },
     category: {
       type: Object as PropType<TodoCategory | null>,
-      default: null
-    }
+      default: null,
+    },
   },
-  emits: ['close', 'edit', 'delete'],
+  emits: ["close", "edit", "delete"],
   methods: {
     close() {
-      this.$emit('close')
+      this.$emit("close");
     },
     editTodo() {
-      this.$emit('edit', this.todo)
+      this.$emit("edit", this.todo);
     },
     deleteTodo() {
-      this.$emit('delete', this.todo)
+      this.$emit("delete", this.todo);
     },
     handleBackdropClick(event: Event) {
       if (event.target === event.currentTarget) {
-        this.close()
+        this.close();
       }
+    },
+    async openGoogleCalendar() {
+      const url = TodoItemRepository.getGoogleCalendarUrl(this.todo);
+      await openUrl(url);
     },
     formatDueDate(dateString: string): string {
       try {
-        const date = new Date(dateString)
-        return date.toLocaleDateString('ja-JP', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          weekday: 'short'
-        })
+        const date = new Date(dateString);
+        return date.toLocaleDateString("ja-JP", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          weekday: "short",
+        });
       } catch {
-        return dateString
+        return dateString;
       }
     },
     formatDateTime(dateString: string): string {
       try {
-        const date = new Date(dateString)
-        return date.toLocaleString('ja-JP', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
+        const date = new Date(dateString);
+        return date.toLocaleString("ja-JP", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
       } catch {
-        return dateString
+        return dateString;
       }
     },
     getRelativeDate(dateString: string): string {
       try {
-        const date = new Date(dateString)
-        const today = new Date()
-        const diffTime = date.getTime() - today.getTime()
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-        
-        if (diffDays === 0) return '今日'
-        if (diffDays === 1) return '明日'
-        if (diffDays === -1) return '昨日'
-        if (diffDays > 0) return `${diffDays}日後`
-        return `${Math.abs(diffDays)}日前`
+        const date = new Date(dateString);
+        const today = new Date();
+        const diffTime = date.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) return "今日";
+        if (diffDays === 1) return "明日";
+        if (diffDays === -1) return "昨日";
+        if (diffDays > 0) return `${diffDays}日後`;
+        return `${Math.abs(diffDays)}日前`;
       } catch {
-        return ''
+        return "";
       }
     },
     getPriorityLabel(priority?: string): string {
       switch (priority) {
-        case 'high': return '高優先度'
-        case 'low': return '低優先度'
-        default: return '通常'
+        case "high":
+          return "高優先度";
+        case "low":
+          return "低優先度";
+        default:
+          return "通常";
       }
     },
     getPriorityClass(priority?: string): string {
       switch (priority) {
-        case 'high': return 'bg-red-100 text-red-800'
-        case 'low': return 'bg-gray-100 text-gray-800'
-        default: return 'bg-blue-100 text-blue-800'
+        case "high":
+          return "bg-red-100 text-red-800";
+        case "low":
+          return "bg-gray-100 text-gray-800";
+        default:
+          return "bg-blue-100 text-blue-800";
       }
-    }
-  }
-})
+    },
+  },
+});
 </script>
 
 <style scoped>
