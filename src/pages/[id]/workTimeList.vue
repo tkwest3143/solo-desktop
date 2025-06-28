@@ -10,16 +10,26 @@
               @click="previousMonth"
               class="p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200"
             >
-              <Icon name="fluent:arrow-left-20-filled" size="1.2em" class="text-slate-600" />
+              <Icon
+                name="fluent:arrow-left-20-filled"
+                size="1.2em"
+                class="text-slate-600"
+              />
             </button>
             <button
               @click="nextMonth"
               class="p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200"
             >
-              <Icon name="fluent:arrow-right-20-filled" size="1.2em" class="text-slate-600" />
+              <Icon
+                name="fluent:arrow-right-20-filled"
+                size="1.2em"
+                class="text-slate-600"
+              />
             </button>
             <h1 class="text-2xl font-bold text-slate-800">
-              {{ selectedMonth.yearText }}年{{ selectedMonth.monthText }}月の勤務時間
+              {{ selectedMonth.yearText }}年{{
+                selectedMonth.monthText
+              }}月の勤務時間
             </h1>
             <button
               @click="thisMonth"
@@ -36,10 +46,14 @@
       <!-- Work Settings Card -->
       <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
         <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-          <Icon name="fluent:briefcase-settings-20-filled" class="mr-2 text-blue-600" size="1.3em" />
+          <Icon
+            name="fluent:briefcase-settings-20-filled"
+            class="mr-2 text-blue-600"
+            size="1.3em"
+          />
           勤務設定
         </h2>
-        
+
         <div class="flex items-center space-x-4 mb-4">
           <div class="flex-1">
             <CommonSelect
@@ -75,26 +89,38 @@
         </div>
 
         <!-- Work Settings Details -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-4 bg-slate-50 rounded-lg">
+        <div
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-4 bg-slate-50 rounded-lg"
+        >
           <div class="text-center">
             <div class="text-xs text-slate-500 mb-1">開始時間</div>
-            <div class="font-semibold text-slate-800">{{ getSelectedWorkSetting()?.startByText ?? "-" }}</div>
+            <div class="font-semibold text-slate-800">
+              {{ getSelectedWorkSetting()?.startByText ?? "-" }}
+            </div>
           </div>
           <div class="text-center">
             <div class="text-xs text-slate-500 mb-1">終了時間</div>
-            <div class="font-semibold text-slate-800">{{ getSelectedWorkSetting()?.endByText ?? "-" }}</div>
+            <div class="font-semibold text-slate-800">
+              {{ getSelectedWorkSetting()?.endByText ?? "-" }}
+            </div>
           </div>
           <div class="text-center">
             <div class="text-xs text-slate-500 mb-1">休憩開始</div>
-            <div class="font-semibold text-slate-800">{{ getSelectedWorkSetting()?.restStartByText ?? "-" }}</div>
+            <div class="font-semibold text-slate-800">
+              {{ getSelectedWorkSetting()?.restStartByText ?? "-" }}
+            </div>
           </div>
           <div class="text-center">
             <div class="text-xs text-slate-500 mb-1">休憩終了</div>
-            <div class="font-semibold text-slate-800">{{ getSelectedWorkSetting()?.restEndByText ?? "-" }}</div>
+            <div class="font-semibold text-slate-800">
+              {{ getSelectedWorkSetting()?.restEndByText ?? "-" }}
+            </div>
           </div>
           <div class="text-center">
             <div class="text-xs text-slate-500 mb-1">時間単位</div>
-            <div class="font-semibold text-slate-800">{{ getSelectedWorkSetting()?.prop.working_unit ?? "-" }}分</div>
+            <div class="font-semibold text-slate-800">
+              {{ getSelectedWorkSetting()?.prop.working_unit ?? "-" }}分
+            </div>
           </div>
         </div>
       </div>
@@ -108,7 +134,11 @@
               @click="setAllDefaultWorkTime"
               class="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg disabled:cursor-not-allowed text-sm font-medium"
             >
-              <Icon name="fluent:magic-wand-20-filled" class="mr-2" size="1em" />
+              <Icon
+                name="fluent:magic-wand-20-filled"
+                class="mr-2"
+                size="1em"
+              />
               未入力を自動登録
             </button>
             <ExportFileDialog
@@ -118,29 +148,71 @@
               @download="downloadWorkTime"
             />
           </div>
-          <div class="flex items-center space-x-2 bg-gradient-to-r from-green-50 to-green-100 px-4 py-2 rounded-lg">
-            <Icon name="fluent:clock-20-filled" class="text-green-600" size="1.2em" />
-            <span class="text-sm font-medium text-green-700">今月の勤務時間:</span>
-            <span class="text-lg font-bold text-green-800">{{ totalWorkTime() }}</span>
+          <div
+            class="flex items-center space-x-2 bg-gradient-to-r from-green-50 to-green-100 px-4 py-2 rounded-lg"
+          >
+            <Icon
+              name="fluent:clock-20-filled"
+              class="text-green-600"
+              size="1.2em"
+            />
+            <span class="text-sm font-medium text-green-700"
+              >今月の勤務時間:</span
+            >
+            <span class="text-lg font-bold text-green-800">{{
+              totalWorkTime()
+            }}</span>
           </div>
         </div>
       </div>
       <!-- Work Time Table -->
-      <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+      <div
+        class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden"
+      >
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
               <tr>
-                <th scope="col" class="w-12 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  class="w-12 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider"
+                ></th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider"
+                >
+                  日付
                 </th>
-                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">日付</th>
-                <th scope="col" class="w-20 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  class="w-20 px-2 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider"
+                >
                   稼働/非稼働
                 </th>
-                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">勤務時間</th>
-                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">休憩時間</th>
-                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">業務時間</th>
-                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">備考</th>
+                <th
+                  scope="col"
+                  class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider"
+                >
+                  勤務時間
+                </th>
+                <th
+                  scope="col"
+                  class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider"
+                >
+                  休憩時間
+                </th>
+                <th
+                  scope="col"
+                  class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider"
+                >
+                  業務時間
+                </th>
+                <th
+                  scope="col"
+                  class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider"
+                >
+                  備考
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
@@ -159,29 +231,34 @@
                     <Icon name="fluent:magic-wand-20-filled" size="1em" />
                   </button>
                 </td>
-                <td 
+                <td
                   class="px-6 py-3 text-center text-sm font-medium"
                   :class="{
-                    'text-red-600': workTime.isHoliday(japaneseHolidays) || workTime.isSunday(),
+                    'text-red-600':
+                      workTime.isHoliday(japaneseHolidays) ||
+                      workTime.isSunday(),
                     'text-blue-600': workTime.isSaturday(),
-                    'text-slate-900': !workTime.isHoliday(japaneseHolidays) && !workTime.isSaturday() && !workTime.isSunday(),
+                    'text-slate-900':
+                      !workTime.isHoliday(japaneseHolidays) &&
+                      !workTime.isSaturday() &&
+                      !workTime.isSunday(),
                   }"
                 >
                   {{ workTime.getDayTextWithWeek(japaneseHolidays) }}
                 </td>
                 <td class="px-2 py-3 text-center">
                   <div class="flex justify-center">
-                    <Icon 
+                    <Icon
                       v-if="workTime.workDurationByMinute !== 0"
-                      name="fluent:checkmark-circle-20-filled" 
-                      class="text-green-600" 
+                      name="fluent:checkmark-circle-20-filled"
+                      class="text-green-600"
                       size="1.5em"
                       title="稼働"
                     />
-                    <Icon 
+                    <Icon
                       v-else
-                      name="fluent:subtract-circle-20-filled" 
-                      class="text-slate-400" 
+                      name="fluent:subtract-circle-20-filled"
+                      class="text-slate-400"
                       size="1.5em"
                       title="非稼働"
                     />
@@ -191,15 +268,22 @@
                   @click="openEditDialog(workTime)"
                   class="px-4 py-3 text-center text-sm text-slate-900 cursor-pointer hover:bg-blue-50 transition-colors"
                 >
-                  <div class="text-xs text-slate-500">{{ workTime.startByText }} - {{ workTime.endByText }}</div>
+                  <div class="text-xs text-slate-500">
+                    {{ workTime.startByText }} - {{ workTime.endByText }}
+                  </div>
                 </td>
                 <td
                   @click="openEditDialog(workTime)"
                   class="px-4 py-3 text-center text-sm text-slate-900 cursor-pointer hover:bg-blue-50 transition-colors"
                 >
                   <div class="space-y-1">
-                    <div class="text-xs text-slate-500">{{ workTime.restStartByText }} - {{ workTime.restEndByText }}</div>
-                    <div class="text-sm font-medium">{{ workTime.restDurationByText ?? "00:00" }}</div>
+                    <div class="text-xs text-slate-500">
+                      {{ workTime.restStartByText }} -
+                      {{ workTime.restEndByText }}
+                    </div>
+                    <div class="text-sm font-medium">
+                      {{ workTime.restDurationByText ?? "00:00" }}
+                    </div>
                   </div>
                 </td>
                 <td
@@ -207,14 +291,10 @@
                 >
                   {{ workTime.workDurationByText ?? "00:00" }}
                 </td>
-                <td class="px-4 py-3 text-center text-sm text-slate-900 max-w-32">
+                <td
+                  class="px-4 py-3 text-center text-sm text-slate-900 max-w-32"
+                >
                   <div class="flex items-center justify-center space-x-2">
-                    <div 
-                      @click="openEditDialog(workTime)"
-                      class="truncate cursor-pointer hover:bg-blue-50 transition-colors px-2 py-1 rounded flex-1"
-                    >
-                      {{ workTime.memo || '-' }}
-                    </div>
                     <button
                       @click="showMemoDialog(workTime)"
                       class="p-1 bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
@@ -238,8 +318,14 @@
     >
       <div class="container mx-auto flex justify-between items-center">
         <div class="flex items-center space-x-2">
-          <Icon name="fluent:edit-20-filled" class="text-blue-600" size="1.2em" />
-          <span class="text-slate-700 font-medium">{{ changedWorkTimes.length }}件の変更があります</span>
+          <Icon
+            name="fluent:edit-20-filled"
+            class="text-blue-600"
+            size="1.2em"
+          />
+          <span class="text-slate-700 font-medium"
+            >{{ changedWorkTimes.length }}件の変更があります</span
+          >
         </div>
         <div class="flex space-x-3">
           <button
@@ -283,9 +369,9 @@
 import { format } from "date-fns";
 import { defineComponent } from "vue";
 import CommonSelect from "~/components/CommonSelect.vue";
+import EditWorkTimeDialog from "~/components/EditWorkTimeDialog.vue";
 import Loading from "~/components/Loading.vue";
 import MemoDialog from "~/components/MemoDialog.vue";
-import EditWorkTimeDialog from "~/components/EditWorkTimeDialog.vue";
 import ExportFileDialog from "~/components/worktime/ExportFileDialog.vue";
 import { JapaneseHolidayData } from "~/models/japaneseHoliday";
 import { MonthForWork } from "~/models/monthForWork";
@@ -318,17 +404,17 @@ export default defineComponent({
       selectedWorkSettingId: 0,
       japaneseHolidays: [] as JapaneseHolidayData[],
       showMemo: false,
-      selectedMemo: '',
-      selectedMemoDate: '',
+      selectedMemo: "",
+      selectedMemoDate: "",
       showEditDialog: false,
       editDialogWorkTime: {
-        start: '',
-        end: '',
-        restStart: '',
-        restEnd: '',
-        memo: ''
+        start: "",
+        end: "",
+        restStart: "",
+        restEnd: "",
+        memo: "",
       },
-      editDialogDate: '',
+      editDialogDate: "",
       currentEditingWorkTime: null as workTimeData | null,
     };
   },
@@ -556,14 +642,16 @@ export default defineComponent({
       });
     },
     showMemoDialog(workTime: workTimeData) {
-      this.selectedMemo = workTime.memo || '';
-      this.selectedMemoDate = workTime.getDayTextWithWeek(this.japaneseHolidays);
+      this.selectedMemo = workTime.memo || "";
+      this.selectedMemoDate = workTime.getDayTextWithWeek(
+        this.japaneseHolidays
+      );
       this.showMemo = true;
     },
     closeMemoDialog() {
       this.showMemo = false;
-      this.selectedMemo = '';
-      this.selectedMemoDate = '';
+      this.selectedMemo = "";
+      this.selectedMemoDate = "";
     },
     openEditDialog(workTime: workTimeData) {
       this.currentEditingWorkTime = workTime;
@@ -572,7 +660,7 @@ export default defineComponent({
         end: workTime.endByText,
         restStart: workTime.restStartByText,
         restEnd: workTime.restEndByText,
-        memo: workTime.memo || ''
+        memo: workTime.memo || "",
       };
       this.editDialogDate = workTime.getDayTextWithWeek(this.japaneseHolidays);
       this.showEditDialog = true;
@@ -588,7 +676,7 @@ export default defineComponent({
           end: editedData.end,
           restStart: editedData.restStart,
           restEnd: editedData.restEnd,
-          memo: editedData.memo
+          memo: editedData.memo,
         });
       }
       this.closeEditDialog();

@@ -12,8 +12,12 @@
             <p class="text-slate-600">今日も1日お疲れ様です</p>
           </div>
           <div class="text-right">
-            <div class="text-2xl font-bold text-slate-800">{{ currentTime }}</div>
-            <div class="text-sm text-slate-600">{{ currentDate }} {{ currentDay }}</div>
+            <div class="text-2xl font-bold text-slate-800">
+              {{ currentTime }}
+            </div>
+            <div class="text-sm text-slate-600">
+              {{ currentDate }} {{ currentDay }}
+            </div>
           </div>
         </div>
       </div>
@@ -25,17 +29,36 @@
         <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
           <div class="flex items-center justify-center mb-4">
             <div class="flex items-center space-x-3">
-              <div v-if="!isWorking() && !isResting()" class="flex items-center space-x-2">
-                <Icon name="fluent:sleep-20-filled" class="text-slate-400" size="2.5em" />
-                <span class="text-2xl font-semibold text-slate-600">未出勤</span>
+              <div
+                v-if="!isWorking() && !isResting()"
+                class="flex items-center space-x-2"
+              >
+                <Icon
+                  name="fluent:sleep-20-filled"
+                  class="text-slate-400"
+                  size="2.5em"
+                />
+                <span class="text-2xl font-semibold text-slate-600"
+                  >未出勤</span
+                >
               </div>
               <div v-else-if="isWorking()" class="flex items-center space-x-2">
-                <Icon name="fluent:people-team-20-filled" class="text-blue-500" size="2.5em" />
+                <Icon
+                  name="fluent:people-team-20-filled"
+                  class="text-blue-500"
+                  size="2.5em"
+                />
                 <span class="text-2xl font-semibold text-blue-600">勤務中</span>
               </div>
               <div v-else-if="isResting()" class="flex items-center space-x-2">
-                <Icon name="fluent:drink-coffee-20-filled" class="text-orange-500" size="2.5em" />
-                <span class="text-2xl font-semibold text-orange-600">休憩中</span>
+                <Icon
+                  name="fluent:drink-coffee-20-filled"
+                  class="text-orange-500"
+                  size="2.5em"
+                />
+                <span class="text-2xl font-semibold text-orange-600"
+                  >休憩中</span
+                >
               </div>
             </div>
           </div>
@@ -51,7 +74,9 @@
           class="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:cursor-not-allowed"
         >
           <div class="flex flex-col items-center space-y-3">
-            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+            <div
+              class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center"
+            >
               <Icon name="fluent:clock-arrow-download-20-filled" size="1.5em" />
             </div>
             <span class="font-semibold">出勤</span>
@@ -65,7 +90,9 @@
           class="bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:cursor-not-allowed"
         >
           <div class="flex flex-col items-center space-y-3">
-            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+            <div
+              class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center"
+            >
               <Icon name="fluent:arrow-right-20-filled" size="1.5em" />
             </div>
             <span class="font-semibold">退勤</span>
@@ -79,7 +106,9 @@
           class="bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:cursor-not-allowed"
         >
           <div class="flex flex-col items-center space-y-3">
-            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+            <div
+              class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center"
+            >
               <Icon name="fluent:drink-coffee-20-filled" size="1.5em" />
             </div>
             <span class="font-semibold">休憩開始</span>
@@ -93,7 +122,9 @@
           class="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:transform-none disabled:cursor-not-allowed"
         >
           <div class="flex flex-col items-center space-y-3">
-            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+            <div
+              class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center"
+            >
               <Icon name="fluent:briefcase-20-filled" size="1.5em" />
             </div>
             <span class="font-semibold">休憩終了</span>
@@ -103,13 +134,19 @@
 
       <!-- Quick Navigation -->
       <div class="mt-8">
-        <h2 class="text-xl font-semibold text-slate-800 mb-4">クイックアクセス</h2>
+        <h2 class="text-xl font-semibold text-slate-800 mb-4">
+          クイックアクセス
+        </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <NuxtLink
             :to="{ name: 'id-workTimeList', params: { id: user?.prop.id } }"
             class="bg-white border-2 border-slate-200 hover:border-blue-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
           >
-            <Icon name="fluent:clock-20-filled" size="2em" class="text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
+            <Icon
+              name="fluent:clock-20-filled"
+              size="2em"
+              class="text-blue-500 mb-2 group-hover:scale-110 transition-transform"
+            />
             <h3 class="font-semibold text-slate-800">勤怠一覧</h3>
             <p class="text-sm text-slate-600">勤務記録を確認</p>
           </NuxtLink>
@@ -118,7 +155,11 @@
             :to="{ name: 'id-report', params: { id: user?.prop.id } }"
             class="bg-white border-2 border-slate-200 hover:border-green-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
           >
-            <Icon name="fluent:document-data-20-filled" size="2em" class="text-green-500 mb-2 group-hover:scale-110 transition-transform" />
+            <Icon
+              name="fluent:document-data-20-filled"
+              size="2em"
+              class="text-green-500 mb-2 group-hover:scale-110 transition-transform"
+            />
             <h3 class="font-semibold text-slate-800">レポート</h3>
             <p class="text-sm text-slate-600">勤務データ分析</p>
           </NuxtLink>
@@ -127,7 +168,11 @@
             :to="{ name: 'id-todo', params: { id: user?.prop.id } }"
             class="bg-white border-2 border-slate-200 hover:border-purple-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
           >
-            <Icon name="fluent:task-list-square-20-filled" size="2em" class="text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
+            <Icon
+              name="fluent:task-list-square-20-filled"
+              size="2em"
+              class="text-purple-500 mb-2 group-hover:scale-110 transition-transform"
+            />
             <h3 class="font-semibold text-slate-800">Todo管理</h3>
             <p class="text-sm text-slate-600">タスクを管理</p>
           </NuxtLink>
@@ -136,7 +181,11 @@
             :to="{ name: 'id-settings', params: { id: user?.prop.id } }"
             class="bg-white border-2 border-slate-200 hover:border-slate-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
           >
-            <Icon name="fluent:settings-20-filled" size="2em" class="text-slate-500 mb-2 group-hover:scale-110 transition-transform" />
+            <Icon
+              name="fluent:settings-20-filled"
+              size="2em"
+              class="text-slate-500 mb-2 group-hover:scale-110 transition-transform"
+            />
             <h3 class="font-semibold text-slate-800">設定</h3>
             <p class="text-sm text-slate-600">アプリ設定</p>
           </NuxtLink>
