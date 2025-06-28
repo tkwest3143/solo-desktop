@@ -1,5 +1,5 @@
 <template>
-  <div class="time-input-container">
+  <div class="time-input-container w-full">
     <div
       class="flex items-center space-x-2 bg-white border border-slate-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all duration-200"
     >
@@ -358,10 +358,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.time-input-container {
-  @apply w-full;
-}
-
 /* Custom scrollbar for quick picker */
 .overflow-y-auto::-webkit-scrollbar {
   width: 4px;

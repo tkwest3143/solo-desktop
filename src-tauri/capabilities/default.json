@@ -6,25 +6,43 @@
   "permissions": [
     "core:default",
     "opener:default",
+    "opener:allow-default-urls",
+    "opener:allow-open-path",
     "log:default",
     "fs:default",
     "core:window:allow-set-size",
     "core:window:allow-set-position",
     {
       "identifier": "fs:allow-exists",
-      "allow": [{ "path": "$DOWNLOAD/*" }]
+      "allow": [
+        {
+          "path": "$DOWNLOAD/*"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-app-read-recursive",
-      "allow": [{ "path": "$DOWNLOAD/*" }]
+      "allow": [
+        {
+          "path": "$DOWNLOAD/*"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-app-write-recursive",
-      "allow": [{ "path": "$DOWNLOAD/*" }]
+      "allow": [
+        {
+          "path": "$DOWNLOAD/*"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-write-file",
-      "allow": [{ "path": "$DOWNLOAD/*" }]
+      "allow": [
+        {
+          "path": "$DOWNLOAD/*"
+        }
+      ]
     }
   ]
 }
