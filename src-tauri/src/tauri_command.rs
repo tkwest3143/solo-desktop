@@ -93,6 +93,13 @@ pub mod user {
     users::Entity::update(user).exec(&db).await.unwrap();
     Ok("update_user finish".to_string())
   }
+
+  #[tauri::command]
+  pub async fn delete_user(id: i32) -> Result<String, String> {
+    let db = establish_connection().await.map_err(|e| e.to_string())?;
+    users::Entity::delete_by_id(id).exec(&db).await.map_err(|e| e.to_string())?;
+    Ok("delete_user finish".to_string())
+  }
 }
 
 pub mod work_times {

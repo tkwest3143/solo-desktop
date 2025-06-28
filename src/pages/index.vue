@@ -24,8 +24,15 @@
             v-for="user in users"
             :key="user.prop.id"
             @click="onClickUser(user)"
-            class="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl hover:border-blue-300 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 p-6"
+            class="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl hover:border-blue-300 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 p-6 relative"
           >
+            <button
+              @click.stop="openDeleteDialog(user)"
+              class="absolute top-3 right-3 p-2 rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-800 transition-colors shadow-sm z-10"
+              title="ユーザー削除"
+            >
+              <Icon name="fluent:delete-20-filled" size="1.2em" />
+            </button>
             <div class="text-center">
               <!-- User Avatar -->
               <div class="mb-4 flex justify-center">
@@ -83,6 +90,37 @@
       </div>
     </div>
   </main>
+
+  <template v-if="showDeleteDialog">
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+    >
+      <div class="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full">
+        <div class="mb-4 text-lg font-semibold text-slate-800">
+          ユーザー削除の確認
+        </div>
+        <div class="mb-6 text-slate-600">
+          「{{
+            userToDelete?.prop.name
+          }}」を削除しますか？<br />この操作は取り消せません。
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button
+            @click="closeDeleteDialog"
+            class="px-4 py-2 rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors"
+          >
+            キャンセル
+          </button>
+          <button
+            @click="deleteUser(userToDelete!)"
+            class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600 transition-colors"
+          >
+            削除
+          </button>
+        </div>
+      </div>
+    </div>
+  </template>
 </template>
 
 <script lang="ts">
@@ -93,6 +131,8 @@ export default {
   data() {
     return {
       users: [] as UserData[],
+      showDeleteDialog: false,
+      userToDelete: null as UserData | null,
     };
   },
   async mounted() {
@@ -109,6 +149,20 @@ export default {
     async loadUsers() {
       const users = await UserRepository.getAll();
       this.users = users.map((user: user) => new UserData(user));
+    },
+    async deleteUser(user: UserData) {
+      await UserRepository.delete(user.prop.id);
+      this.users = this.users.filter((u) => u.prop.id !== user.prop.id);
+      this.showDeleteDialog = false;
+      this.userToDelete = null;
+    },
+    openDeleteDialog(user: UserData) {
+      this.userToDelete = user;
+      this.showDeleteDialog = true;
+    },
+    closeDeleteDialog() {
+      this.showDeleteDialog = false;
+      this.userToDelete = null;
     },
   },
 };

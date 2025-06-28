@@ -38,4 +38,7 @@ export class UserRepository {
     const data = JSON.parse(res as string) as user;
     return data;
   }
+  static async delete(id: number) {
+    await invoke<String>("delete_user", { id });
+  }
 }
