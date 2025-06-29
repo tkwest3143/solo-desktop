@@ -9,8 +9,8 @@
     class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50 overflow-auto"
     v-if="isShow"
   >
-    <div class="bg-white p-6 rounded shadow-lg w-4/5 mt-10">
-      <div class="form-group mb-4 border rounded p-4">
+    <div class="bg-white p-4 rounded shadow-lg w-4/5 mt-10">
+      <div class="form-group mb-4 border rounded p-2">
         <label for="columns" class="block mb-2"
           >エクスポートする列を選択してください</label
         >
@@ -30,7 +30,7 @@
           </div>
           <label class="ml-2">ヘッダも含める</label>
         </div>
-        <div id="columns" class="w-full p-2 grid grid-cols-2 gap-2">
+        <div id="columns" class="w-full p-2 grid grid-cols-3 gap-2">
           <div
             v-for="(column, index) in selectableColumns"
             :key="index"
@@ -38,7 +38,9 @@
             :class="{ 'bg-primary-100': selectedColumns.includes(column) }"
             @click="oncheckColumn(column)"
           >
-            <label for="columns" class="cursor-pointer">{{ column }}</label>
+            <label for="columns" class="cursor-pointer text-sm">{{
+              column
+            }}</label>
             <Switch
               :class="
                 selectedColumns.includes(column)
@@ -60,7 +62,7 @@
           </div>
         </div>
       </div>
-      <div class="form-group mb-4 border rounded p-4">
+      <div class="form-group mb-4 border rounded p-2">
         <label for="separator" class="block mb-2"
           >区切り文字を選択してください</label
         >
@@ -81,7 +83,9 @@
                 v-if="selectedSeparatorIndex === index"
               />
             </div>
-            <label for="columns" class="ml-2">{{ separator.text }}</label>
+            <label for="columns" class="ml-2 text-sm">{{
+              separator.text
+            }}</label>
           </div>
         </div>
       </div>
