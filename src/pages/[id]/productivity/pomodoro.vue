@@ -382,7 +382,17 @@ export default defineComponent({
       saveTask,
       
       // Aliases for cleaner template
-      toggleTimer: timer.startTimer.bind(null) || timer.pauseTimer.bind(null),
+      // Aliases for cleaner template
+      mode: timer.mode,
+      pomodoroPhase: timer.pomodoroPhase,
+      isRunning: timer.isRunning,
+      timeLeft: timer.timeLeft,
+      timeElapsed: timer.timeElapsed,
+      state: timer.state,
+      currentTask: timer.currentTask,
+      formatTime: timer.formatTime,
+      resetTimer: timer.resetTimer,
+      switchMode: timer.switchMode,
     }
   },
   methods: {
