@@ -178,6 +178,19 @@
           </NuxtLink>
 
           <NuxtLink
+            :to="{ name: 'id-productivity', params: { id: user?.prop.id } }"
+            class="bg-white border-2 border-slate-200 hover:border-purple-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
+          >
+            <Icon
+              name="fluent:brain-circuit-20-filled"
+              size="2em"
+              class="text-purple-500 mb-2 group-hover:scale-110 transition-transform"
+            />
+            <h3 class="font-semibold text-slate-800">集中力向上</h3>
+            <p class="text-sm text-slate-600">ポモドーロ・ディープワーク</p>
+          </NuxtLink>
+
+          <NuxtLink
             :to="{ name: 'id-settings', params: { id: user?.prop.id } }"
             class="bg-white border-2 border-slate-200 hover:border-slate-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
           >
