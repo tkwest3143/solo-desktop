@@ -178,6 +178,19 @@
           </NuxtLink>
 
           <NuxtLink
+            :to="{ name: 'id-productivity', params: { id: user?.prop.id } }"
+            class="bg-white border-2 border-slate-200 hover:border-red-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
+          >
+            <Icon
+              name="fluent:timer-20-filled"
+              size="2em"
+              class="text-red-500 mb-2 group-hover:scale-110 transition-transform"
+            />
+            <h3 class="font-semibold text-slate-800">タイマー</h3>
+            <p class="text-sm text-slate-600">ポモドーロ・カウントアップ</p>
+          </NuxtLink>
+
+          <NuxtLink
             :to="{ name: 'id-settings', params: { id: user?.prop.id } }"
             class="bg-white border-2 border-slate-200 hover:border-slate-300 rounded-lg p-4 text-center transition-all duration-200 hover:shadow-lg group"
           >
