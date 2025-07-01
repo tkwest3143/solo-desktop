@@ -363,7 +363,17 @@ pub mod japanese_holiday {
   }
   #[tauri::command]
   pub async fn import_japanese_holiday() -> Result<String, String> {
-    let data = read_csv_to_2d_array("https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv").await.unwrap();
+    log::info!("Starting Japanese holiday import");
+    
+    // Add timeout for network request
+    let data = tokio::time::timeout(
+      std::time::Duration::from_secs(30),
+      read_csv_to_2d_array("https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv")
+    ).await.map_err(|_| "Timeout while downloading holiday data".to_string())?
+    .map_err(|e| format!("Failed to download holiday data: {}", e))?;
+    
+    log::info!("Downloaded holiday data, processing {} rows", data.len());
+    
     let mut holidays: Vec<japanese_holiday::ActiveModel> = vec![];
     for result in data {
       let date = NaiveDateTime::parse_from_str(&format!("{} 00:00:00", result[0]), "%Y/%m/%d %H:%M:%S");
@@ -378,9 +388,32 @@ pub mod japanese_holiday {
         ..Default::default()
       });
     }
-    let db = establish_connection().await.unwrap();
-    japanese_holiday::Entity::delete_many().exec(&db).await.unwrap();
-    japanese_holiday::Entity::insert_many(holidays).exec(&db).await.unwrap();
+    
+    log::info!("Parsed {} holiday entries, connecting to database", holidays.len());
+    
+    // Add timeout for database connection
+    let db = tokio::time::timeout(
+      std::time::Duration::from_secs(10),
+      establish_connection()
+    ).await.map_err(|_| "Timeout while connecting to database".to_string())?
+    .map_err(|e| format!("Failed to connect to database: {}", e))?;
+    
+    log::info!("Connected to database, inserting holiday data");
+    
+    // Add timeout for database operations
+    tokio::time::timeout(
+      std::time::Duration::from_secs(10),
+      japanese_holiday::Entity::delete_many().exec(&db)
+    ).await.map_err(|_| "Timeout while deleting old holiday data".to_string())?
+    .map_err(|e| format!("Failed to delete old holiday data: {}", e))?;
+    
+    tokio::time::timeout(
+      std::time::Duration::from_secs(10),
+      japanese_holiday::Entity::insert_many(holidays).exec(&db)
+    ).await.map_err(|_| "Timeout while inserting holiday data".to_string())?
+    .map_err(|e| format!("Failed to insert holiday data: {}", e))?;
+    
+    log::info!("Japanese holiday import completed successfully");
     Ok("create_japanese_holiday finish".to_string())
   }
 }
