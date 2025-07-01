@@ -47,12 +47,25 @@ export default defineComponent({
 
     // 初期ロード時にデータ取得
     onMounted(async () => {
-      const holiday = await JapaneseHolidayRepository.get(
-        new Date().getFullYear().toString()
-      );
-      if (holiday.length === 0) {
-        await JapaneseHolidayRepository.import();
+      try {
+        const holiday = await JapaneseHolidayRepository.get(
+          new Date().getFullYear().toString()
+        );
+        if (holiday.length === 0) {
+          console.log("No holiday data found, attempting to import...");
+          try {
+            await JapaneseHolidayRepository.import();
+            console.log("Holiday data imported successfully");
+          } catch (error) {
+            console.error("Failed to import holiday data:", error);
+            // Continue loading even if holiday import fails
+          }
+        }
+      } catch (error) {
+        console.error("Failed to check holiday data:", error);
+        // Continue loading even if holiday check fails
       }
+      
       isLoading.value = false;
 
       // 初回データ取得
