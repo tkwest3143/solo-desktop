@@ -95,33 +95,32 @@
         <div v-else class="space-y-3">
           <div
             v-for="session in todaySessions"
-            :key="session.id"
+            :key="session.prop.id"
             class="flex items-center justify-between p-4 bg-slate-50 rounded-lg"
           >
             <div class="flex items-center space-x-3">
               <div 
                 class="w-3 h-3 rounded-full"
                 :class="{
-                  'bg-red-500': session.type === 'pomodoro',
-                  'bg-blue-500': session.type === 'timeblock',
-                  'bg-purple-500': session.type === 'deepwork'
+                  'bg-red-500': session.prop.type === 'pomodoro',
+                  'bg-blue-500': session.prop.type === 'timeblock',
+                  'bg-purple-500': session.prop.type === 'deepwork'
                 }"
               ></div>
               <div>
-                <p class="font-medium text-slate-800">{{ session.title }}</p>
-                <p class="text-sm text-slate-600">{{ session.duration }}分 · {{ session.startTime }}</p>
+                <p class="font-medium text-slate-800">{{ session.prop.title }}</p>
+                <p class="text-sm text-slate-600">{{ session.durationText }} · {{ session.startTimeText }}</p>
               </div>
             </div>
             <div class="text-right">
               <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                 :class="{
-                  'bg-green-100 text-green-800': session.status === 'completed',
-                  'bg-yellow-100 text-yellow-800': session.status === 'in-progress',
-                  'bg-gray-100 text-gray-800': session.status === 'planned'
+                  'bg-green-100 text-green-800': session.prop.completed,
+                  'bg-yellow-100 text-yellow-800': !session.prop.completed
                 }"
               >
-                {{ getStatusLabel(session.status) }}
+                {{ getStatusLabel(session.prop.completed) }}
               </span>
             </div>
           </div>
@@ -155,15 +154,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-
-interface FocusSession {
-  id: string
-  type: 'pomodoro' | 'timeblock' | 'deepwork'
-  title: string
-  duration: number
-  startTime: string
-  status: 'planned' | 'in-progress' | 'completed'
-}
+import { ProductivitySessionData, type ProductivitySession } from '~/models/productivitySession'
 
 export default defineComponent({
   name: 'ProductivityIndex',
@@ -171,26 +162,63 @@ export default defineComponent({
     return {
       currentDate: new Date().toLocaleDateString('ja-JP'),
       currentDay: new Date().toLocaleDateString('ja-JP', { weekday: 'long' }),
-      todaySessions: [] as FocusSession[]
+      todaySessions: [] as ProductivitySessionData[]
     }
+  },
+  mounted() {
+    this.loadTodaySessions()
   },
   computed: {
     todaySessionsCount(): number {
-      return this.todaySessions.filter(session => session.status === 'completed').length
+      return this.todaySessions.filter(session => session.prop.completed).length
     }
   },
   methods: {
-    getStatusLabel(status: string): string {
-      switch (status) {
-        case 'completed':
-          return '完了'
-        case 'in-progress':
-          return '実行中'
-        case 'planned':
-          return '予定'
-        default:
-          return status
+    getStatusLabel(completed: boolean): string {
+      return completed ? '完了' : '中断'
+    },
+    loadTodaySessions() {
+      // Load sessions for today from localStorage or API
+      const today = new Date().toISOString().split('T')[0]
+      const allSessions = this.getAllSessions()
+      
+      this.todaySessions = allSessions
+        .filter(session => session.prop.targetDay === today)
+        .sort((a, b) => b.prop.startTime.getTime() - a.prop.startTime.getTime())
+    },
+    getAllSessions(): ProductivitySessionData[] {
+      const sessions: ProductivitySessionData[] = []
+      
+      // Load from localStorage (in a real app, this would be from a database)
+      const pomodoro = localStorage.getItem('pomodoroSessions')
+      const deepWork = localStorage.getItem('deepWorkSessions') 
+      const timeBlocks = localStorage.getItem('timeBlocks')
+      
+      if (pomodoro) {
+        const pomodoroSessions = JSON.parse(pomodoro)
+        sessions.push(...pomodoroSessions.map((s: any) => 
+          new ProductivitySessionData({
+            ...s,
+            type: 'pomodoro' as const,
+            startTime: new Date(s.startTime),
+            endTime: s.endTime ? new Date(s.endTime) : undefined
+          })
+        ))
       }
+      
+      if (deepWork) {
+        const deepWorkSessions = JSON.parse(deepWork)
+        sessions.push(...deepWorkSessions.map((s: any) => 
+          new ProductivitySessionData({
+            ...s,
+            type: 'deepwork' as const,
+            startTime: new Date(s.startTime),
+            endTime: s.endTime ? new Date(s.endTime) : undefined
+          })
+        ))
+      }
+      
+      return sessions
     }
   }
 })
